@@ -1,0 +1,10 @@
+{
+  "name": "tiktok-bridge",
+  "version": "1.0.0",
+  "description": "TikTok Live Connector stdio bridge for C# Backend",
+  "main": "tiktok_bridge.js",
+  "dependencies": {
+    "tiktok-live-connector": "^2.1.0"
+  }
+}
+
