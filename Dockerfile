@@ -47,5 +47,5 @@ ENV ASPNETCORE_HTTP_PORTS=8080
 ENV ASPNETCORE_ENVIRONMENT=Production
 EXPOSE 8080
 
-ENTRYPOINT ["dotnet", "Temple.Server.dll"]
+ENTRYPOINT ["dotnet", "Temple.Server.dll", "--urls", "http://0.0.0.0:8080"]
 

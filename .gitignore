@@ -4,6 +4,8 @@ obj/
 *.user
 *.suo
 .vs/
+.config/
+PublishProfiles/
 
 # Node.js
 node_modules/

@@ -67,6 +67,11 @@ string clientDist = Directory.Exists(Path.Combine(contentRoot, "dist"))
 
 if (Directory.Exists(clientDist))
 {
+    app.UseDefaultFiles(new DefaultFilesOptions
+    {
+        FileProvider = new PhysicalFileProvider(clientDist),
+        RequestPath = ""
+    });
     app.UseStaticFiles(new StaticFileOptions
     {
         FileProvider = new PhysicalFileProvider(clientDist),
@@ -249,6 +254,15 @@ _ = Task.Run(async () =>
     }
 });
 
-var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
-Console.WriteLine($"🚀 Server listening on http://0.0.0.0:{port}");
+app.MapGet("/healthz", () => Results.Ok("OK"));
+
+var port = Environment.GetEnvironmentVariable("PORT")
+    ?? Environment.GetEnvironmentVariable("ASPNETCORE_HTTP_PORTS");
+
+if (string.IsNullOrEmpty(port))
+{
+    port = app.Environment.IsProduction() ? "8080" : "5000";
+}
+
+Console.WriteLine($"🚀 Server listening on http://0.0.0.0:{port} (Env: {app.Environment.EnvironmentName})");
 app.Run($"http://0.0.0.0:{port}");
