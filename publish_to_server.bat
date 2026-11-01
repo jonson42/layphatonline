@@ -88,6 +88,7 @@ if exist "scripts\start_tunnel.js" copy /y "scripts\start_tunnel.js" "%OUT_DIR%\
 
 REM Copy script livestream sieu nhe vps_live.bat
 if exist "vps_live.bat" copy /y "vps_live.bat" "%OUT_DIR%\" >nul
+if exist "mo_link_public.bat" copy /y "mo_link_public.bat" "%OUT_DIR%\" >nul
 
 REM Tao file chay server start_server.bat
 (

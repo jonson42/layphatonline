@@ -202,7 +202,10 @@ app.MapMethods("/api/tts", new[] { "GET", "POST" }, async (HttpContext context, 
 
 app.MapGet("/api/tunnel-url", () =>
 {
-    string filePath = Path.GetFullPath(Path.Combine(contentRoot, "..", "..", "cloudflare_url.txt"));
+    string localFile = Path.Combine(contentRoot, "cloudflare_url.txt");
+    string parentFile = Path.GetFullPath(Path.Combine(contentRoot, "..", "..", "cloudflare_url.txt"));
+    string filePath = File.Exists(localFile) ? localFile : parentFile;
+
     if (File.Exists(filePath))
     {
         string url = File.ReadAllText(filePath).Trim();
