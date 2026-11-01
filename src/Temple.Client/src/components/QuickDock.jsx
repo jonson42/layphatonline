@@ -364,6 +364,31 @@ export default function QuickDock({ state, audio, callRpc, onOpenAdmin }) {
           placeholder="Lời cầu nguyện..."
         />
 
+        <button
+          className="dock-btn gold"
+          style={{ marginBottom: '10px', fontSize: '13px', padding: '10px' }}
+          onClick={() => {
+            const wishes = [
+              "Cầu cho gia đạo bình an, phúc lộc dồi dào, vạn sự cát tường",
+              "Cầu sức khỏe dồi dào, tâm an trí sáng, gia đình êm ấm",
+              "Cầu công danh sự nghiệp thuận buồm xuôi gió, hanh thông tấn tới",
+              "Cầu tài lộc hanh thông, tai qua nạn khỏi, sở nguyện tòng tâm"
+            ];
+            const w = wishes[Math.floor(Math.random() * wishes.length)];
+            const name = devoteeName.trim() || 'Thí Chủ Hữu Duyên';
+            const greeting = `Nam mô A Di Đà Phật. Chùa Thiên Sơn xin kính chào thí chủ ${name} đã vào Chánh Điện bái Phật. Nguyện cầu cho thí chủ ${w.toLowerCase()}.`;
+            callRpc('temple.burnIncense', {
+              user: name,
+              wish: w,
+              count: 1,
+              readTts: true,
+              customTts: greeting
+            });
+          }}
+        >
+          👋 Thử Người Vào Chùa (Chào Tên & Chúc Phúc)
+        </button>
+
         <div className="dock-grid-2">
           <button
             className="dock-btn gold"

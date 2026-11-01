@@ -229,13 +229,13 @@ export default function TempleStage({ state, activeEvent, audio, callRpc, obsMod
           pe.spawnIncenseBurst(540, 895);
           pe.spawnFloatingMerit(`+${ev.merit} Công Đức`, 540, 860, '#ffe082');
         }
-        const isJoining = ev.wish && (ev.wish.includes('Chánh Điện') || ev.wish.includes('vào phòng'));
+        const isJoining = (ev.count === 1) ||
+          (ev.ttsText && ev.ttsText.includes('kính chào')) ||
+          (ev.wish && (ev.wish.includes('Chánh Điện') || ev.wish.includes('vào phòng')));
         const actionLabel = isJoining
           ? '🌸 Đã vào Chánh Điện bái Phật'
           : `🔥 Dâng ${ev.count} nén hương (+${ev.merit} CĐ)`;
-        const wishLabel = isJoining
-          ? `Kính chào thí chủ ${ev.user} đến chiêm bái Phật quang`
-          : ev.wish;
+        const wishLabel = ev.wish || 'Nam Mô A Di Đà Phật, cầu bình an cát tường';
         animateWalkerOnCarpet(ev.user, ev.avatar, actionLabel, wishLabel);
         break;
 

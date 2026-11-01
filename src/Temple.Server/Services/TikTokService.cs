@@ -14,6 +14,16 @@ public class TikTokService : ITikTokService, IDisposable
     private TaskCompletionSource<TikTokState>? _connectTcs;
     private readonly object _lock = new();
 
+    private static readonly string[] AuspiciousWishes =
+    {
+        "Cầu cho gia đạo bình an, phúc lộc dồi dào, vạn sự cát tường",
+        "Cầu sức khỏe dồi dào, tâm an trí sáng, gia đình êm ấm",
+        "Cầu công danh sự nghiệp thuận buồm xuôi gió, hanh thông tấn tới",
+        "Cầu tài lộc hanh thông, tai qua nạn khỏi, sở nguyện tòng tâm",
+        "Cầu chư Phật gia hộ cho thí chủ thân tâm an lạc, vạn điều may mắn",
+        "Cầu bách bệnh tiêu trừ, phước thọ tăng long, vạn sự như ý"
+    };
+
     public TikTokService(ILogger<TikTokService> logger, ITempleService templeService, IHostEnvironment env)
     {
         _logger = logger;
@@ -172,25 +182,26 @@ public class TikTokService : ITikTokService, IDisposable
                     
                     if (string.IsNullOrWhiteSpace(mUser) || mUser == "Thí Chủ")
                     {
-                        mUser = !string.IsNullOrWhiteSpace(mUnique) ? mUnique : "Thí Chủ";
+                        mUser = !string.IsNullOrWhiteSpace(mUnique) ? mUnique : "Thí Chủ Hữu Duyên";
                     }
 
-                    string memberKey = !string.IsNullOrEmpty(mUnique) ? mUnique : mUser;
-                    if (string.IsNullOrWhiteSpace(memberKey) || memberKey == "Thí Chủ" || !TextSanitizer.CheckAndRecordCooldown("member_greet_" + memberKey, 30000))
+                    string memberKey = (!string.IsNullOrEmpty(mUnique) ? mUnique : mUser).ToLowerInvariant();
+                    if (!TextSanitizer.CheckAndRecordCooldown("member_greet_" + memberKey, 15000))
                     {
                         break;
                     }
 
                     _logger.LogInformation("[TikTokLive Member] Người xem vào phòng: {User} ({UniqueId})", mUser, mUnique);
 
-                    string greeting = $"Nam mô A Di Đà Phật. Chùa Thiên Sơn xin kính chào thí chủ {mUser} đã vào Chánh Điện bái Phật.";
+                    string memberWish = AuspiciousWishes[Random.Shared.Next(AuspiciousWishes.Length)];
+                    string greeting = $"Nam mô A Di Đà Phật. Chùa Thiên Sơn xin kính chào thí chủ {mUser} đã vào Chánh Điện bái Phật. Nguyện cầu cho thí chủ {memberWish.ToLowerInvariant()}.";
                     _templeService.BurnIncense(new BurnIncenseParams
                     {
                         User = mUser,
                         UniqueId = mUnique,
                         Avatar = mAvatar,
                         Count = 1,
-                        Wish = "Đã vào Chánh Điện bái Phật",
+                        Wish = memberWish,
                         ReadTts = true,
                         CustomTts = greeting
                     });

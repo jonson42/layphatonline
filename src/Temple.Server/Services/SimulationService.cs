@@ -18,6 +18,16 @@ public class SimulationService : BackgroundService
         ("Vũ Đức Thịnh", "ducthinh88", "Con xin gieo một quẻ cầu tài lộc đầu năm")
     };
 
+    private static readonly string[] AuspiciousWishes =
+    {
+        "Cầu cho gia đạo bình an, phúc lộc dồi dào, vạn sự cát tường",
+        "Cầu sức khỏe dồi dào, tâm an trí sáng, gia đình êm ấm",
+        "Cầu công danh sự nghiệp thuận buồm xuôi gió, hanh thông tấn tới",
+        "Cầu tài lộc hanh thông, tai qua nạn khỏi, sở nguyện tòng tâm",
+        "Cầu chư Phật gia hộ cho thí chủ thân tâm an lạc, vạn điều may mắn",
+        "Cầu bách bệnh tiêu trừ, phước thọ tăng long, vạn sự như ý"
+    };
+
     public SimulationService(ILogger<SimulationService> logger, ITempleService templeService)
     {
         _logger = logger;
@@ -56,19 +66,36 @@ public class SimulationService : BackgroundService
         var pick = SimDevotees[_rnd.Next(SimDevotees.Length)];
         double roll = _rnd.NextDouble();
 
-        if (roll < 0.40)
+        if (roll < 0.35)
         {
+            // 1. Giả lập Phật tử vào Chánh Điện (Chào mừng & Chúc phúc cầu an)
+            string wish = AuspiciousWishes[_rnd.Next(AuspiciousWishes.Length)];
+            string greeting = $"Nam mô A Di Đà Phật. Chùa Thiên Sơn xin kính chào thí chủ {pick.User} đã vào Chánh Điện bái Phật. Nguyện cầu cho thí chủ {wish.ToLowerInvariant()}.";
+            _templeService.BurnIncense(new BurnIncenseParams
+            {
+                User = pick.User,
+                UniqueId = pick.UniqueId,
+                Count = 1,
+                Wish = wish,
+                ReadTts = true,
+                CustomTts = greeting
+            });
+        }
+        else if (roll < 0.65)
+        {
+            // 2. Thắp hương bái Phật
             _templeService.BurnIncense(new BurnIncenseParams
             {
                 User = pick.User,
                 UniqueId = pick.UniqueId,
                 Count = 3,
                 Wish = pick.Wish,
-                ReadTts = false // Tắt TTS giả lập để nhường cho người xem thật
+                ReadTts = true
             });
         }
-        else if (roll < 0.75)
+        else if (roll < 0.85)
         {
+            // 3. Gõ mõ tích công đức
             _templeService.StrikeWoodenFish(new StrikeWoodenFishParams
             {
                 User = pick.User,
@@ -76,25 +103,15 @@ public class SimulationService : BackgroundService
                 Count = 3
             });
         }
-        else if (roll < 0.95)
+        else
         {
+            // 4. Thả hoa đăng cầu phúc
             _templeService.SendPrayer(new SendPrayerParams
             {
                 User = pick.User,
                 UniqueId = pick.UniqueId,
                 Wish = pick.Wish,
-                ReadTts = false
-            });
-        }
-        else
-        {
-            // Chỉ 5% rất hiếm khi gieo quẻ trong chế độ chạy thử
-            _templeService.DrawFortune(new DrawFortuneParams
-            {
-                User = pick.User,
-                UniqueId = pick.UniqueId,
-                Topic = pick.Wish,
-                ReadTts = false
+                ReadTts = true
             });
         }
     }
