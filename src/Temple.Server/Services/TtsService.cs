@@ -126,6 +126,8 @@ public class TtsService : ITtsService, IDisposable
         catch (Exception ex)
         {
             _logger.LogWarning(ex, "[ZeroTTS] Không thể khởi động tiến trình Python ZeroTTS. Sẽ sử dụng chế độ dự phòng.");
+            _process = null;
+            _stdin = null;
             _status = "fallback";
             _ready = true;
         }
@@ -226,7 +228,18 @@ public class TtsService : ITtsService, IDisposable
         }
 
         // 2. Thử tổng hợp qua ZeroTTS Worker (nếu đang chạy bình thường)
-        if (_process != null && !_process.HasExited && _stdin != null && _status != "error")
+        bool isProcessRunning = false;
+        try
+        {
+            isProcessRunning = _process != null && !_process.HasExited;
+        }
+        catch
+        {
+            isProcessRunning = false;
+            _process = null;
+        }
+
+        if (isProcessRunning && _stdin != null && _status != "error")
         {
             int id = Interlocked.Increment(ref _reqCounter);
             var tcs = new TaskCompletionSource<TtsResult>(TaskCreationOptions.RunContinuationsAsynchronously);

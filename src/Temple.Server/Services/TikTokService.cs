@@ -61,17 +61,23 @@ public class TikTokService : ITikTokService, IDisposable
 
             try
             {
+                string scriptDir = Path.GetDirectoryName(_scriptPath) ?? string.Empty;
+                string candidateNode1 = Path.Combine(scriptDir, "node.exe");
+                string candidateNode2 = Path.Combine(scriptDir, "..", "node.exe");
+                string nodeExe = File.Exists(candidateNode1) ? candidateNode1 : (File.Exists(candidateNode2) ? Path.GetFullPath(candidateNode2) : "node");
+
                 var startInfo = new ProcessStartInfo
                 {
-                    FileName = "node",
+                    FileName = nodeExe,
                     Arguments = $"\"{_scriptPath}\" \"{cleanUser}\"",
                     RedirectStandardInput = true,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
                     UseShellExecute = false,
                     CreateNoWindow = true,
-                    WorkingDirectory = Path.GetDirectoryName(_scriptPath) ?? string.Empty
+                    WorkingDirectory = scriptDir
                 };
+                startInfo.EnvironmentVariables["NODE_SKIP_PLATFORM_CHECK"] = "1";
 
                 _process = new Process { StartInfo = startInfo, EnableRaisingEvents = true };
 
@@ -109,6 +115,8 @@ public class TikTokService : ITikTokService, IDisposable
             catch (Exception ex)
             {
                 _logger.LogWarning(ex, "[TikTokLive] Không thể khởi chạy node tiktok_bridge.js");
+                _process = null;
+                _stdin = null;
                 _templeService.UpdateTikTokState(tt =>
                 {
                     tt.Connected = false;

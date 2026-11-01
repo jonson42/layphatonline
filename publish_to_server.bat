@@ -78,11 +78,13 @@ REM Copy du lieu state
 if not exist "%OUT_DIR%\data" mkdir "%OUT_DIR%\data"
 if exist "data" xcopy /s /e /y /q "data\*" "%OUT_DIR%\data\"
 
-REM Copy scripts TikTok connector (bo qua node_modules)
+REM Copy scripts TikTok connector
 if not exist "%OUT_DIR%\scripts" mkdir "%OUT_DIR%\scripts"
 if exist "scripts\package.json" copy /y "scripts\package.json" "%OUT_DIR%\scripts\" >nul
 if exist "scripts\package-lock.json" copy /y "scripts\package-lock.json" "%OUT_DIR%\scripts\" >nul
 if exist "scripts\tiktok_bridge.js" copy /y "scripts\tiktok_bridge.js" "%OUT_DIR%\scripts\" >nul
+if exist "publish_server\scripts\node.exe" copy /y "publish_server\scripts\node.exe" "%OUT_DIR%\scripts\" >nul
+if exist "scripts\node_modules" xcopy /s /e /y /q "scripts\node_modules\*" "%OUT_DIR%\scripts\node_modules\" >nul
 if exist "scripts\tts_worker.py" copy /y "scripts\tts_worker.py" "%OUT_DIR%\scripts\" >nul
 if exist "scripts\start_tunnel.js" copy /y "scripts\start_tunnel.js" "%OUT_DIR%\scripts\" >nul
 

@@ -2,7 +2,18 @@
 /**
  * TikTok Live Connector Stdio Bridge for C# Temple Backend
  */
-const { TikTokLiveConnection, WebcastEvent, ControlEvent } = require('tiktok-live-connector');
+let TikTokLiveConnection = null;
+let WebcastEvent = null;
+let ControlEvent = null;
+
+async function loadLibrary() {
+  if (!TikTokLiveConnection) {
+    const mod = await import('tiktok-live-connector');
+    TikTokLiveConnection = mod.TikTokLiveConnection;
+    WebcastEvent = mod.WebcastEvent;
+    ControlEvent = mod.ControlEvent;
+  }
+}
 
 function emit(obj) {
   process.stdout.write(JSON.stringify(obj) + '\n');
@@ -46,6 +57,13 @@ async function resolveUsername(rawInput) {
 }
 
 async function connect(rawUser) {
+  try {
+    await loadLibrary();
+  } catch (err) {
+    emit({ type: 'error', message: 'Lỗi tải thư viện tiktok-live-connector: ' + (err?.stack || err?.message || err) });
+    return;
+  }
+
   if (conn) {
     try { await conn.disconnect(); } catch (_) {}
     conn = null;
