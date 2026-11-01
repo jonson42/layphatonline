@@ -28,7 +28,10 @@ public class TikTokService : ITikTokService, IDisposable
     {
         _logger = logger;
         _templeService = templeService;
-        _scriptPath = Path.GetFullPath(Path.Combine(env.ContentRootPath, "..", "..", "scripts", "tiktok_bridge.js"));
+        string scriptCandidate = Path.Combine(env.ContentRootPath, "scripts", "tiktok_bridge.js");
+        _scriptPath = File.Exists(scriptCandidate)
+            ? scriptCandidate
+            : Path.GetFullPath(Path.Combine(env.ContentRootPath, "..", "..", "scripts", "tiktok_bridge.js"));
     }
 
     public async Task<TikTokState> ConnectAsync(string usernameOrUrl)

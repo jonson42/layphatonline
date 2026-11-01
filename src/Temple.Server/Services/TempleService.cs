@@ -19,7 +19,10 @@ public class TempleService : ITempleService
         _logger = logger;
         _ttsService = ttsService;
 
-        _stateFilePath = Path.GetFullPath(Path.Combine(env.ContentRootPath, "..", "..", "data", "merit-state.json"));
+        string dataCandidate = Path.Combine(env.ContentRootPath, "data", "merit-state.json");
+        _stateFilePath = File.Exists(dataCandidate) || Directory.Exists(Path.Combine(env.ContentRootPath, "data"))
+            ? dataCandidate
+            : Path.GetFullPath(Path.Combine(env.ContentRootPath, "..", "..", "data", "merit-state.json"));
         LoadState();
 
         _ttsService.SetStatusListener((method, payload) => Broadcast(method, payload));

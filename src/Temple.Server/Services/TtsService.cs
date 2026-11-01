@@ -27,10 +27,16 @@ public class TtsService : ITtsService, IDisposable
         _logger = logger;
         _config = config;
 
-        _cacheDir = Path.GetFullPath(Path.Combine(env.ContentRootPath, "..", "..", "data", "tts-cache"));
+        string dataDir = Directory.Exists(Path.Combine(env.ContentRootPath, "data"))
+            ? Path.Combine(env.ContentRootPath, "data")
+            : Path.GetFullPath(Path.Combine(env.ContentRootPath, "..", "..", "data"));
+        _cacheDir = Path.Combine(dataDir, "tts-cache");
         Directory.CreateDirectory(_cacheDir);
 
-        _scriptPath = Path.GetFullPath(Path.Combine(env.ContentRootPath, "..", "..", "scripts", "tts_worker.py"));
+        string scriptCandidate = Path.Combine(env.ContentRootPath, "scripts", "tts_worker.py");
+        _scriptPath = File.Exists(scriptCandidate)
+            ? scriptCandidate
+            : Path.GetFullPath(Path.Combine(env.ContentRootPath, "..", "..", "scripts", "tts_worker.py"));
 
         StartWorker();
     }

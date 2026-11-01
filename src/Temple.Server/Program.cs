@@ -40,7 +40,10 @@ app.UseWebSockets(new WebSocketOptions
 
 // Setup paths
 string contentRoot = app.Environment.ContentRootPath;
-string dataDir = Path.GetFullPath(Path.Combine(contentRoot, "..", "..", "data"));
+string dataDir = Directory.Exists(Path.Combine(contentRoot, "data"))
+    ? Path.Combine(contentRoot, "data")
+    : Path.GetFullPath(Path.Combine(contentRoot, "..", "..", "data"));
+
 string ttsCacheDir = Path.Combine(dataDir, "tts-cache");
 Directory.CreateDirectory(ttsCacheDir);
 
@@ -56,7 +59,12 @@ app.UseStaticFiles(new StaticFileOptions
 });
 
 // Static file serving for React build if client dist exists
-string clientDist = Path.GetFullPath(Path.Combine(contentRoot, "..", "Temple.Client", "dist"));
+string clientDist = Directory.Exists(Path.Combine(contentRoot, "dist"))
+    ? Path.Combine(contentRoot, "dist")
+    : (Directory.Exists(Path.Combine(contentRoot, "wwwroot"))
+        ? Path.Combine(contentRoot, "wwwroot")
+        : Path.GetFullPath(Path.Combine(contentRoot, "..", "Temple.Client", "dist")));
+
 if (Directory.Exists(clientDist))
 {
     app.UseStaticFiles(new StaticFileOptions
@@ -241,4 +249,6 @@ _ = Task.Run(async () =>
     }
 });
 
-app.Run("http://localhost:5000");
+var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
+Console.WriteLine($"🚀 Server listening on http://0.0.0.0:{port}");
+app.Run($"http://0.0.0.0:{port}");
