@@ -12254,9 +12254,9 @@
       "gifts": 0,
       "lastWish": "\u0110\u00E3 v\u00E0o Ch\u00E1nh \u0110i\u1EC7n l\u1EC5 Ph\u1EADt"
     },
-    "zenfacts_vn": {
+    "thienkim20060402": {
       "name": "Zenfacts",
-      "uniqueId": "zenfacts_vn",
+      "uniqueId": "thienkim20060402",
       "avatar": "https://p16-common-sign.tiktokcdn.com/tos-alisg-avt-0068/6050fee0f15d292f427e7292b84e1ca4~tplv-tiktok-shrink:72:72.webp?dr=14561\u0026refresh_token=1bf44a7c\u0026x-expires=1793606400\u0026x-signature=UPphjQyOJ1xBVB2rQNJGgM6gXfs%3D\u0026t=4d5b0474\u0026ps=13740610\u0026shp=a5d48078\u0026shcp=fdd36af4\u0026idc=my2",
       "merit": 30,
       "incense": 2,
@@ -15537,9 +15537,9 @@
   "tiktok": {
     "connected": false,
     "connecting": false,
-    "username": "zenfacts_vn",
-    "roomId": "7703004920101964596",
+    "username": "thienkim20060402",
+    "roomId": "",
     "viewerCount": 1,
-    "lastError": "T\u251C\u00E1i kho\u00DF\u2551\u00FAn @zenfacts_vn hi\u00DF\u2557\u00E7n KH\u251C\u00F6NG PH\u251C\u00FCT TR\u00DF\u2557\u2591C TI\u00DF\u2551\u255BP (Offline) tr\u251C\u00ACn TikTok. Vui l\u251C\u2593ng ki\u00DF\u2557\u00E2m tra t\u251C\u00E1i kho\u00DF\u2551\u00FAn \u2500\u00E6ang ph\u251C\u00EDt Live tr\u255E\u2591\u00DF\u2557\u00A2c khi k\u00DF\u2551\u2510t n\u00DF\u2557\u00E6i, ho\u00DF\u2551\u2556c b\u00DF\u2551\u00A1t ch\u00DF\u2551\u2510 \u2500\u00E6\u00DF\u2557\u00D6 Gi\u00DF\u2551\u00FA l\u00DF\u2551\u00A1p (Auto-Sim) \u2500\u00E6\u00DF\u2557\u00E2 tr\u00DF\u2551\u00FAi nghi\u00DF\u2557\u00E7m th\u00DF\u2557\u00A1."
+    "lastError": "T\u251C\u00E1i thienkim20060402\u00DF\u2551\u00FAn @zthienkim20060402 hi\u00DF\u2557\u00E7n KH\u251C\u00F6NG PH\u251C\u00FCT TR\u00DF\u2557\u2591C TI\u00DF\u2551\u255BP (Offline) tr\u251C\u00ACn TikTok. Vui l\u251C\u2593ng ki\u00DF\u2557\u00E2m tra t\u251C\u00E1i kho\u00DF\u2551\u00FAn \u2500\u00E6ang ph\u251C\u00EDt Live tr\u255E\u2591\u00DF\u2557\u00A2c khi k\u00DF\u2551\u2510t n\u00DF\u2557\u00E6i, ho\u00DF\u2551\u2556c b\u00DF\u2551\u00A1t ch\u00DF\u2551\u2510 \u2500\u00E6\u00DF\u2557\u00D6 Gi\u00DF\u2551\u00FA l\u00DF\u2551\u00A1p (Auto-Sim) \u2500\u00E6\u00DF\u2557\u00E2 tr\u00DF\u2551\u00FAi nghi\u00DF\u2557\u00E7m th\u00DF\u2557\u00A1."
   }
 }

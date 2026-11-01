@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 export default function AdminPanel({ state, callRpc, onCloseAdmin }) {
-  const [ttUser, setTtUser] = useState(state?.tiktok?.username || 'zenfacts_vn');
+  const [ttUser, setTtUser] = useState(state?.tiktok?.username || 'thienkim20060402');
   const [ttsText, setTtsText] = useState('Nam mô A Di Đà Phật. Chùa Thiên Sơn Online xin kính chào quý thí chủ thập phương.');
   const [ttsAudioUrl, setTtsAudioUrl] = useState('');
   const [loadingTts, setLoadingTts] = useState(false);
