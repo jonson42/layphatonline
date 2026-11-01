@@ -6,4 +6,17 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <!-- Auto-build React client before Publish -->
+  <Target Name="BuildClient" BeforeTargets="BeforePublish">
+    <Message Importance="high" Text="[*] Dang bien dich React Client (Vite) truoc khi Publish..." />
+    <Exec Command="npm run build" WorkingDirectory="..\Temple.Client" Condition="Exists('..\Temple.Client\package.json')" ContinueOnError="true" />
+  </Target>
+
+  <!-- Include Frontend, Data, and Scripts in publish package -->
+  <ItemGroup>
+    <Content Include="..\Temple.Client\dist\**" Link="wwwroot\%(RecursiveDir)%(Filename)%(Extension)" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="..\..\data\**" Link="data\%(RecursiveDir)%(Filename)%(Extension)" CopyToPublishDirectory="PreserveNewest" />
+    <Content Include="..\..\scripts\**" Link="scripts\%(RecursiveDir)%(Filename)%(Extension)" Exclude="..\..\scripts\node_modules\**" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>

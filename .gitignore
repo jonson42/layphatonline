@@ -25,6 +25,11 @@ data/tts-cache/*.mp3
 test_*.mp3
 *.log
 
+# Publish outputs
+publish_server/
+publish_output/
+*.zip
+
 # OS generated
 .DS_Store
 Thumbs.db
