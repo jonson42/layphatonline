@@ -9,3 +9,4 @@ data/tts-cache/*.mp3
 cloudflare_url.txt
 cloudflared.exe
 *.log
+
