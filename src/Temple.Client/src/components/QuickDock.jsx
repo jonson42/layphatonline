@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 
 export default function QuickDock({ state, audio, callRpc, onOpenAdmin }) {
   const [audioUnlocked, setAudioUnlocked] = useState(false);
@@ -13,11 +13,39 @@ export default function QuickDock({ state, audio, callRpc, onOpenAdmin }) {
   const [ttsVol, setTtsVol] = useState(95);
   const [youtubeInput, setYoutubeInput] = useState(() => state?.settings?.youtubeUrl || '');
 
+  const [tunnelUrl, setTunnelUrl] = useState('');
+  const [copiedTunnel, setCopiedTunnel] = useState(false);
+
   const [tiktokInput, setTiktokInput] = useState('@zenfacts_vn');
   const [connecting, setConnecting] = useState(false);
 
   const [devoteeName, setDevoteeName] = useState('Quỳnh_Finn');
   const [devoteeWish, setDevoteeWish] = useState('Cầu cho gia đình bình an, tài lộc hanh thông, vạn sự như ý');
+
+  useEffect(() => {
+    let timer;
+    const fetchTunnel = async () => {
+      try {
+        const res = await fetch('/api/tunnel-url');
+        const data = await res.json();
+        if (data.ok && data.url) {
+          setTunnelUrl(data.url);
+        }
+      } catch (_) {}
+    };
+    fetchTunnel();
+    timer = setInterval(fetchTunnel, 4000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const handleCopyTunnel = () => {
+    if (!tunnelUrl) return;
+    try {
+      navigator.clipboard.writeText(tunnelUrl);
+    } catch (_) {}
+    setCopiedTunnel(true);
+    setTimeout(() => setCopiedTunnel(false), 2500);
+  };
 
   const unlockAudio = () => {
     audio.ensureContext();
@@ -54,8 +82,12 @@ export default function QuickDock({ state, audio, callRpc, onOpenAdmin }) {
   const handleApplyYoutube = async () => {
     const url = youtubeInput.trim();
     if (!url) return;
-    // Phát ngay lập tức trên máy hiện tại qua audio engine
-    audio.loadYouTube(url);
+    // Kiểm tra định dạng link video YouTube
+    const ok = audio.loadYouTube(url);
+    if (!ok) {
+      alert('⚠️ Vui lòng dán link video YouTube đầy đủ có ID video (Ví dụ: https://www.youtube.com/watch?v=...)');
+      return;
+    }
     // Đồng bộ về máy chủ & các client OBS / TikTok LIVE Studio khác
     try {
       await callRpc('temple.updateSettings', { youtubeUrl: url });
@@ -104,6 +136,54 @@ export default function QuickDock({ state, audio, callRpc, onOpenAdmin }) {
         >
           Mở Admin Đầy Đủ ↗
         </button>
+      </div>
+
+      {/* LINK CLOUDFLARE TIKTOK LIVE STUDIO */}
+      <div style={{
+        background: 'linear-gradient(135deg, rgba(255, 152, 0, 0.16) 0%, rgba(139, 29, 0, 0.28) 100%)',
+        border: '1px solid rgba(255, 183, 77, 0.45)',
+        borderRadius: '12px',
+        padding: '10px 14px',
+        marginBottom: '14px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '6px'
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontSize: '12px', fontWeight: 700, color: '#ffe082' }}>
+            🌐 Link TikTok LIVE Studio (OBS):
+          </span>
+          {tunnelUrl && (
+            <button
+              onClick={handleCopyTunnel}
+              style={{
+                background: copiedTunnel ? '#2e7d32' : 'linear-gradient(180deg, #ffa726 0%, #fb8c00 100%)',
+                color: '#1a0500',
+                border: 'none',
+                borderRadius: '6px',
+                padding: '3px 10px',
+                fontSize: '11px',
+                fontWeight: 700,
+                cursor: 'pointer',
+                transition: 'all 0.2s'
+              }}
+            >
+              {copiedTunnel ? '✅ Đã Copy' : '📋 Copy Link'}
+            </button>
+          )}
+        </div>
+        <div style={{
+          fontSize: '11px',
+          color: tunnelUrl ? '#fffde7' : '#ffcc80',
+          fontFamily: 'monospace',
+          wordBreak: 'break-all',
+          background: 'rgba(0, 0, 0, 0.45)',
+          padding: '6px 8px',
+          borderRadius: '6px',
+          border: '1px solid rgba(255,255,255,0.08)'
+        }}>
+          {tunnelUrl || '⏳ Đang lấy link Cloudflare Tunnel...'}
+        </div>
       </div>
 
       {/* 1. ÂM THANH */}

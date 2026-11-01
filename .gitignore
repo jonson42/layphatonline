@@ -17,6 +17,7 @@ cloudflared.exe
 *.dll
 
 # Temporary and Cache files
+cloudflare_url.txt
 data/tts-cache/*.mp3
 !data/tts-cache/.gitkeep
 test_*.mp3
@@ -25,3 +26,4 @@ test_*.mp3
 # OS generated
 .DS_Store
 Thumbs.db
+

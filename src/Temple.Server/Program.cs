@@ -187,6 +187,20 @@ app.MapMethods("/api/tts", new[] { "GET", "POST" }, async (HttpContext context, 
     return Results.Json(result);
 }).RequireCors("AllowAll");
 
+app.MapGet("/api/tunnel-url", () =>
+{
+    string filePath = Path.GetFullPath(Path.Combine(contentRoot, "..", "..", "cloudflare_url.txt"));
+    if (File.Exists(filePath))
+    {
+        string url = File.ReadAllText(filePath).Trim();
+        if (!string.IsNullOrWhiteSpace(url))
+        {
+            return Results.Json(new { ok = true, url });
+        }
+    }
+    return Results.Json(new { ok = false, url = "" });
+}).RequireCors("AllowAll");
+
 // SPA fallback for /admin and /*
 app.MapFallback(async (HttpContext context) =>
 {
