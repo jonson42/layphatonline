@@ -1357,7 +1357,7 @@ body.obs-mode .phongsinh-stage-wrapper {
   padding: 4px 0;
 }
 
-/* BÓNG THOẠI KHẨN CẦU (ĐẶT NGAY TRÊN ĐẦU CẬU BÉ, CHỈ XUỐNG ĐẦU CU CẬU) */
+/* BÓNG THOẠI KHẨN CẦU (ĐẶT CỐ ĐỊNH TRÊN ĐẦU CẬU BÉ, ĐỨNG YÊN TĨNH TẠI) */
 .bothi-speech-bubble {
   position: absolute;
   top: 880px;
@@ -1366,7 +1366,6 @@ body.obs-mode .phongsinh-stage-wrapper {
   width: 720px;
   z-index: 50;
   pointer-events: none;
-  animation: bubbleFloat 3s ease-in-out infinite;
 }
 
 @keyframes bubbleFloat {
