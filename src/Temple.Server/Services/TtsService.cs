@@ -79,6 +79,9 @@ public class TtsService : ITtsService, IDisposable
                 RedirectStandardInput = true,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
+                StandardInputEncoding = System.Text.Encoding.UTF8,
+                StandardOutputEncoding = System.Text.Encoding.UTF8,
+                StandardErrorEncoding = System.Text.Encoding.UTF8,
                 UseShellExecute = false,
                 CreateNoWindow = true,
                 WorkingDirectory = Path.GetDirectoryName(_scriptPath) ?? string.Empty
@@ -104,7 +107,9 @@ public class TtsService : ITtsService, IDisposable
 
             _process.Exited += (s, e) =>
             {
-                _logger.LogWarning("[ZeroTTS] Worker đã thoát (exit code {Code})", _process.ExitCode);
+                int exitCode = -1;
+                try { exitCode = (s as Process)?.ExitCode ?? (_process?.ExitCode ?? -1); } catch { }
+                _logger.LogWarning("[ZeroTTS] Worker đã thoát (exit code {Code})", exitCode);
                 _ready = false;
                 _status = "stopped";
                 BroadcastStatus();
@@ -323,9 +328,18 @@ public class TtsService : ITtsService, IDisposable
     {
         try
         {
-            if (_process != null && !_process.HasExited)
+            if (_process != null)
             {
-                _process.Kill(true);
+                try
+                {
+                    if (!_process.HasExited)
+                    {
+                        _process.Kill(true);
+                    }
+                }
+                catch { }
+                _process.Dispose();
+                _process = null;
             }
         }
         catch { }

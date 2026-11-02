@@ -1,8 +1,13 @@
+using System.Text;
 using System.Text.Json;
 using Microsoft.Extensions.FileProviders;
 using Temple.Server.Models;
 using Temple.Server.Services;
 using Temple.Server.WebSocket;
+
+// Thiet lap ma hoa UTF-8 toan cuc cho Console va Stdio streams
+Console.OutputEncoding = Encoding.UTF8;
+Console.InputEncoding = Encoding.UTF8;
 
 var builder = WebApplication.CreateBuilder(args);
 

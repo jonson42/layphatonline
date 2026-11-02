@@ -13,15 +13,15 @@ public static class TextSanitizer
 
     private static readonly Regex BracketEmoteRegex = new(@"\[[^\]]{1,24}\]", RegexOptions.Compiled);
     private static readonly Regex AllowedViTextRegex = new(
-        @"[^0-9a-zA-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚÝàáâãèéêìíòóôõùúýĂăĐđĨĩŨũƠơƯưẠ-ỹ\s.,!?]",
+        @"[^\p{L}\p{N}\s.,!?'-]",
         RegexOptions.Compiled);
 
     private static readonly Regex AllowedViNameRegex = new(
-        @"[^0-9a-zA-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚÝàáâãèéêìíòóôõùúýĂăĐđĨĩŨũƠơƯưẠ-ỹ\s._-]",
+        @"[^\p{L}\p{N}\s._-]",
         RegexOptions.Compiled);
 
     private static readonly Regex ViLetterRegex = new(
-        @"[a-zA-ZÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚÝàáâãèéêìíòóôõùúýĂăĐđĨĩŨũƠơƯưẠ-ỹ]",
+        @"[\p{L}]",
         RegexOptions.Compiled);
 
     private static readonly Regex BadWordsRegex = new(
