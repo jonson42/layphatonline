@@ -843,7 +843,7 @@ export default function BothiStage({ state, activeEvent, audio, callRpc, obsMode
             <span className={`live-dot ${state?.tiktok?.connected ? 'connected' : ''}`} />
             <span>
               {state?.tiktok?.connected
-                ? `LIVE @${state.tiktok.username} • ${state.tiktok.viewerCount || 0} người xem`
+                ? `LIVE @${state.tiktok.username}`
                 : state?.settings?.autoSim
                 ? 'CHẾ ĐỘ BỐ THÍ • TỰ ĐỘNG GIẢ LẬP ĐÔNG NGƯỜI'
                 : 'CHẾ ĐỘ BỐ THÍ • XIN TIỀN UỐNG BIA 🍺'}
@@ -851,7 +851,7 @@ export default function BothiStage({ state, activeEvent, audio, callRpc, obsMode
           </div>
           <div className="top-Right-badges">
             <div className="mini-stat-pill bothi-stat-pill">
-              🍺 <strong>{totalBeer.toLocaleString('vi-VN')}</strong> đ tiền bia • ❤️ <strong>{totalHearts.toLocaleString('vi-VN')}</strong> tim • ➕ <strong>{totalFollows.toLocaleString('vi-VN')}</strong> follow • 🔄 <strong>{totalShares.toLocaleString('vi-VN')}</strong> share
+              🍺 <strong>{totalBeer.toLocaleString('vi-VN')}</strong> đ tiền bia • ❤️ <strong>{totalHearts.toLocaleString('vi-VN')}</strong> tim
             </div>
           </div>
         </header>

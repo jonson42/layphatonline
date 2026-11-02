@@ -632,8 +632,6 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
             <span className="stat-bird">🕊️ {totalBirds.toLocaleString('vi-VN')} chim</span>
             <span className="stat-sep">•</span>
             <span className="stat-heart">❤️ {totalHearts.toLocaleString('vi-VN')} tim</span>
-            <span className="stat-sep">•</span>
-            <span className="stat-follow">➕ {totalFollows.toLocaleString('vi-VN')} follow</span>
           </div>
         </div>
 
