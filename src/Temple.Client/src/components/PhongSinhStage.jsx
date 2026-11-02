@@ -35,6 +35,19 @@ const ALL_MODELS = [
   { sprite: 'girl_purple', crouchSprite: 'crouch_girl' }
 ];
 
+const AVATAR_COLORS = [
+  '#e91e63', '#9c27b0', '#673ab7', '#3f51b5',
+  '#2196f3', '#009688', '#4caf50', '#ff9800', '#ff5722'
+];
+
+function getAvatarColor(name) {
+  let hash = 0;
+  for (let i = 0; i < (name || '').length; i++) {
+    hash = name.charCodeAt(i) + ((hash << 5) - hash);
+  }
+  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
+}
+
 // 11 TUYẾN ĐƯỜNG ĐI BỘ 3D TRÊN SÂN ĐÁ (ĐI RA, ĐI VÔ, ĐI QUA ĐI LẠI, ĐI CHÉO)
 const PS_ROUTES = [
   { id: 'r1', route: 'route-ps-depth-out-left', duration: 11.5, dir: -1, type: 'out', spawnX: 200, spawnY: 1380 },
@@ -139,8 +152,14 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
   // Người đứng ngắm cảnh tại các vị trí cố định
   const [vantageDevotees, setVantageDevotees] = useState(INITIAL_PS_VANTAGE);
 
-  // Trạng thái cúi người phóng sinh của từng nhân vật
+  // Trạng thái cúi người phóng sinh của từng nhân vật nền
   const [crouchStates, setCrouchStates] = useState({});
+
+  // VIP FOCUS DEVOTEE: Người xem vừa vào Live / Follow / Donate được focus to rõ với Spotlight
+  const [activeFocusDevotee, setActiveFocusDevotee] = useState(null);
+  const focusTimerRef = useRef(null);
+  const focusCrouchTimerRef = useRef(null);
+  const focusExitTimerRef = useRef(null);
 
   // Danh sách chim đang bay trên màn hình
   const [birds, setBirds] = useState([]);
@@ -263,18 +282,91 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
     }, 350);
   }, [vantageDevotees, walkers, spawnFlock]);
 
+  // KÍCH HOẠT FOCUS NGƯỜI MỚI VÀO LIVE / TƯƠNG TÁC: XUẤT HIỆN SPOTLIGHT + TÊN TO RÕ + CÚI THẢ CHIM CHÍNH DIỆN
+  const triggerFocusViewer = useCallback((user, avatar, actionType = 'greet', customText = '', count = 0) => {
+    if (focusTimerRef.current) clearTimeout(focusTimerRef.current);
+    if (focusCrouchTimerRef.current) clearTimeout(focusCrouchTimerRef.current);
+    if (focusExitTimerRef.current) clearTimeout(focusExitTimerRef.current);
+
+    const model = ALL_MODELS[Math.floor(Math.random() * ALL_MODELS.length)];
+    let actionTag = '✨ VỪA VÀO LIVE ✨';
+    let chatBubble = 'Chào mọi người, em vừa vào live phóng sinh chim! 🕊️✨';
+
+    if (actionType === 'greet') {
+      actionTag = '✨ VỪA VÀO LIVE ✨';
+      chatBubble = 'Chào Sư thầy và cả nhà, em cùng phóng sinh tích đức! 🙏';
+    } else if (actionType === 'follow') {
+      actionTag = '➕ ĐÃ FOLLOW KÊNH';
+      chatBubble = 'Em vừa bấm follow kênh, chúc cả nhà vạn sự cát tường! 🌸';
+    } else if (actionType === 'heart') {
+      actionTag = `❤️ THẢ ${count || 10} TIM`;
+      chatBubble = `Em thả ${count || 10} tim trợ duyên cho buổi phóng sinh! ❤️`;
+    } else if (actionType === 'donate') {
+      actionTag = `🕊️ PHÓNG SINH ${count || 50} CHIM`;
+      chatBubble = `Em xin ủng hộ phóng sinh ${count || 50} chú chim về với tự do! 🕊️`;
+    }
+
+    const focusObj = {
+      id: `focus_${Date.now()}`,
+      name: user || 'Thí Chủ Hữu Duyên',
+      avatar: avatar || '',
+      avatarBg: getAvatarColor(user || 'user'),
+      sprite: model.sprite,
+      crouchSprite: model.crouchSprite,
+      actionType,
+      actionTag,
+      chatBubble: customText ? (customText.length > 40 ? customText.slice(0, 40) + '...' : customText) : chatBubble,
+      phaseClass: 'phase-walk-in',
+      isCrouching: false
+    };
+
+    setActiveFocusDevotee(focusObj);
+
+    // Sau 3.6s sải bước ra tiền cảnh trung tâm -> Cúi người đặt lồng mở cửa phóng sinh chim
+    focusCrouchTimerRef.current = setTimeout(() => {
+      setActiveFocusDevotee(prev => {
+        if (!prev || prev.id !== focusObj.id) return prev;
+        return {
+          ...prev,
+          phaseClass: 'phase-crouch',
+          isCrouching: true
+        };
+      });
+
+      // Bung đàn bồ câu lớn 25 con từ chính lồng chim của nhân vật được focus!
+      spawnFlock(530, 1450, 25);
+      if (audio?.playBirdChirp) {
+        audio.playBirdChirp();
+      }
+
+      // Sau 4s thả chim -> Đứng dậy vẫy tay và dạo bước ra
+      focusExitTimerRef.current = setTimeout(() => {
+        setActiveFocusDevotee(prev => {
+          if (!prev || prev.id !== focusObj.id) return prev;
+          return {
+            ...prev,
+            phaseClass: 'phase-walk-out',
+            isCrouching: false
+          };
+        });
+
+        // Sau 3.2s đi ra -> Hoàn tất phiên focus
+        focusTimerRef.current = setTimeout(() => {
+          setActiveFocusDevotee(null);
+        }, 3200);
+      }, 4000);
+    }, 3600);
+  }, [audio, spawnFlock]);
+
   // Xử lý khi một người đi bộ hoàn thành 1 tuyến đường:
-  // Chọn ngay một tuyến đường mới (Đi ra, đi vô, đi ngang, đi chéo) để người di chuyển không ngừng
   const handleWalkerEnd = useCallback((walker) => {
     setWalkers(prev => prev.map(w => {
       if (w.id !== walker.id) return w;
 
-      // Chọn 1 tuyến đường khác với tuyến đường vừa đi
       const otherRoutes = PS_ROUTES.filter(r => r.route !== w.route);
       const chosenRoute = otherRoutes[Math.floor(Math.random() * otherRoutes.length)] || PS_ROUTES[0];
       const model = ALL_MODELS[Math.floor(Math.random() * ALL_MODELS.length)];
 
-      // 30% xác suất: sau khi đến điểm dừng thì cúi xuống thả chim mừng rỡ
       if (Math.random() < 0.3) {
         setTimeout(() => {
           triggerCrouchAndRelease(w.id, Math.floor(10 + Math.random() * 8), {
@@ -301,7 +393,6 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
     const timer = setInterval(() => {
       const now = Date.now();
 
-      // Dọn dẹp những người đã hết thời gian cúi -> đứng dậy tiếp tục đi bộ / ngắm cảnh
       setCrouchStates(prev => {
         let changed = false;
         const next = { ...prev };
@@ -314,21 +405,20 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
         return changed ? next : prev;
       });
 
-      // Danh sách tất cả người đang đứng thẳng (bao gồm cả người đi bộ và người ngắm cảnh)
       const allDevotees = [
         ...walkers.map(w => ({ id: w.id, isWalker: true, route: w.route })),
         ...vantageDevotees.map(v => ({ id: v.id, isWalker: false, x: v.x, y: v.y, scale: v.scale }))
       ];
 
       const standing = allDevotees.filter(d => !crouchStates[d.id]?.isCrouching);
-      if (standing.length > 0) {
+      if (standing.length > 0 && !activeFocusDevotee) {
         const pick = standing[Math.floor(Math.random() * standing.length)];
         triggerCrouchAndRelease(pick.id, Math.floor(12 + Math.random() * 8));
       }
     }, 3200);
 
     return () => clearInterval(timer);
-  }, [crouchStates, walkers, vantageDevotees, triggerCrouchAndRelease]);
+  }, [crouchStates, walkers, vantageDevotees, activeFocusDevotee, triggerCrouchAndRelease]);
 
   // Tự động dọn dẹp chim bay khỏi màn hình
   useEffect(() => {
@@ -372,7 +462,7 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
     if (!activeEvent || activeEvent.id === processedEventIdRef.current) return;
     processedEventIdRef.current = activeEvent.id;
 
-    const { type, user, coins, count, ttsText } = activeEvent;
+    const { type, user, avatar, coins, count, ttsText } = activeEvent;
     const cleanUser = user || 'Thí Chủ Hữu Duyên';
 
     // 1. Nếu có ttsText -> Phát âm thanh cảm ơn / chúc phúc
@@ -380,11 +470,7 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
       audio.queueTts(ttsText, activeEvent.ttsVoice || 'maichi');
     }
 
-    // 2. Kích hoạt người ở hàng trước cúi xuống phóng sinh chim
-    const frontIds = ['ps_w5', 'ps_w6', 'ps_w1', 'ps_v4'];
-    const chosenId = frontIds[Math.floor(Math.random() * frontIds.length)];
-
-    // 3. Cập nhật Banner đối thoại phía dưới & chim bay
+    // 2. Kích hoạt FOCUS NGƯỜI MỚI VÀO LIVE / ĐÓNG GÓP TƯƠNG TÁC + Cập nhật Banner đối thoại
     if (type === 'phongsinhGreet' || type === 'bothiGreet' || type === 'templeGreet') {
       setSpeech({
         user: cleanUser,
@@ -392,7 +478,7 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
         text: ttsText || `Chào mừng ${cleanUser} đã đến với buổi phóng sinh chim tích đức!`,
         time: Date.now()
       });
-      triggerCrouchAndRelease(chosenId, 14);
+      triggerFocusViewer(cleanUser, avatar, 'greet', ttsText);
     } else if (type === 'phongsinhRelease' || type === 'bothiDonate' || type === 'offerGift' || type === 'grandCeremony') {
       const birdsCount = count > 1 ? count : (coins ? coins * 5 : 50);
       setSpeech({
@@ -401,9 +487,7 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
         text: ttsText || `Cảm ơn anh/chị ${cleanUser} đã ủng hộ phóng sinh ${birdsCount} chú chim về với thiên nhiên! Công đức vô lượng!`,
         time: Date.now()
       });
-      // 2 người cùng cúi xuống phóng sinh đàn chim lớn
-      triggerCrouchAndRelease('ps_w5', 20);
-      triggerCrouchAndRelease('ps_w6', 20);
+      triggerFocusViewer(cleanUser, avatar, 'donate', ttsText, birdsCount);
       spawnHearts(540, 1300, 10);
     } else if (type === 'phongsinhHeart' || type === 'bothiHeart' || type === 'strikeWoodenFish') {
       setSpeech({
@@ -412,7 +496,7 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
         text: ttsText || `Cảm ơn anh/chị ${cleanUser} đã thả tim trợ duyên phóng sinh chim!`,
         time: Date.now()
       });
-      triggerCrouchAndRelease(chosenId, 12);
+      triggerFocusViewer(cleanUser, avatar, 'heart', ttsText, count || 1);
       spawnHearts(540, 1400, 8);
     } else if (type === 'phongsinhFollow' || type === 'bothiFollow' || type === 'templeFollow') {
       setSpeech({
@@ -421,8 +505,7 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
         text: ttsText || `Cảm ơn anh/chị ${cleanUser} đã follow kênh đồng hành cùng hoạt động phóng sinh tích đức!`,
         time: Date.now()
       });
-      triggerCrouchAndRelease('ps_w1', 16);
-      triggerCrouchAndRelease('ps_w2', 16);
+      triggerFocusViewer(cleanUser, avatar, 'follow', ttsText);
     } else if (type === 'phongsinhShare' || type === 'bothiShare' || type === 'templeShare') {
       setSpeech({
         user: cleanUser,
@@ -430,11 +513,11 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
         text: ttsText || `Cảm ơn anh/chị ${cleanUser} đã chia sẻ buổi live lan tỏa phước báu đến muôn nơi!`,
         time: Date.now()
       });
-      triggerCrouchAndRelease(chosenId, 16);
+      triggerFocusViewer(cleanUser, avatar, 'greet', ttsText);
     }
-  }, [activeEvent, audio, triggerCrouchAndRelease, spawnHearts]);
+  }, [activeEvent, audio, triggerFocusViewer, spawnHearts]);
 
-  // Click thủ công trên màn hình để phóng sinh thử nghiệm
+  // Click thủ công trên màn hình để phóng sinh thử nghiệm và test Focus người xem
   const handleStageClick = (e) => {
     const rect = stage9x16Ref.current.getBoundingClientRect();
     const scale = Math.min(rect.width / 1080, rect.height / 1920);
@@ -442,13 +525,10 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
     const clickY = (e.clientY - rect.top) / scale;
 
     if (clickY > 850 && clickY < 1650) {
-      // Chọn 1 người bất kỳ đang đứng để cúi xuống thả chim
-      const candidates = [...walkers, ...vantageDevotees];
-      const pick = candidates[Math.floor(Math.random() * candidates.length)];
-      triggerCrouchAndRelease(pick.id, 22, { x: clickX, y: clickY });
+      triggerFocusViewer('Phật Tử Hữu Duyên', '', 'greet', 'Chào mừng đến với buổi phóng sinh chim!');
       spawnHearts(clickX, clickY, 6);
       callRpc('temple.releaseBirds', {
-        user: speech.user || 'Phật Tử Hữu Duyên',
+        user: 'Phật Tử Hữu Duyên',
         count: 50,
         wish: 'Cầu cho muôn loài tự do, an lành, hạnh phúc'
       });
@@ -564,7 +644,77 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
 
         {/* 5. CÁC PHẬT TỬ DI CHUYỂN TRÊN SÂN ĐÁ: ĐI RA, ĐI VÔ, ĐI QUA ĐI LẠI VÀ CÚI THẢ CHIM */}
         <div className="phongsinh-devotees-layer">
-          {/* A. NGƯỜI ĐI BỘ CHIỀU SÂU 3D VÀ ĐI NGANG SÂN (WALKERS) */}
+          {/* A. VIP FOCUS DEVOTEE: NGƯỜI MỚI VÀO LIVE / ĐÓNG GÓP ĐƯỢC FOCUS TO RÕ, NỔI BẬT NHẤT SÂN ĐÁ */}
+          {activeFocusDevotee && (
+            <div
+              key={activeFocusDevotee.id}
+              className={`ps-focus-devotee ${activeFocusDevotee.phaseClass}`}
+            >
+              {/* CHÙM SÁNG SPOTLIGHT VÀ VÒNG HÀO QUANG DƯỚI CHÂN */}
+              <div className="focus-spotlight-beam" />
+              <div className="focus-ground-halo" />
+
+              {/* BẢNG TÊN FOCUS VÀNG KIM NỔI BẬT NHẤT LIVE */}
+              <div className="ps-focus-badge">
+                {activeFocusDevotee.chatBubble && (
+                  <div className="focus-chat-bubble">
+                    <span>{activeFocusDevotee.chatBubble}</span>
+                    <div className="focus-chat-tail" />
+                  </div>
+                )}
+
+                <div className="focus-capsule-badge">
+                  <div className="focus-avatar-ring">
+                    {activeFocusDevotee.avatar ? (
+                      <img src={activeFocusDevotee.avatar} alt="" className="focus-avatar-img" />
+                    ) : (
+                      <div className="focus-avatar-fallback" style={{ background: activeFocusDevotee.avatarBg }}>
+                        {activeFocusDevotee.name ? activeFocusDevotee.name.slice(0, 1).toUpperCase() : '✨'}
+                      </div>
+                    )}
+                  </div>
+                  <div className="focus-user-info">
+                    <span className="focus-username">@{activeFocusDevotee.name}</span>
+                    <span className={`focus-action-tag tag-${activeFocusDevotee.actionType}`}>
+                      {activeFocusDevotee.actionTag}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* HÌNH ẢNH NHÂN VẬT 3D CỦA NGƯỜI ĐÓ */}
+              <div className="devotee-character-container">
+                <img
+                  src={activeFocusDevotee.isCrouching
+                    ? (CHARACTER_SPRITES[activeFocusDevotee.crouchSprite] || crouchBoyImg)
+                    : (CHARACTER_SPRITES[activeFocusDevotee.sprite] || devoteeImg)
+                  }
+                  alt={activeFocusDevotee.name}
+                  className={`devotee-sprite-img ${activeFocusDevotee.isCrouching ? 'crouching-pose' : 'focus-walking-bob'}`}
+                  draggable={false}
+                />
+
+                {!activeFocusDevotee.isCrouching ? (
+                  <div className="bamboo-bird-cage">
+                    <svg viewBox="0 0 32 36" className="cage-svg">
+                      <path d="M16,2 L16,6" stroke="#d7ccc8" strokeWidth="2" />
+                      <path d="M6,8 Q16,4 26,8 L24,30 Q16,33 8,30 Z" fill="#8d6e63" stroke="#5d4037" strokeWidth="1.5" />
+                      <line x1="11" y1="8" x2="11" y2="30" stroke="#d7ccc8" strokeWidth="1" />
+                      <line x1="16" y1="6" x2="16" y2="31" stroke="#d7ccc8" strokeWidth="1" />
+                      <line x1="21" y1="8" x2="21" y2="30" stroke="#d7ccc8" strokeWidth="1" />
+                      <circle cx="16" cy="18" r="2.5" fill="#ffffff" />
+                    </svg>
+                  </div>
+                ) : (
+                  <div className="crouch-release-burst">
+                    <div className="cage-aura-burst" />
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* B. NGƯỜI ĐI BỘ CHIỀU SÂU 3D VÀ ĐI NGANG SÂN (WALKERS) */}
           {walkers.map((w, idx) => {
             const matchedLeader = state?.leaderboard?.[idx];
             const displayName = matchedLeader?.name || w.defaultName;
@@ -640,7 +790,7 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
             );
           })}
 
-          {/* B. PHẬT TỬ ĐỨNG NGẮM CẢNH TẠI CÁC GÓC ĐẸP TRÊN SÂN ĐÁ (VANTAGE DEVOTEES) */}
+          {/* C. PHẬT TỬ ĐỨNG NGẮM CẢNH TẠI CÁC GÓC ĐẸP TRÊN SÂN ĐÁ (VANTAGE DEVOTEES) */}
           {vantageDevotees.map((v, idx) => {
             const leaderOffset = idx + walkers.length;
             const matchedLeader = state?.leaderboard?.[leaderOffset];
