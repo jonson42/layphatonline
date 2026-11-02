@@ -63,8 +63,74 @@ public class SimulationService : BackgroundService
 
     private void RunSingleStep()
     {
+        var state = _templeService.GetPublicState();
         var pick = SimDevotees[_rnd.Next(SimDevotees.Length)];
         double roll = _rnd.NextDouble();
+
+        if (state.Settings.Mode == "bothi")
+        {
+            if (roll < 0.30)
+            {
+                // 1. Giả lập người vào live chế độ Bố Thí
+                string greeting = $"Chào {pick.User}, nhờ anh chị cho em xin vài đồng, tim hoặc bấm follow để em có tiền đi uống bia.";
+                _templeService.BurnIncense(new BurnIncenseParams
+                {
+                    User = pick.User,
+                    UniqueId = pick.UniqueId,
+                    Count = 1,
+                    Wish = "Nhờ anh/chị cho em xin vài đồng, tim hoặc follow để có tiền đi uống bia! 🍺🙏",
+                    ReadTts = true,
+                    CustomTts = greeting
+                });
+            }
+            else if (roll < 0.55)
+            {
+                // 2. Giả lập bố thí tiền / xu
+                int[] coinPicks = { 5, 10, 20, 50, 100 };
+                int coins = coinPicks[_rnd.Next(coinPicks.Length)];
+                _templeService.OfferGift(new OfferGiftParams
+                {
+                    User = pick.User,
+                    UniqueId = pick.UniqueId,
+                    Coins = coins,
+                    GiftName = $"{coins} Đồng Tiền Lẻ",
+                    Wish = $"Bố thí {coins} đồng để em đi uống bia 🍺",
+                    ReadTts = true
+                });
+            }
+            else if (roll < 0.72)
+            {
+                // 3. Giả lập thả tim
+                _templeService.StrikeWoodenFish(new StrikeWoodenFishParams
+                {
+                    User = pick.User,
+                    UniqueId = pick.UniqueId,
+                    Count = _rnd.Next(5, 20),
+                    ReadTts = true
+                });
+            }
+            else if (roll < 0.88)
+            {
+                // 4. Giả lập Follow kênh
+                _templeService.FollowChannel(new FollowChannelParams
+                {
+                    User = pick.User,
+                    UniqueId = pick.UniqueId,
+                    ReadTts = true
+                });
+            }
+            else
+            {
+                // 5. Giả lập Chia sẻ live (Share)
+                _templeService.ShareStream(new ShareStreamParams
+                {
+                    User = pick.User,
+                    UniqueId = pick.UniqueId,
+                    ReadTts = true
+                });
+            }
+            return;
+        }
 
         if (roll < 0.35)
         {

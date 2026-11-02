@@ -105,6 +105,9 @@ public class StrikeWoodenFishParams
     [JsonPropertyName("count")]
     public int Count { get; set; } = 1;
 
+    [JsonPropertyName("readTts")]
+    public bool? ReadTts { get; set; } = true;
+
     [JsonPropertyName("ttsText")]
     public string? TtsText { get; set; }
 }
@@ -239,5 +242,41 @@ public class SetAutoSimParams
 {
     [JsonPropertyName("enabled")]
     public bool Enabled { get; set; }
+}
+
+public class FollowChannelParams
+{
+    [JsonPropertyName("user")]
+    public string? User { get; set; }
+
+    [JsonPropertyName("uniqueId")]
+    public string? UniqueId { get; set; }
+
+    [JsonPropertyName("avatar")]
+    public string? Avatar { get; set; }
+
+    [JsonPropertyName("readTts")]
+    public bool? ReadTts { get; set; } = true;
+
+    [JsonPropertyName("customTts")]
+    public string? CustomTts { get; set; }
+}
+
+public class ShareStreamParams
+{
+    [JsonPropertyName("user")]
+    public string? User { get; set; }
+
+    [JsonPropertyName("uniqueId")]
+    public string? UniqueId { get; set; }
+
+    [JsonPropertyName("avatar")]
+    public string? Avatar { get; set; }
+
+    [JsonPropertyName("readTts")]
+    public bool? ReadTts { get; set; } = true;
+
+    [JsonPropertyName("customTts")]
+    public string? CustomTts { get; set; }
 }
 

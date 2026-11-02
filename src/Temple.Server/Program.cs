@@ -59,11 +59,12 @@ app.UseStaticFiles(new StaticFileOptions
 });
 
 // Static file serving for React build if client dist exists
-string clientDist = Directory.Exists(Path.Combine(contentRoot, "dist"))
-    ? Path.Combine(contentRoot, "dist")
-    : (Directory.Exists(Path.Combine(contentRoot, "wwwroot"))
-        ? Path.Combine(contentRoot, "wwwroot")
-        : Path.GetFullPath(Path.Combine(contentRoot, "..", "Temple.Client", "dist")));
+string clientCandidate = Path.GetFullPath(Path.Combine(contentRoot, "..", "Temple.Client", "dist"));
+string clientDist = Directory.Exists(clientCandidate)
+    ? clientCandidate
+    : (Directory.Exists(Path.Combine(contentRoot, "dist"))
+        ? Path.Combine(contentRoot, "dist")
+        : Path.Combine(contentRoot, "wwwroot"));
 
 if (Directory.Exists(clientDist))
 {

@@ -138,6 +138,53 @@ export default function QuickDock({ state, audio, callRpc, onOpenAdmin }) {
         </button>
       </div>
 
+      {/* CHỌN CHẾ ĐỘ PHÁT LIVE */}
+      <div style={{
+        background: 'rgba(0, 0, 0, 0.45)',
+        border: '1px solid rgba(255, 215, 0, 0.35)',
+        borderRadius: '12px',
+        padding: '10px 12px',
+        marginBottom: '14px'
+      }}>
+        <div style={{ fontSize: '12px', fontWeight: 700, color: '#ffd54f', marginBottom: '8px' }}>
+          🔄 CHẾ ĐỘ PHÁT LIVE HIỆN TẠI:
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+          <button
+            style={{
+              padding: '10px 6px',
+              borderRadius: '8px',
+              border: (state?.settings?.mode !== 'bothi') ? '2px solid #ffd54f' : '1px solid rgba(255,255,255,0.15)',
+              background: (state?.settings?.mode !== 'bothi') ? 'linear-gradient(180deg, #d48806 0%, #ad6800 100%)' : 'rgba(255,255,255,0.06)',
+              color: '#fff',
+              fontWeight: 700,
+              fontSize: '12px',
+              cursor: 'pointer',
+              boxShadow: (state?.settings?.mode !== 'bothi') ? '0 0 10px rgba(255,213,79,0.4)' : 'none'
+            }}
+            onClick={() => callRpc('temple.updateSettings', { mode: 'temple' })}
+          >
+            🪷 Đi Chùa Lễ Phật
+          </button>
+          <button
+            style={{
+              padding: '10px 6px',
+              borderRadius: '8px',
+              border: (state?.settings?.mode === 'bothi') ? '2px solid #ff9800' : '1px solid rgba(255,255,255,0.15)',
+              background: (state?.settings?.mode === 'bothi') ? 'linear-gradient(180deg, #f57c00 0%, #e65100 100%)' : 'rgba(255,255,255,0.06)',
+              color: '#fff',
+              fontWeight: 700,
+              fontSize: '12px',
+              cursor: 'pointer',
+              boxShadow: (state?.settings?.mode === 'bothi') ? '0 0 10px rgba(255,152,0,0.5)' : 'none'
+            }}
+            onClick={() => callRpc('temple.updateSettings', { mode: 'bothi' })}
+          >
+            🍺 Bố Thí Uống Bia
+          </button>
+        </div>
+      </div>
+
       {/* LINK CLOUDFLARE TIKTOK LIVE STUDIO */}
       <div style={{
         background: 'linear-gradient(135deg, rgba(255, 152, 0, 0.16) 0%, rgba(139, 29, 0, 0.28) 100%)',
@@ -209,9 +256,15 @@ export default function QuickDock({ state, audio, callRpc, onOpenAdmin }) {
             🎵 Nhạc Nền: {musicEnabled ? 'BẬT' : 'TẮT'}
           </button>
         </div>
-        <div style={{ fontSize: '11px', color: '#cbb387', margin: '4px 0 10px 0', lineHeight: '1.4' }}>
-          💡 <em>Mẹo: Khi mở đồng thời TikTok LIVE Studio trên cùng máy, hãy tắt <strong>Giọng Đọc</strong> hoặc <strong>Nhạc Nền</strong> tại tab này để chỉ có TikTok LIVE Studio phát tiếng ra stream (tránh bị phát 2 lần).</em>
-        </div>
+        {state?.settings?.mode === 'bothi' ? (
+          <div style={{ fontSize: '11.5px', color: '#ffe082', background: 'rgba(255, 152, 0, 0.15)', border: '1px solid rgba(255, 183, 77, 0.35)', borderRadius: '8px', padding: '6px 10px', margin: '4px 0 10px 0' }}>
+            🎵 <strong>Nhạc nền Bố Thí:</strong> <em>Không Cần Đi Làm.mp3</em> {musicEnabled ? '🟢 Đang phát lặp' : '⚪ Đã tắt'}
+          </div>
+        ) : (
+          <div style={{ fontSize: '11px', color: '#cbb387', margin: '4px 0 10px 0', lineHeight: '1.4' }}>
+            💡 <em>Mẹo: Khi mở đồng thời TikTok LIVE Studio trên cùng máy, hãy tắt <strong>Giọng Đọc</strong> hoặc <strong>Nhạc Nền</strong> tại tab này để chỉ có TikTok LIVE Studio phát tiếng ra stream (tránh bị phát 2 lần).</em>
+          </div>
+        )}
         <button
           className="dock-btn"
           style={{
@@ -348,91 +401,222 @@ export default function QuickDock({ state, audio, callRpc, onOpenAdmin }) {
 
       {/* 3. NGHI THỨC TƯƠNG TÁC */}
       <div className="dock-section">
-        <div className="dock-section-title">🙏 Kích Hoạt Nghi Thức Tương Tác (RPC)</div>
-        <input
-          type="text"
-          className="dock-input"
-          value={devoteeName}
-          onChange={(e) => setDevoteeName(e.target.value)}
-          placeholder="Tên người xem / Thí chủ..."
-        />
-        <input
-          type="text"
-          className="dock-input"
-          value={devoteeWish}
-          onChange={(e) => setDevoteeWish(e.target.value)}
-          placeholder="Lời cầu nguyện..."
-        />
+        {state?.settings?.mode === 'bothi' ? (
+          <>
+            <div className="dock-section-title">🍺 Kích Hoạt Tương Tác Bố Thí (RPC)</div>
+            <input
+              type="text"
+              className="dock-input"
+              value={devoteeName}
+              onChange={(e) => setDevoteeName(e.target.value)}
+              placeholder="Tên người xem / Mạnh thường quân..."
+            />
+            <input
+              type="text"
+              className="dock-input"
+              value={devoteeWish}
+              onChange={(e) => setDevoteeWish(e.target.value)}
+              placeholder="Lời nhắn / Ghi chú..."
+            />
 
-        <button
-          className="dock-btn gold"
-          style={{ marginBottom: '10px', fontSize: '13px', padding: '10px' }}
-          onClick={() => {
-            const wishes = [
-              "Cầu cho gia đạo bình an, phúc lộc dồi dào, vạn sự cát tường",
-              "Cầu sức khỏe dồi dào, tâm an trí sáng, gia đình êm ấm",
-              "Cầu công danh sự nghiệp thuận buồm xuôi gió, hanh thông tấn tới",
-              "Cầu tài lộc hanh thông, tai qua nạn khỏi, sở nguyện tòng tâm"
-            ];
-            const w = wishes[Math.floor(Math.random() * wishes.length)];
-            const name = devoteeName.trim() || 'Thí Chủ Hữu Duyên';
-            const greeting = `Nam mô A Di Đà Phật. Chùa Thiên Sơn xin kính chào thí chủ ${name} đã vào Chánh Điện bái Phật. Nguyện cầu cho thí chủ ${w.toLowerCase()}.`;
-            callRpc('temple.burnIncense', {
-              user: name,
-              wish: w,
-              count: 1,
-              readTts: true,
-              customTts: greeting
-            });
-          }}
-        >
-          👋 Thử Người Vào Chùa (Chào Tên & Chúc Phúc)
-        </button>
+            <button
+              className="dock-btn gold"
+              style={{ marginBottom: '10px', fontSize: '13px', padding: '10px' }}
+              onClick={() => {
+                const name = devoteeName.trim() || 'Bạn Hữu';
+                const greeting = `Chào ${name}, nhờ anh chị cho em xin vài đồng, tim hoặc bấm follow để em có tiền đi uống bia.`;
+                callRpc('temple.burnIncense', {
+                  user: name,
+                  wish: 'Nhờ anh/chị cho em xin vài đồng, tim hoặc follow để có tiền đi uống bia! 🍺🙏',
+                  count: 1,
+                  readTts: true,
+                  customTts: greeting
+                });
+              }}
+            >
+              👋 Thử Người Vào Live (Chào & Xin Bia)
+            </button>
 
-        <div className="dock-grid-2">
-          <button
-            className="dock-btn gold"
-            onClick={() => callRpc('temple.burnIncense', { user: devoteeName, wish: devoteeWish, count: 3 })}
-          >
-            🔥 Thắp 3 Nén Hương
-          </button>
-          <button
-            className="dock-btn"
-            onClick={() => callRpc('temple.sendPrayer', { user: devoteeName, wish: devoteeWish })}
-          >
-            🏮 Thả Đèn Hoa Đăng
-          </button>
-          <button
-            className="dock-btn"
-            onClick={() => callRpc('temple.strikeWoodenFish', { user: devoteeName, count: 5 })}
-          >
-            🪵 Gõ Mõ (+5)
-          </button>
-          <button
-            className="dock-btn"
-            onClick={() => callRpc('temple.ringBell', { user: devoteeName, wish: devoteeWish, count: 1, readTts: true })}
-          >
-            🔔 Thỉnh Chuông Chùa
-          </button>
-          <button
-            className="dock-btn"
-            onClick={() => callRpc('temple.drawFortune', { user: devoteeName, topic: devoteeWish })}
-          >
-            🎋 Xin Xăm / Gieo Quẻ
-          </button>
-          <button
-            className="dock-btn"
-            onClick={() => callRpc('temple.offerGift', { user: devoteeName, giftType: 'lotus', coins: 15 })}
-          >
-            🪷 Dâng Hoa Sen Vàng
-          </button>
-        </div>
-        <button
-          className="dock-btn gold"
-          onClick={() => callRpc('temple.grandCeremony', { user: devoteeName, coins: 199 })}
-        >
-          🐉 Đại Lễ Kim Long Chầu Phật (Quà Lớn)
-        </button>
+            <button
+              className="dock-btn"
+              style={{
+                marginBottom: '10px',
+                fontSize: '13px',
+                padding: '10px',
+                background: 'linear-gradient(180deg, #10b981 0%, #059669 100%)',
+                color: '#fff',
+                fontWeight: 800,
+                border: '1.5px solid #a7f3d0',
+                boxShadow: '0 0 10px rgba(16, 185, 129, 0.4)'
+              }}
+              onClick={() => {
+                const name = devoteeName.trim() || 'Thí Chủ Hảo Tâm';
+                callRpc('temple.follow', {
+                  user: name,
+                  readTts: true
+                });
+              }}
+            >
+              ➕ Thử Bấm Follow Kênh
+            </button>
+
+            <button
+              className="dock-btn"
+              style={{
+                marginBottom: '10px',
+                fontSize: '13px',
+                padding: '10px',
+                background: 'linear-gradient(180deg, #0284c7 0%, #0369a1 100%)',
+                color: '#fff',
+                fontWeight: 800,
+                border: '1.5px solid #7dd3fc',
+                boxShadow: '0 0 10px rgba(2, 132, 199, 0.4)'
+              }}
+              onClick={() => {
+                const name = devoteeName.trim() || 'Thí Chủ Hảo Tâm';
+                callRpc('temple.share', {
+                  user: name,
+                  readTts: true
+                });
+              }}
+            >
+              🔄 Thử Bấm Chia Sẻ Live
+            </button>
+
+            <div className="dock-grid-2">
+              <button
+                className="dock-btn gold"
+                onClick={() => callRpc('temple.offerGift', { user: devoteeName, coins: 5, giftName: '5 Đồng Tiền Lẻ' })}
+              >
+                🪙 Bố Thí 5 Đồng
+              </button>
+              <button
+                className="dock-btn gold"
+                onClick={() => callRpc('temple.offerGift', { user: devoteeName, coins: 10, giftName: '10 Đồng Tiền Lẻ' })}
+              >
+                🪙 Bố Thí 10 Đồng
+              </button>
+              <button
+                className="dock-btn"
+                onClick={() => callRpc('temple.offerGift', { user: devoteeName, coins: 20, giftName: 'Ly Bia Hơi' })}
+              >
+                🍺 Tặng Ly Bia (+20đ)
+              </button>
+              <button
+                className="dock-btn"
+                onClick={() => callRpc('temple.offerGift', { user: devoteeName, coins: 100, giftName: 'Thùng Bia Sài Gòn' })}
+              >
+                🍻 Tặng Thùng Bia (+100đ)
+              </button>
+              <button
+                className="dock-btn"
+                onClick={() => callRpc('temple.strikeWoodenFish', { user: devoteeName, count: 20 })}
+              >
+                ❤️ Thả 20 Tim
+              </button>
+              <button
+                className="dock-btn"
+                onClick={() => callRpc('temple.strikeWoodenFish', { user: devoteeName, count: 50 })}
+              >
+                💖 Thả 50 Tim
+              </button>
+            </div>
+            <button
+              className="dock-btn gold"
+              onClick={() => callRpc('temple.grandCeremony', { user: devoteeName, coins: 200, giftName: 'Đại Tiệc Bố Thí Bia' })}
+            >
+              🎉 Đại Lễ Bố Thí Tiền Uống Bia (200 Đồng)
+            </button>
+          </>
+        ) : (
+          <>
+            <div className="dock-section-title">🙏 Kích Hoạt Nghi Thức Tương Tác (RPC)</div>
+            <input
+              type="text"
+              className="dock-input"
+              value={devoteeName}
+              onChange={(e) => setDevoteeName(e.target.value)}
+              placeholder="Tên người xem / Thí chủ..."
+            />
+            <input
+              type="text"
+              className="dock-input"
+              value={devoteeWish}
+              onChange={(e) => setDevoteeWish(e.target.value)}
+              placeholder="Lời cầu nguyện..."
+            />
+
+            <button
+              className="dock-btn gold"
+              style={{ marginBottom: '10px', fontSize: '13px', padding: '10px' }}
+              onClick={() => {
+                const wishes = [
+                  "Cầu cho gia đạo bình an, phúc lộc dồi dào, vạn sự cát tường",
+                  "Cầu sức khỏe dồi dào, tâm an trí sáng, gia đình êm ấm",
+                  "Cầu công danh sự nghiệp thuận buồm xuôi gió, hanh thông tấn tới",
+                  "Cầu tài lộc hanh thông, tai qua nạn khỏi, sở nguyện tòng tâm"
+                ];
+                const w = wishes[Math.floor(Math.random() * wishes.length)];
+                const name = devoteeName.trim() || 'Thí Chủ Hữu Duyên';
+                const greeting = `Nam mô A Di Đà Phật. Chùa Thiên Sơn xin kính chào thí chủ ${name} đã vào Chánh Điện bái Phật. Nguyện cầu cho thí chủ ${w.toLowerCase()}.`;
+                callRpc('temple.burnIncense', {
+                  user: name,
+                  wish: w,
+                  count: 1,
+                  readTts: true,
+                  customTts: greeting
+                });
+              }}
+            >
+              👋 Thử Người Vào Chùa (Chào Tên & Chúc Phúc)
+            </button>
+
+            <div className="dock-grid-2">
+              <button
+                className="dock-btn gold"
+                onClick={() => callRpc('temple.burnIncense', { user: devoteeName, wish: devoteeWish, count: 3 })}
+              >
+                🔥 Thắp 3 Nén Hương
+              </button>
+              <button
+                className="dock-btn"
+                onClick={() => callRpc('temple.sendPrayer', { user: devoteeName, wish: devoteeWish })}
+              >
+                🏮 Thả Đèn Hoa Đăng
+              </button>
+              <button
+                className="dock-btn"
+                onClick={() => callRpc('temple.strikeWoodenFish', { user: devoteeName, count: 5 })}
+              >
+                🪵 Gõ Mõ (+5)
+              </button>
+              <button
+                className="dock-btn"
+                onClick={() => callRpc('temple.ringBell', { user: devoteeName, wish: devoteeWish, count: 1, readTts: true })}
+              >
+                🔔 Thỉnh Chuông Chùa
+              </button>
+              <button
+                className="dock-btn"
+                onClick={() => callRpc('temple.drawFortune', { user: devoteeName, topic: devoteeWish })}
+              >
+                🎋 Xin Xăm / Gieo Quẻ
+              </button>
+              <button
+                className="dock-btn"
+                onClick={() => callRpc('temple.offerGift', { user: devoteeName, giftType: 'lotus', coins: 15 })}
+              >
+                🪷 Dâng Hoa Sen Vàng
+              </button>
+            </div>
+            <button
+              className="dock-btn gold"
+              onClick={() => callRpc('temple.grandCeremony', { user: devoteeName, coins: 199 })}
+            >
+              🐉 Đại Lễ Kim Long Chầu Phật (Quà Lớn)
+            </button>
+          </>
+        )}
       </div>
 
       {/* 4. NHẬT KÝ GẦN NHẤT */}
@@ -441,6 +625,13 @@ export default function QuickDock({ state, audio, callRpc, onOpenAdmin }) {
         <div className="event-feed">
           {recentEvents.slice(0, 8).map((ev) => (
             <div key={ev.id} className="event-feed-item">
+              {ev.type === 'bothiGreet' && `👋 ${ev.user} vào live xin bia: “${ev.wish}”`}
+              {ev.type === 'bothiFollow' && `➕ ${ev.user} đã follow kênh ủng hộ`}
+              {ev.type === 'templeFollow' && `➕ ${ev.user} đã theo dõi đạo tràng`}
+              {ev.type === 'bothiShare' && `🔄 ${ev.user} đã chia sẻ live giúp xin bia`}
+              {ev.type === 'templeShare' && `🔄 ${ev.user} đã chia sẻ live đạo tràng`}
+              {ev.type === 'bothiDonate' && `🪙 ${ev.user} bố thí ${ev.coins} đồng uống bia`}
+              {ev.type === 'bothiHeart' && `❤️ ${ev.user} đã thả ${ev.count} tim`}
               {ev.type === 'burnIncense' && `🔥 ${ev.user} dâng ${ev.count} nén nhang (+${ev.merit} CĐ)`}
               {ev.type === 'strikeWoodenFish' && `🪵 ${ev.user} gõ mõ ${ev.count} nhịp (+${ev.merit} CĐ)`}
               {ev.type === 'ringBell' && `🔔 ${ev.user} thỉnh Đại Hồng Chung (+${ev.merit} CĐ)`}

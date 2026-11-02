@@ -184,6 +184,10 @@ public class TempleService : ITempleService
                 BellRings = _state.BellRings,
                 LanternCount = _state.LanternCount,
                 FortuneCount = _state.FortuneCount,
+                TotalBeerMoney = _state.TotalBeerMoney,
+                TotalHearts = _state.TotalHearts,
+                TotalFollows = _state.TotalFollows,
+                TotalShares = _state.TotalShares,
                 ActiveIncenseSticks = _state.ActiveIncenseSticks,
                 HaloIntensity = _state.HaloIntensity,
                 Offerings = new OfferingsState
@@ -218,6 +222,7 @@ public class TempleService : ITempleService
             _state.ActiveIncenseSticks = Math.Min(36, _state.ActiveIncenseSticks + count);
             var dev = RecordDevotee(user, uniqueId, avatar, merit, count, 0, wish);
 
+            bool isBothi = _state.Settings.Mode == "bothi";
             string ttsText;
             if (p.ReadTts == false)
             {
@@ -226,6 +231,10 @@ public class TempleService : ITempleService
             else if (!string.IsNullOrEmpty(p.CustomTts))
             {
                 ttsText = p.CustomTts;
+            }
+            else if (isBothi)
+            {
+                ttsText = $"Chào {dev.Name}, nhờ anh chị cho em xin vài đồng, tim hoặc bấm follow để em có tiền đi uống bia.";
             }
             else if (wish.Contains("Chánh Điện") || wish.Contains("vào phòng"))
             {
@@ -238,7 +247,7 @@ public class TempleService : ITempleService
 
             var evt = PushEvent(new TempleEvent
             {
-                Type = "burnIncense",
+                Type = isBothi ? "bothiGreet" : "burnIncense",
                 User = dev.Name,
                 UniqueId = dev.UniqueId,
                 Avatar = dev.Avatar,
@@ -267,18 +276,34 @@ public class TempleService : ITempleService
             int count = Math.Clamp(p.Count <= 0 ? 1 : p.Count, 1, 50);
             int merit = count;
 
-            _state.WoodenFishHits += count;
+            bool isBothi = _state.Settings.Mode == "bothi";
+            if (isBothi)
+            {
+                _state.TotalHearts += count;
+            }
+            else
+            {
+                _state.WoodenFishHits += count;
+            }
             var dev = RecordDevotee(user, uniqueId, avatar, merit, 0, 0);
+
+            string ttsText = p.TtsText ?? string.Empty;
+            if (string.IsNullOrEmpty(ttsText) && isBothi && p.ReadTts != false)
+            {
+                ttsText = $"Cảm ơn anh chị {dev.Name} đã thả {count} tim ủng hộ em kiếm tiền uống bia!";
+            }
 
             var evt = PushEvent(new TempleEvent
             {
-                Type = "strikeWoodenFish",
+                Type = isBothi ? "bothiHeart" : "strikeWoodenFish",
                 User = dev.Name,
                 UniqueId = dev.UniqueId,
                 Avatar = dev.Avatar,
                 Count = count,
                 Merit = merit,
-                TtsText = p.TtsText ?? string.Empty
+                Wish = isBothi ? "Đã thả tim ủng hộ em kiếm tiền uống bia! ❤️" : "",
+                TtsText = ttsText,
+                TtsVoice = _state.Settings.TtsVoice ?? "maichi"
             });
 
             _ = SaveStateAsync();
@@ -367,6 +392,110 @@ public class TempleService : ITempleService
         }
     }
 
+    public TempleEventResult FollowChannel(FollowChannelParams p)
+    {
+        lock (_lock)
+        {
+            string user = TextSanitizer.SanitizeUserName(p.User);
+            string uniqueId = p.UniqueId ?? string.Empty;
+            string avatar = p.Avatar ?? string.Empty;
+            bool isBothi = _state.Settings.Mode == "bothi";
+            int merit = 20;
+
+            _state.TotalFollows += 1;
+            var dev = RecordDevotee(user, uniqueId, avatar, merit, 0, 0, isBothi ? "Đã follow kênh ủng hộ em uống bia! ➕" : "Đã theo dõi đạo tràng! ➕");
+
+            string ttsText;
+            if (p.ReadTts == false)
+            {
+                ttsText = string.Empty;
+            }
+            else if (!string.IsNullOrEmpty(p.CustomTts))
+            {
+                ttsText = p.CustomTts;
+            }
+            else if (isBothi)
+            {
+                ttsText = $"Cảm ơn anh chị {dev.Name} đã bấm follow kênh để ủng hộ em kiếm tiền đi uống bia! Chúc anh chị luôn vui vẻ và nhiều may mắn!";
+            }
+            else
+            {
+                ttsText = $"Nam mô A Di Đà Phật. Cảm tạ thí chủ {dev.Name} đã theo dõi đạo tràng Chùa Thiên Sơn. Nguyện cầu Đức Phật gia hộ cho thí chủ vạn sự cát tường.";
+            }
+
+            var evt = PushEvent(new TempleEvent
+            {
+                Type = isBothi ? "bothiFollow" : "templeFollow",
+                User = dev.Name,
+                UniqueId = dev.UniqueId,
+                Avatar = dev.Avatar,
+                Count = 1,
+                Merit = merit,
+                Wish = isBothi ? "Đã follow kênh ủng hộ! ➕" : "Đã theo dõi kênh! ➕",
+                TtsText = ttsText,
+                TtsVoice = _state.Settings.TtsVoice ?? "maichi"
+            });
+
+            _ = SaveStateAsync();
+            var state = GetPublicState();
+            var result = new TempleEventResult { Event = evt, State = state };
+            Broadcast("temple.event", result);
+            return result;
+        }
+    }
+
+    public TempleEventResult ShareStream(ShareStreamParams p)
+    {
+        lock (_lock)
+        {
+            string user = TextSanitizer.SanitizeUserName(p.User);
+            string uniqueId = p.UniqueId ?? string.Empty;
+            string avatar = p.Avatar ?? string.Empty;
+            bool isBothi = _state.Settings.Mode == "bothi";
+            int merit = 25;
+
+            _state.TotalShares += 1;
+            var dev = RecordDevotee(user, uniqueId, avatar, merit, 0, 0, isBothi ? "Đã chia sẻ live giúp em kiếm tiền uống bia! 🔄" : "Đã chia sẻ live! 🔄");
+
+            string ttsText;
+            if (p.ReadTts == false)
+            {
+                ttsText = string.Empty;
+            }
+            else if (!string.IsNullOrEmpty(p.CustomTts))
+            {
+                ttsText = p.CustomTts;
+            }
+            else if (isBothi)
+            {
+                ttsText = $"Cảm ơn anh chị {dev.Name} đã chia sẻ buổi live giúp em kiếm tiền đi uống bia! Chúc anh chị luôn vui vẻ và thật nhiều may mắn!";
+            }
+            else
+            {
+                ttsText = $"Nam mô A Di Đà Phật. Cảm tạ thí chủ {dev.Name} đã chia sẻ buổi phát trực tiếp. Nguyện cầu Phật gia hộ cho thí chủ vạn sự cát tường.";
+            }
+
+            var evt = PushEvent(new TempleEvent
+            {
+                Type = isBothi ? "bothiShare" : "templeShare",
+                User = dev.Name,
+                UniqueId = dev.UniqueId,
+                Avatar = dev.Avatar,
+                Count = 1,
+                Merit = merit,
+                Wish = isBothi ? "Đã chia sẻ buổi live! 🔄" : "Đã chia sẻ live! 🔄",
+                TtsText = ttsText,
+                TtsVoice = _state.Settings.TtsVoice ?? "maichi"
+            });
+
+            _ = SaveStateAsync();
+            var state = GetPublicState();
+            var result = new TempleEventResult { Event = evt, State = state };
+            Broadcast("temple.event", result);
+            return result;
+        }
+    }
+
     public TempleEventResult OfferGift(OfferGiftParams p)
     {
         lock (_lock)
@@ -396,6 +525,38 @@ public class TempleService : ITempleService
             string giftName = p.GiftName ?? giftLabels[giftType];
             int multiplier = coins >= 100 ? 50 : coins >= 10 ? 30 : 20;
             int merit = Math.Max(20, coins * multiplier);
+
+            bool isBothi = _state.Settings.Mode == "bothi";
+            if (isBothi)
+            {
+                _state.TotalBeerMoney += coins;
+                string bothiWish = p.Wish ?? $"Bố thí {coins} đồng để em đi uống bia 🍺";
+                var bothiDev = RecordDevotee(user, uniqueId, avatar, merit, 0, 1, bothiWish);
+                string bothiTts = (p.ReadTts == false)
+                    ? string.Empty
+                    : $"Cảm ơn anh chị {bothiDev.Name} đã bố thí {coins} đồng để em có tiền đi uống bia! Chúc anh chị luôn dồi dào sức khỏe và gặp nhiều may mắn!";
+
+                var bothiEvt = PushEvent(new TempleEvent
+                {
+                    Type = "bothiDonate",
+                    User = bothiDev.Name,
+                    UniqueId = bothiDev.UniqueId,
+                    Avatar = bothiDev.Avatar,
+                    GiftType = giftType,
+                    GiftName = giftName,
+                    Coins = coins,
+                    Merit = merit,
+                    Wish = bothiWish,
+                    TtsText = bothiTts,
+                    TtsVoice = _state.Settings.TtsVoice ?? "maichi"
+                });
+
+                _ = SaveStateAsync();
+                var bothiState = GetPublicState();
+                var bothiResult = new TempleEventResult { Event = bothiEvt, State = bothiState };
+                Broadcast("temple.event", bothiResult);
+                return bothiResult;
+            }
 
             if (giftType == "lotus") _state.Offerings.Lotus++;
             else if (giftType == "fruit") _state.Offerings.Fruit++;
@@ -498,6 +659,10 @@ public class TempleService : ITempleService
             if (p.TryGetProperty("youtubeUrl", out var ytUrl))
             {
                 _state.Settings.YoutubeUrl = ytUrl.ValueKind == JsonValueKind.Null ? null : ytUrl.GetString();
+            }
+            if (p.TryGetProperty("mode", out var md))
+            {
+                _state.Settings.Mode = md.GetString() ?? "temple";
             }
 
             _ = SaveStateAsync();

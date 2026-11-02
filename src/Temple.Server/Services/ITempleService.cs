@@ -13,6 +13,8 @@ public interface ITempleService
     TempleEventResult OfferGift(OfferGiftParams p);
     TempleEventResult DrawFortune(DrawFortuneParams p);
     TempleEventResult GrandCeremony(OfferGiftParams p);
+    TempleEventResult FollowChannel(FollowChannelParams p);
+    TempleEventResult ShareStream(ShareStreamParams p);
     PublicTempleState UpdateSettings(JsonElement p);
     PublicTempleState ResetMerit();
     object? HandleComment(string? comment, string? user, string? uniqueId, string? avatar);

@@ -57,6 +57,14 @@ public class RpcDispatcher
                 var pCeremony = DeserializeParams<OfferGiftParams>(parameters);
                 return _templeService.GrandCeremony(pCeremony ?? new OfferGiftParams());
 
+            case "temple.follow":
+                var pFollow = DeserializeParams<FollowChannelParams>(parameters);
+                return _templeService.FollowChannel(pFollow ?? new FollowChannelParams());
+
+            case "temple.share":
+                var pShare = DeserializeParams<ShareStreamParams>(parameters);
+                return _templeService.ShareStream(pShare ?? new ShareStreamParams());
+
             case "temple.updateSettings":
                 if (parameters.HasValue)
                 {

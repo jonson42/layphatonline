@@ -81,21 +81,9 @@ async function connect(rawUser) {
 
   conn = new TikTokLiveConnection(cleanUser, {
     processInitialData: true,
-    fetchRoomInfoOnConnect: false,
+    fetchRoomInfoOnConnect: true,
     enableExtendedGiftInfo: false
   });
-
-  // Kiểm tra trước xem tài khoản có đang bật Live hay không
-  try {
-    const isLive = await conn.fetchIsLive().catch(() => null);
-    if (isLive === false) {
-      emit({
-        type: 'error',
-        message: `Tài khoản @${cleanUser} hiện KHÔNG PHÁT TRỰC TIẾP (Offline) trên TikTok. Vui lòng kiểm tra tài khoản đang phát Live trước khi kết nối, hoặc bật chế độ Giả lập (Auto-Sim) để trải nghiệm thử.`
-      });
-      return;
-    }
-  } catch (_) {}
 
   conn.on(ControlEvent.CONNECTED, (state) => {
     if (reconnectTimer) { clearTimeout(reconnectTimer); reconnectTimer = null; }
@@ -165,17 +153,26 @@ async function connect(rawUser) {
     emit({ type: 'like', ...u, count });
   });
 
-  const onSocial = (data) => {
+  conn.on(WebcastEvent.FOLLOW, (data) => {
     const u = extractUser(data);
-    emit({ type: 'social', ...u });
-  };
-  conn.on(WebcastEvent.FOLLOW, onSocial);
-  conn.on(WebcastEvent.SHARE, onSocial);
+    emit({ type: 'follow', ...u });
+  });
+
+  conn.on(WebcastEvent.SHARE, (data) => {
+    const u = extractUser(data);
+    emit({ type: 'share', ...u });
+  });
+
   conn.on(WebcastEvent.SOCIAL, (data) => {
+    const u = extractUser(data);
     const action = String(data?.action || '');
     const disp = String(data?.common?.displayText?.displayType || data?.displayType || '').toLowerCase();
-    if (action === '1' || action === '3' || disp.includes('follow') || disp.includes('share')) {
-      onSocial(data);
+    if (action === '3' || disp.includes('follow')) {
+      emit({ type: 'follow', ...u });
+    } else if (action === '1' || disp.includes('share')) {
+      emit({ type: 'share', ...u });
+    } else {
+      emit({ type: 'social', ...u });
     }
   });
 
@@ -217,8 +214,8 @@ async function connect(rawUser) {
     // ControlEvent.CONNECTED already emits connected event, no duplicate emit here
   } catch (err) {
     let msg = err?.message || 'Không thể kết nối phòng Live';
-    if (msg.includes('illegal secret key') || msg.includes('RoomId not found') || msg.includes('status code 417')) {
-      msg = `Tài khoản @${cleanUser} hiện không phát Live hoặc TikTok yêu cầu phiên Live đang hoạt động.`;
+    if (msg.includes('illegal secret key') || msg.includes('RoomId not found') || msg.includes('status code 417') || msg.includes("isn't online") || msg.includes('offline') || msg.includes('not online')) {
+      msg = `Tài khoản @${cleanUser} hiện KHÔNG PHÁT TRỰC TIẾP (Offline) trên TikTok. Vui lòng đảm bảo tài khoản đang mở Live trên TikTok trước khi bấm Kết nối, hoặc bật 'Tự động giả lập đông người' để trải nghiệm thử.`;
     }
     emit({ type: 'error', message: msg });
   }

@@ -22,7 +22,9 @@ class TempleAudioEngine {
 
     this.useSynthMusicFallback = false;
     this.synthBgTimer = null;
-    this.bgAudio = new Audio('/assets/bg_chant.m4a');
+    this.currentMode = 'temple';
+    this.currentTrackSrc = '/assets/bg_chant.m4a';
+    this.bgAudio = new Audio(this.currentTrackSrc);
     this.bgAudio.loop = true;
     this.bgAudio.preload = 'auto';
     this.bgAudio.volume = this.bgBaseVolume;
@@ -94,8 +96,50 @@ class TempleAudioEngine {
     }
   }
 
+  setMode(mode) {
+    const isBothi = mode === 'bothi';
+    const targetSrc = isBothi ? '/assets/khong_can_di_lam.mp3' : '/assets/bg_chant.m4a';
+
+    if (this.currentMode === mode && this.currentTrackSrc === targetSrc && this.bgAudio) {
+      return;
+    }
+
+    this.currentMode = mode;
+    this.currentTrackSrc = targetSrc;
+    this.useSynthMusicFallback = false;
+
+    if (this.bgAudio) {
+      try {
+        this.bgAudio.pause();
+      } catch (_) {}
+    }
+
+    this.bgAudio = new Audio(targetSrc);
+    this.bgAudio.loop = true;
+    this.bgAudio.preload = 'auto';
+    this.bgAudio.volume = this.ttsPlaying ? this.getDuckedVolume() : this.bgBaseVolume;
+    this.bgAudio.onerror = () => {
+      if (isBothi && this.bgAudio.src.indexOf('/tts-cache/') === -1) {
+        this.bgAudio.src = '/tts-cache/khong_can_di_lam.mp3';
+        if (this.bgMusicEnabled && this.unlocked && !this.activeYoutubeId) {
+          this.bgAudio.play().catch(() => {});
+        }
+      } else {
+        this.useSynthMusicFallback = true;
+        if (this.bgMusicEnabled && this.unlocked && !this.activeYoutubeId) {
+          this.startDefaultZenSynthLoop();
+        }
+      }
+    };
+
+    if (this.bgMusicEnabled && this.unlocked && !this.activeYoutubeId) {
+      this.startZenAmbience();
+    }
+  }
+
   startZenAmbience() {
     if (!this.bgMusicEnabled) return;
+    if (this.activeYoutubeId) return;
     if (this.useSynthMusicFallback) {
       this.startDefaultZenSynthLoop();
       return;
@@ -107,8 +151,13 @@ class TempleAudioEngine {
         if (p && typeof p.catch === 'function') {
           p.catch(() => {
             if (this.bgAudio.error) {
-              this.useSynthMusicFallback = true;
-              this.startDefaultZenSynthLoop();
+              if (this.currentMode === 'bothi' && this.bgAudio.src.indexOf('/tts-cache/') === -1) {
+                this.bgAudio.src = '/tts-cache/khong_can_di_lam.mp3';
+                this.bgAudio.play().catch(() => {});
+              } else {
+                this.useSynthMusicFallback = true;
+                this.startDefaultZenSynthLoop();
+              }
             }
           });
         }
@@ -472,6 +521,84 @@ class TempleAudioEngine {
         };
         osc.start(now + idx * 0.1);
         osc.stop(now + idx * 0.1 + 1.15);
+      });
+    } catch (_) {}
+  }
+
+  // --------------------------------------------------------------------------
+  // 5b. ÂM THANH BỐ THÍ & XIN TIỀN UỐNG BIA
+  // --------------------------------------------------------------------------
+  playCoinDrop() {
+    if (!this.sfxEnabled) return;
+    try {
+      const ctx = this.ensureContext();
+      const now = ctx.currentTime;
+      // Giả lập 2-3 tiếng đồng xu leng keng va vào bát nhôm
+      const hits = [0, 0.06, 0.13];
+      hits.forEach((offset, idx) => {
+        const t = now + offset;
+        const freqs = [2400 + Math.random() * 200, 3800 + Math.random() * 300, 5200 + Math.random() * 400];
+        freqs.forEach((f) => {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(f, t);
+
+          gain.gain.setValueAtTime(0.0001, t);
+          gain.gain.linearRampToValueAtTime(0.08 / (idx + 1), t + 0.002);
+          gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.18);
+
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(t);
+          osc.stop(t + 0.2);
+        });
+      });
+    } catch (_) {}
+  }
+
+  playHeartPop() {
+    if (!this.sfxEnabled) return;
+    try {
+      const ctx = this.ensureContext();
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(520, now);
+      osc.frequency.exponentialRampToValueAtTime(1040, now + 0.08);
+
+      gain.gain.setValueAtTime(0.001, now);
+      gain.gain.linearRampToValueAtTime(0.06, now + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.1);
+    } catch (_) {}
+  }
+
+  playBeerCheers() {
+    if (!this.sfxEnabled) return;
+    try {
+      const ctx = this.ensureContext();
+      const now = ctx.currentTime;
+      // Tiếng chạm cốc bia leng keng vui vẻ
+      [1800, 2200, 3100].forEach((freq) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, now);
+
+        gain.gain.setValueAtTime(0.001, now);
+        gain.gain.linearRampToValueAtTime(0.12, now + 0.005);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.45);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.48);
       });
     } catch (_) {}
   }

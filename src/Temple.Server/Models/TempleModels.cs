@@ -22,6 +22,18 @@ public class TempleState
     [JsonPropertyName("fortuneCount")]
     public int FortuneCount { get; set; } = 12;
 
+    [JsonPropertyName("totalBeerMoney")]
+    public long TotalBeerMoney { get; set; } = 0;
+
+    [JsonPropertyName("totalHearts")]
+    public long TotalHearts { get; set; } = 0;
+
+    [JsonPropertyName("totalFollows")]
+    public long TotalFollows { get; set; } = 0;
+
+    [JsonPropertyName("totalShares")]
+    public long TotalShares { get; set; } = 0;
+
     [JsonPropertyName("activeIncenseSticks")]
     public int ActiveIncenseSticks { get; set; } = 9;
 
@@ -108,6 +120,9 @@ public class TempleSettings
 
     [JsonPropertyName("youtubeUrl")]
     public string? YoutubeUrl { get; set; }
+
+    [JsonPropertyName("mode")]
+    public string Mode { get; set; } = "temple";
 }
 
 public class TikTokState
@@ -246,6 +261,18 @@ public class PublicTempleState
 
     [JsonPropertyName("fortuneCount")]
     public int FortuneCount { get; set; }
+
+    [JsonPropertyName("totalBeerMoney")]
+    public long TotalBeerMoney { get; set; }
+
+    [JsonPropertyName("totalHearts")]
+    public long TotalHearts { get; set; }
+
+    [JsonPropertyName("totalFollows")]
+    public long TotalFollows { get; set; }
+
+    [JsonPropertyName("totalShares")]
+    public long TotalShares { get; set; }
 
     [JsonPropertyName("activeIncenseSticks")]
     public int ActiveIncenseSticks { get; set; }

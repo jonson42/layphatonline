@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useTempleRpc } from './hooks/useTempleRpc';
 import { TempleAudioEngine } from './utils/audio';
 import TempleStage from './components/TempleStage';
+import BothiStage from './components/BothiStage';
 import QuickDock from './components/QuickDock';
 import AdminPanel from './components/AdminPanel';
 
@@ -36,15 +37,23 @@ export default function App() {
     return () => window.removeEventListener('pointerdown', unlock);
   }, [audio]);
 
-  // Sync YouTube audio across all instances (including OBS / TikTok LIVE Studio)
+  // Sync background music with mode ('bothi' vs 'temple') & YouTube
   useEffect(() => {
-    const ytUrl = state?.settings?.youtubeUrl;
-    if (ytUrl) {
-      audio.loadYouTube(ytUrl);
-    } else {
+    const isBothi = state?.settings?.mode === 'bothi';
+    audio.setMode(isBothi ? 'bothi' : 'temple');
+
+    // In bothi mode, khong_can_di_lam.mp3 is the dedicated background track
+    if (isBothi) {
       audio.stopYouTube();
+    } else {
+      const ytUrl = state?.settings?.youtubeUrl;
+      if (ytUrl) {
+        audio.loadYouTube(ytUrl);
+      } else {
+        audio.stopYouTube();
+      }
     }
-  }, [state?.settings?.youtubeUrl, audio]);
+  }, [state?.settings?.mode, state?.settings?.youtubeUrl, audio]);
 
   if (isAdminView) {
     return (
@@ -56,15 +65,27 @@ export default function App() {
     );
   }
 
+  const isBothiMode = state?.settings?.mode === 'bothi';
+
   return (
     <div className="app-workspace">
-      <TempleStage
-        state={state}
-        activeEvent={activeEvent}
-        audio={audio}
-        callRpc={callRpc}
-        obsMode={obsMode}
-      />
+      {isBothiMode ? (
+        <BothiStage
+          state={state}
+          activeEvent={activeEvent}
+          audio={audio}
+          callRpc={callRpc}
+          obsMode={obsMode}
+        />
+      ) : (
+        <TempleStage
+          state={state}
+          activeEvent={activeEvent}
+          audio={audio}
+          callRpc={callRpc}
+          obsMode={obsMode}
+        />
+      )}
       {!obsMode && (
         <QuickDock
           state={state}

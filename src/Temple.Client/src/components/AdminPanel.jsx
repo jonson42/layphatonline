@@ -289,6 +289,53 @@ export default function AdminPanel({ state, callRpc, onCloseAdmin }) {
               <audio src={ttsAudioUrl} controls autoPlay style={{ width: '100%', height: '38px', marginTop: '6px' }} />
             )}
 
+            {/* Chuyển đổi chế độ phát Live */}
+            <div style={{
+              background: 'rgba(0, 0, 0, 0.35)',
+              border: '1px solid rgba(255, 215, 0, 0.3)',
+              borderRadius: '12px',
+              padding: '12px 14px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '8px'
+            }}>
+              <span style={{ fontSize: '14px', fontWeight: 700, color: '#ffd54f' }}>
+                🔄 Chọn Chế Độ Phát Live:
+              </span>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <button
+                  onClick={() => callRpc('temple.updateSettings', { mode: 'temple' })}
+                  style={{
+                    flex: 1,
+                    padding: '10px',
+                    borderRadius: '8px',
+                    border: (state?.settings?.mode !== 'bothi') ? '2px solid #ffd54f' : '1px solid rgba(255,255,255,0.15)',
+                    background: (state?.settings?.mode !== 'bothi') ? 'linear-gradient(180deg, #d48806 0%, #ad6800 100%)' : 'rgba(255,255,255,0.06)',
+                    color: '#fff',
+                    fontWeight: 700,
+                    cursor: 'pointer'
+                  }}
+                >
+                  🪷 Đi Chùa Lễ Phật
+                </button>
+                <button
+                  onClick={() => callRpc('temple.updateSettings', { mode: 'bothi' })}
+                  style={{
+                    flex: 1,
+                    padding: '10px',
+                    borderRadius: '8px',
+                    border: (state?.settings?.mode === 'bothi') ? '2px solid #ff9800' : '1px solid rgba(255,255,255,0.15)',
+                    background: (state?.settings?.mode === 'bothi') ? 'linear-gradient(180deg, #f57c00 0%, #e65100 100%)' : 'rgba(255,255,255,0.06)',
+                    color: '#fff',
+                    fontWeight: 700,
+                    cursor: 'pointer'
+                  }}
+                >
+                  🍺 Bố Thí Uống Bia
+                </button>
+              </div>
+            </div>
+
             {/* Nhạc nền YouTube */}
             <div style={{ marginTop: '14px', paddingTop: '12px', borderTop: '1px solid rgba(244,193,80,0.25)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -386,7 +433,9 @@ export default function AdminPanel({ state, callRpc, onCloseAdmin }) {
                   color: '#fff8eb'
                 }}
               >
-                <option value="temple.burnIncense">temple.burnIncense (Thắp hương)</option>
+                <option value="temple.burnIncense">temple.burnIncense (Thắp hương / Chào người vào)</option>
+                <option value="temple.follow">temple.follow (Follow kênh)</option>
+                <option value="temple.share">temple.share (Chia sẻ live)</option>
                 <option value="temple.sendPrayer">temple.sendPrayer (Cầu nguyện / Hoa đăng)</option>
                 <option value="temple.drawFortune">temple.drawFortune (Xin xăm / Gieo quẻ)</option>
                 <option value="temple.strikeWoodenFish">temple.strikeWoodenFish (Gõ mõ)</option>

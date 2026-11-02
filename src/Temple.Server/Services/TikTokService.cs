@@ -204,18 +204,36 @@ public class TikTokService : ITikTokService, IDisposable
 
                     _logger.LogInformation("[TikTokLive Member] Người xem vào phòng: {User} ({UniqueId})", mUser, mUnique);
 
-                    string memberWish = AuspiciousWishes[Random.Shared.Next(AuspiciousWishes.Length)];
-                    string greeting = $"Nam mô A Di Đà Phật. Chùa Thiên Sơn xin kính chào thí chủ {mUser} đã vào Chánh Điện bái Phật. Nguyện cầu cho thí chủ {memberWish.ToLowerInvariant()}.";
-                    _templeService.BurnIncense(new BurnIncenseParams
+                    bool isBothiMode = _templeService.GetPublicState().Settings.Mode == "bothi";
+                    if (isBothiMode)
                     {
-                        User = mUser,
-                        UniqueId = mUnique,
-                        Avatar = mAvatar,
-                        Count = 1,
-                        Wish = memberWish,
-                        ReadTts = true,
-                        CustomTts = greeting
-                    });
+                        string bothiGreeting = $"Chào {mUser}, nhờ anh chị cho em xin vài đồng, tim hoặc bấm follow để em có tiền đi uống bia.";
+                        _templeService.BurnIncense(new BurnIncenseParams
+                        {
+                            User = mUser,
+                            UniqueId = mUnique,
+                            Avatar = mAvatar,
+                            Count = 1,
+                            Wish = "Nhờ anh/chị cho em xin vài đồng, tim hoặc follow để có tiền đi uống bia! 🍺🙏",
+                            ReadTts = true,
+                            CustomTts = bothiGreeting
+                        });
+                    }
+                    else
+                    {
+                        string memberWish = AuspiciousWishes[Random.Shared.Next(AuspiciousWishes.Length)];
+                        string greeting = $"Nam mô A Di Đà Phật. Chùa Thiên Sơn xin kính chào thí chủ {mUser} đã vào Chánh Điện bái Phật. Nguyện cầu cho thí chủ {memberWish.ToLowerInvariant()}.";
+                        _templeService.BurnIncense(new BurnIncenseParams
+                        {
+                            User = mUser,
+                            UniqueId = mUnique,
+                            Avatar = mAvatar,
+                            Count = 1,
+                            Wish = memberWish,
+                            ReadTts = true,
+                            CustomTts = greeting
+                        });
+                    }
                     break;
 
                 case "chat":
@@ -231,28 +249,63 @@ public class TikTokService : ITikTokService, IDisposable
                     string lUnique = root.TryGetProperty("uniqueId", out var lq) ? lq.GetString() ?? "" : "";
                     string lAvatar = root.TryGetProperty("avatar", out var la) ? la.GetString() ?? "" : "";
                     int lCount = root.TryGetProperty("count", out var lc) ? lc.GetInt32() : 1;
+
+                    string lKey = (!string.IsNullOrEmpty(lUnique) ? lUnique : lUser).ToLowerInvariant();
+                    bool shouldReadLikeTts = TextSanitizer.CheckAndRecordCooldown("like_tts_" + lKey, 8000);
+
                     _templeService.StrikeWoodenFish(new StrikeWoodenFishParams
                     {
                         User = lUser,
                         UniqueId = lUnique,
                         Avatar = lAvatar,
-                        Count = lCount
+                        Count = lCount,
+                        ReadTts = shouldReadLikeTts
                     });
                     break;
 
+                case "follow":
+                    string fUser = root.TryGetProperty("user", out var fu) ? fu.GetString() ?? "Thí Chủ" : "Thí Chủ";
+                    string fUnique = root.TryGetProperty("uniqueId", out var fq) ? fq.GetString() ?? "" : "";
+                    string fAvatar = root.TryGetProperty("avatar", out var fa) ? fa.GetString() ?? "" : "";
+                    _logger.LogInformation("[TikTokLive Follow] Người xem follow kênh: {User} ({UniqueId})", fUser, fUnique);
+                    _templeService.FollowChannel(new FollowChannelParams
+                    {
+                        User = fUser,
+                        UniqueId = fUnique,
+                        Avatar = fAvatar,
+                        ReadTts = true
+                    });
+                    break;
+
+                case "share":
                 case "social":
                     string sUser = root.TryGetProperty("user", out var su) ? su.GetString() ?? "Thí Chủ" : "Thí Chủ";
                     string sUnique = root.TryGetProperty("uniqueId", out var sq) ? sq.GetString() ?? "" : "";
                     string sAvatar = root.TryGetProperty("avatar", out var sa) ? sa.GetString() ?? "" : "";
-                    _templeService.RingBell(new RingBellParams
+                    bool isBothiShare = _templeService.GetPublicState().Settings.Mode == "bothi";
+                    if (isBothiShare)
                     {
-                        User = sUser,
-                        UniqueId = sUnique,
-                        Avatar = sAvatar,
-                        Count = 1,
-                        Wish = "Hữu duyên tương ngộ nơi cửa Phật, cầu bình an may mắn",
-                        ReadTts = false
-                    });
+                        _logger.LogInformation("[TikTokLive Share] Người xem chia sẻ live: {User} ({UniqueId})", sUser, sUnique);
+                        _templeService.ShareStream(new ShareStreamParams
+                        {
+                            User = sUser,
+                            UniqueId = sUnique,
+                            Avatar = sAvatar,
+                            ReadTts = true
+                        });
+                    }
+                    else
+                    {
+                        _templeService.RingBell(new RingBellParams
+                        {
+                            User = sUser,
+                            UniqueId = sUnique,
+                            Avatar = sAvatar,
+                            Count = 1,
+                            Wish = "Hữu duyên tương ngộ, cảm ơn đã chia sẻ live",
+                            ReadTts = false
+                        });
+                    }
                     break;
 
                 case "gift":
