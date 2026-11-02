@@ -5,7 +5,7 @@ import devoteeImg from '../assets/phongsinh_devotee.png';
 import crouchBoyImg from '../assets/crouch_boy.png';
 import crouchGirlImg from '../assets/crouch_girl.png';
 
-// Import thêm các nhân vật 3D cho đàn người đa dạng phong phú
+// 6 Nhân vật 3D Pixar đa dạng màu áo và quần riêng biệt
 import boyGreenImg from '../assets/pedestrian_boy.png';
 import girlPinkImg from '../assets/pedestrian_girl.png';
 import manYellowImg from '../assets/pedestrian_man_yellow.png';
@@ -25,18 +25,107 @@ const CHARACTER_SPRITES = {
   crouch_girl: crouchGirlImg
 };
 
-// Vị trí các Phật tử đứng trên sân đá phóng sinh (Tọa độ tự nhiên theo phối cảnh 3D)
-const DEVOTEES_PLATFORM = [
-  { id: 'dev_1', defaultName: 'Nguyễn Nhân', count: 50, x: 230, y: 1040, scale: 0.80, sprite: 'devotee', crouchSprite: 'crouch_boy' },
-  { id: 'dev_2', defaultName: 'Mai Lan', count: 50, x: 740, y: 1030, scale: 0.80, sprite: 'girl_blue', crouchSprite: 'crouch_girl' },
-  { id: 'dev_3', defaultName: 'Anh Tuấn', count: 50, x: 360, y: 1140, scale: 0.86, sprite: 'boy', crouchSprite: 'crouch_boy' },
-  { id: 'dev_4', defaultName: 'Bảo Châu', count: 50, x: 530, y: 1080, scale: 0.83, sprite: 'girl', crouchSprite: 'crouch_girl' },
-  { id: 'dev_5', defaultName: 'Thanh Bình', count: 50, x: 680, y: 1160, scale: 0.88, sprite: 'man_orange', crouchSprite: 'crouch_boy' },
-  { id: 'dev_6', defaultName: 'Mai Lan', count: 50, x: 860, y: 1070, scale: 0.82, sprite: 'girl_purple', crouchSprite: 'crouch_girl' },
-  { id: 'dev_7', defaultName: 'Anh Tuấn', count: 50, x: 160, y: 1260, scale: 0.94, sprite: 'devotee', crouchSprite: 'crouch_boy' },
-  { id: 'dev_8', defaultName: 'Thanh Bình A', count: 50, x: 490, y: 1360, scale: 0.98, sprite: 'man_yellow', crouchSprite: 'crouch_boy' },
-  { id: 'dev_9', defaultName: 'Nguyen Van A', count: 50, x: 820, y: 1250, scale: 0.93, sprite: 'devotee', crouchSprite: 'crouch_boy' },
-  { id: 'dev_10', defaultName: 'Thanh Vân', count: 50, x: 920, y: 1380, scale: 1.00, sprite: 'girl', crouchSprite: 'crouch_girl' }
+const ALL_MODELS = [
+  { sprite: 'devotee', crouchSprite: 'crouch_boy' },
+  { sprite: 'boy', crouchSprite: 'crouch_boy' },
+  { sprite: 'girl', crouchSprite: 'crouch_girl' },
+  { sprite: 'man_yellow', crouchSprite: 'crouch_boy' },
+  { sprite: 'girl_blue', crouchSprite: 'crouch_girl' },
+  { sprite: 'man_orange', crouchSprite: 'crouch_boy' },
+  { sprite: 'girl_purple', crouchSprite: 'crouch_girl' }
+];
+
+// 11 TUYẾN ĐƯỜNG ĐI BỘ 3D TRÊN SÂN ĐÁ (ĐI RA, ĐI VÔ, ĐI QUA ĐI LẠI, ĐI CHÉO)
+const PS_ROUTES = [
+  { id: 'r1', route: 'route-ps-depth-out-left', duration: 11.5, dir: -1, type: 'out', spawnX: 200, spawnY: 1380 },
+  { id: 'r2', route: 'route-ps-depth-out-right', duration: 11.0, dir: 1, type: 'out', spawnX: 820, spawnY: 1400 },
+  { id: 'r3', route: 'route-ps-depth-out-center', duration: 12.0, dir: 1, type: 'out', spawnX: 500, spawnY: 1460 },
+  { id: 'r4', route: 'route-ps-depth-in-left', duration: 12.5, dir: 1, type: 'in', spawnX: 470, spawnY: 980 },
+  { id: 'r5', route: 'route-ps-depth-in-right', duration: 12.0, dir: -1, type: 'in', spawnX: 570, spawnY: 990 },
+  { id: 'r6', route: 'route-ps-cross-mid-lr', duration: 13.0, dir: 1, type: 'cross', spawnX: 860, spawnY: 1170 },
+  { id: 'r7', route: 'route-ps-cross-mid-rl', duration: 13.5, dir: -1, type: 'cross', spawnX: 170, spawnY: 1160 },
+  { id: 'r8', route: 'route-ps-cross-front-lr', duration: 12.0, dir: 1, type: 'cross', spawnX: 880, spawnY: 1420 },
+  { id: 'r9', route: 'route-ps-cross-front-rl', duration: 12.5, dir: -1, type: 'cross', spawnX: 140, spawnY: 1400 },
+  { id: 'r10', route: 'route-ps-diag-down-right', duration: 13.0, dir: 1, type: 'diag', spawnX: 800, spawnY: 1420 },
+  { id: 'r11', route: 'route-ps-diag-down-left', duration: 13.0, dir: -1, type: 'diag', spawnX: 220, spawnY: 1420 }
+];
+
+// Danh sách 6 người đi lại liên tục trên sân đá (Đi ra đi vô & Đi qua đi lại)
+const INITIAL_PS_WALKERS = [
+  {
+    id: 'ps_w1',
+    defaultName: 'Nguyễn Nhân',
+    sprite: 'devotee',
+    crouchSprite: 'crouch_boy',
+    route: 'route-ps-depth-out-left',
+    duration: 11.5,
+    dir: -1,
+    releasedCount: 150,
+    cycle: 0
+  },
+  {
+    id: 'ps_w2',
+    defaultName: 'Mai Lan',
+    sprite: 'girl_blue',
+    crouchSprite: 'crouch_girl',
+    route: 'route-ps-cross-mid-lr',
+    duration: 13.0,
+    dir: 1,
+    releasedCount: 120,
+    cycle: 0
+  },
+  {
+    id: 'ps_w3',
+    defaultName: 'Thanh Bình',
+    sprite: 'man_orange',
+    crouchSprite: 'crouch_boy',
+    route: 'route-ps-depth-in-right',
+    duration: 12.0,
+    dir: -1,
+    releasedCount: 90,
+    cycle: 0
+  },
+  {
+    id: 'ps_w4',
+    defaultName: 'Bảo Châu',
+    sprite: 'girl_purple',
+    crouchSprite: 'crouch_girl',
+    route: 'route-ps-diag-down-left',
+    duration: 13.0,
+    dir: -1,
+    releasedCount: 80,
+    cycle: 0
+  },
+  {
+    id: 'ps_w5',
+    defaultName: 'Anh Tuấn',
+    sprite: 'man_yellow',
+    crouchSprite: 'crouch_boy',
+    route: 'route-ps-cross-front-rl',
+    duration: 12.5,
+    dir: -1,
+    releasedCount: 65,
+    cycle: 0
+  },
+  {
+    id: 'ps_w6',
+    defaultName: 'Thanh Vân',
+    sprite: 'girl',
+    crouchSprite: 'crouch_girl',
+    route: 'route-ps-depth-out-center',
+    duration: 12.0,
+    dir: 1,
+    releasedCount: 50,
+    cycle: 0
+  }
+];
+
+// 4 Phật tử đứng ngắm cảnh tại các góc đẹp trên sân đá (Lan can nhìn sông, bậc gác chuông)
+const INITIAL_PS_VANTAGE = [
+  { id: 'ps_v1', defaultName: 'Trường-Bạc Liêu', count: 50, x: 740, y: 1040, scale: 0.74, dir: -1, sprite: 'boy', crouchSprite: 'crouch_boy' },
+  { id: 'ps_v2', defaultName: 'Thu Phương', count: 50, x: 860, y: 1070, scale: 0.78, dir: -1, sprite: 'girl_purple', crouchSprite: 'crouch_girl' },
+  { id: 'ps_v3', defaultName: 'Thúy Vân', count: 50, x: 720, y: 1150, scale: 0.82, dir: -1, sprite: 'girl_blue', crouchSprite: 'crouch_girl' },
+  { id: 'ps_v4', defaultName: 'BO', count: 50, x: 210, y: 1190, scale: 0.85, dir: 1, sprite: 'devotee', crouchSprite: 'crouch_boy' }
 ];
 
 export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obsMode }) {
@@ -44,8 +133,14 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
   const stage9x16Ref = useRef(null);
   const processedEventIdRef = useRef(null);
 
-  // Trạng thái hành động cúi người thả chim của từng Phật tử trên sân đá
-  const [devoteeStates, setDevoteeStates] = useState({});
+  // Người đi bộ chiều sâu 3D trên sân đá
+  const [walkers, setWalkers] = useState(INITIAL_PS_WALKERS);
+
+  // Người đứng ngắm cảnh tại các vị trí cố định
+  const [vantageDevotees, setVantageDevotees] = useState(INITIAL_PS_VANTAGE);
+
+  // Trạng thái cúi người phóng sinh của từng nhân vật
+  const [crouchStates, setCrouchStates] = useState({});
 
   // Danh sách chim đang bay trên màn hình
   const [birds, setBirds] = useState([]);
@@ -126,7 +221,7 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
       });
     }
 
-    setBirds(prev => [...prev.slice(-40), ...flock]);
+    setBirds(prev => [...prev.slice(-45), ...flock]);
 
     // Âm thanh chim vỗ cánh / hót
     if (audio?.playBirdChirp) {
@@ -134,33 +229,80 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
     }
   }, [audio]);
 
-  // Kích hoạt Phật tử cúi xuống đặt lồng chim mở nắp thả đàn chim
-  const triggerCrouchAndRelease = useCallback((devId, birdsCount = 14) => {
-    const dev = DEVOTEES_PLATFORM.find(d => d.id === devId);
-    if (!dev) return;
-
-    // Cập nhật trạng thái nhân vật: cúi người xuống sàn đá
-    setDevoteeStates(prev => ({
+  // Kích hoạt Phật tử (Walker hoặc Vantage) cúi xuống đặt lồng chim mở nắp thả chim
+  const triggerCrouchAndRelease = useCallback((id, birdsCount = 14, originPos = null) => {
+    setCrouchStates(prev => ({
       ...prev,
-      [devId]: {
+      [id]: {
         isCrouching: true,
         until: Date.now() + 3800
       }
     }));
 
-    // Chim bắt đầu vỗ cánh bay vút ra từ chiếc lồng chim trên mặt đất
     setTimeout(() => {
-      spawnFlock(dev.x + 35, dev.y + 130 * dev.scale, birdsCount);
+      let x = 540;
+      let y = 1350;
+      if (originPos) {
+        x = originPos.x;
+        y = originPos.y;
+      } else {
+        const v = vantageDevotees.find(item => item.id === id);
+        if (v) {
+          x = v.x + 30;
+          y = v.y + 120 * v.scale;
+        } else {
+          const w = walkers.find(item => item.id === id);
+          const rObj = PS_ROUTES.find(r => r.route === w?.route);
+          if (rObj) {
+            x = rObj.spawnX;
+            y = rObj.spawnY;
+          }
+        }
+      }
+      spawnFlock(x, y, birdsCount);
     }, 350);
-  }, [spawnFlock]);
+  }, [vantageDevotees, walkers, spawnFlock]);
 
-  // Luân phiên liên tục trên sân đá: mỗi 3.2s chọn 1-2 người cúi xuống thả chim cho sống động
+  // Xử lý khi một người đi bộ hoàn thành 1 tuyến đường:
+  // Chọn ngay một tuyến đường mới (Đi ra, đi vô, đi ngang, đi chéo) để người di chuyển không ngừng
+  const handleWalkerEnd = useCallback((walker) => {
+    setWalkers(prev => prev.map(w => {
+      if (w.id !== walker.id) return w;
+
+      // Chọn 1 tuyến đường khác với tuyến đường vừa đi
+      const otherRoutes = PS_ROUTES.filter(r => r.route !== w.route);
+      const chosenRoute = otherRoutes[Math.floor(Math.random() * otherRoutes.length)] || PS_ROUTES[0];
+      const model = ALL_MODELS[Math.floor(Math.random() * ALL_MODELS.length)];
+
+      // 30% xác suất: sau khi đến điểm dừng thì cúi xuống thả chim mừng rỡ
+      if (Math.random() < 0.3) {
+        setTimeout(() => {
+          triggerCrouchAndRelease(w.id, Math.floor(10 + Math.random() * 8), {
+            x: chosenRoute.spawnX,
+            y: chosenRoute.spawnY
+          });
+        }, 100);
+      }
+
+      return {
+        ...w,
+        cycle: (w.cycle || 0) + 1,
+        route: chosenRoute.route,
+        duration: chosenRoute.duration + (Math.random() * 2 - 1),
+        dir: chosenRoute.dir,
+        sprite: model.sprite,
+        crouchSprite: model.crouchSprite
+      };
+    }));
+  }, [triggerCrouchAndRelease]);
+
+  // Luân phiên tự động thả chim trên sân: Cứ mỗi 3.2s chọn 1 người cúi xuống thả chim
   useEffect(() => {
     const timer = setInterval(() => {
       const now = Date.now();
 
-      // Dọn dẹp những người đã hết thời gian cúi -> đứng dậy
-      setDevoteeStates(prev => {
+      // Dọn dẹp những người đã hết thời gian cúi -> đứng dậy tiếp tục đi bộ / ngắm cảnh
+      setCrouchStates(prev => {
         let changed = false;
         const next = { ...prev };
         for (const [id, st] of Object.entries(next)) {
@@ -172,22 +314,23 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
         return changed ? next : prev;
       });
 
-      // Chọn ngẫu nhiên 1 người đang đứng thẳng để cúi xuống thả chim
-      const standing = DEVOTEES_PLATFORM.filter(d => {
-        const st = devoteeStates[d.id];
-        return !st || !st.isCrouching;
-      });
+      // Danh sách tất cả người đang đứng thẳng (bao gồm cả người đi bộ và người ngắm cảnh)
+      const allDevotees = [
+        ...walkers.map(w => ({ id: w.id, isWalker: true, route: w.route })),
+        ...vantageDevotees.map(v => ({ id: v.id, isWalker: false, x: v.x, y: v.y, scale: v.scale }))
+      ];
 
+      const standing = allDevotees.filter(d => !crouchStates[d.id]?.isCrouching);
       if (standing.length > 0) {
         const pick = standing[Math.floor(Math.random() * standing.length)];
-        triggerCrouchAndRelease(pick.id, Math.floor(10 + Math.random() * 8));
+        triggerCrouchAndRelease(pick.id, Math.floor(12 + Math.random() * 8));
       }
     }, 3200);
 
     return () => clearInterval(timer);
-  }, [devoteeStates, triggerCrouchAndRelease]);
+  }, [crouchStates, walkers, vantageDevotees, triggerCrouchAndRelease]);
 
-  // Tự động dọn dẹp các chú chim đã bay khỏi màn hình
+  // Tự động dọn dẹp chim bay khỏi màn hình
   useEffect(() => {
     if (birds.length === 0) return;
     const timer = setInterval(() => {
@@ -238,8 +381,8 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
     }
 
     // 2. Kích hoạt người ở hàng trước cúi xuống phóng sinh chim
-    const frontDevotees = ['dev_8', 'dev_10', 'dev_7', 'dev_9', 'dev_3'];
-    const chosenDevId = frontDevotees[Math.floor(Math.random() * frontDevotees.length)];
+    const frontIds = ['ps_w5', 'ps_w6', 'ps_w1', 'ps_v4'];
+    const chosenId = frontIds[Math.floor(Math.random() * frontIds.length)];
 
     // 3. Cập nhật Banner đối thoại phía dưới & chim bay
     if (type === 'phongsinhGreet' || type === 'bothiGreet' || type === 'templeGreet') {
@@ -249,7 +392,7 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
         text: ttsText || `Chào mừng ${cleanUser} đã đến với buổi phóng sinh chim tích đức!`,
         time: Date.now()
       });
-      triggerCrouchAndRelease(chosenDevId, 12);
+      triggerCrouchAndRelease(chosenId, 14);
     } else if (type === 'phongsinhRelease' || type === 'bothiDonate' || type === 'offerGift' || type === 'grandCeremony') {
       const birdsCount = count > 1 ? count : (coins ? coins * 5 : 50);
       setSpeech({
@@ -259,8 +402,8 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
         time: Date.now()
       });
       // 2 người cùng cúi xuống phóng sinh đàn chim lớn
-      triggerCrouchAndRelease('dev_8', 18);
-      triggerCrouchAndRelease('dev_10', 18);
+      triggerCrouchAndRelease('ps_w5', 20);
+      triggerCrouchAndRelease('ps_w6', 20);
       spawnHearts(540, 1300, 10);
     } else if (type === 'phongsinhHeart' || type === 'bothiHeart' || type === 'strikeWoodenFish') {
       setSpeech({
@@ -269,7 +412,7 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
         text: ttsText || `Cảm ơn anh/chị ${cleanUser} đã thả tim trợ duyên phóng sinh chim!`,
         time: Date.now()
       });
-      triggerCrouchAndRelease(chosenDevId, 10);
+      triggerCrouchAndRelease(chosenId, 12);
       spawnHearts(540, 1400, 8);
     } else if (type === 'phongsinhFollow' || type === 'bothiFollow' || type === 'templeFollow') {
       setSpeech({
@@ -278,8 +421,8 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
         text: ttsText || `Cảm ơn anh/chị ${cleanUser} đã follow kênh đồng hành cùng hoạt động phóng sinh tích đức!`,
         time: Date.now()
       });
-      triggerCrouchAndRelease('dev_7', 15);
-      triggerCrouchAndRelease('dev_9', 15);
+      triggerCrouchAndRelease('ps_w1', 16);
+      triggerCrouchAndRelease('ps_w2', 16);
     } else if (type === 'phongsinhShare' || type === 'bothiShare' || type === 'templeShare') {
       setSpeech({
         user: cleanUser,
@@ -287,7 +430,7 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
         text: ttsText || `Cảm ơn anh/chị ${cleanUser} đã chia sẻ buổi live lan tỏa phước báu đến muôn nơi!`,
         time: Date.now()
       });
-      triggerCrouchAndRelease(chosenDevId, 16);
+      triggerCrouchAndRelease(chosenId, 16);
     }
   }, [activeEvent, audio, triggerCrouchAndRelease, spawnHearts]);
 
@@ -298,19 +441,11 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
     const clickX = (e.clientX - rect.left) / scale;
     const clickY = (e.clientY - rect.top) / scale;
 
-    if (clickY > 800 && clickY < 1600) {
-      // Tìm người gần vị trí click nhất để cho cúi xuống thả chim
-      let nearestDev = DEVOTEES_PLATFORM[0];
-      let minDist = 999999;
-      DEVOTEES_PLATFORM.forEach(d => {
-        const dist = Math.hypot(d.x - clickX, d.y - clickY);
-        if (dist < minDist) {
-          minDist = dist;
-          nearestDev = d;
-        }
-      });
-
-      triggerCrouchAndRelease(nearestDev.id, 20);
+    if (clickY > 850 && clickY < 1650) {
+      // Chọn 1 người bất kỳ đang đứng để cúi xuống thả chim
+      const candidates = [...walkers, ...vantageDevotees];
+      const pick = candidates[Math.floor(Math.random() * candidates.length)];
+      triggerCrouchAndRelease(pick.id, 22, { x: clickX, y: clickY });
       spawnHearts(clickX, clickY, 6);
       callRpc('temple.releaseBirds', {
         user: speech.user || 'Phật Tử Hữu Duyên',
@@ -406,52 +541,49 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
           </div>
         </div>
 
-        {/* 4. MINI-MAP GÓC TRÊN BÊN PHẢI (Y HỆT HÌNH MẪU CỦA USER) */}
+        {/* 4. MINI-MAP GÓC TRÊN BÊN PHẢI VỚI CÁC CHẤM CHUYỂN ĐỘNG TRỰC QUAN */}
         <div className="phongsinh-minimap-box">
           <div className="minimap-preview">
             <svg viewBox="0 0 100 100" className="minimap-svg">
               {/* Vòng đá đỉnh núi */}
               <polygon points="50,10 85,25 90,65 75,90 25,90 10,65 15,25" fill="#a89a83" stroke="#e0d4be" strokeWidth="2" />
               <polygon points="50,15 80,28 85,62 72,85 28,85 15,62 20,28" fill="#c4b69d" />
-              {/* Các chấm nhỏ đại diện người đứng phóng sinh */}
-              <circle cx="32" cy="45" r="3" fill="#ff9800" />
-              <circle cx="70" cy="42" r="3" fill="#ff9800" />
-              <circle cx="45" cy="55" r="3" fill="#ffc107" />
-              <circle cx="58" cy="50" r="3" fill="#ff9800" />
-              <circle cx="65" cy="62" r="3" fill="#4caf50" />
-              <circle cx="38" cy="72" r="3" fill="#ff9800" />
-              <circle cx="50" cy="80" r="3" fill="#00bcd4" />
-              <circle cx="75" cy="74" r="3" fill="#ff9800" />
+              {/* Các chấm nhỏ chuyển động đại diện cho người di chuyển trên sân đá */}
+              <circle cx="34" cy="45" r="3.2" fill="#ff9800" className="minimap-dot-1" />
+              <circle cx="68" cy="42" r="3.2" fill="#ff9800" className="minimap-dot-2" />
+              <circle cx="46" cy="55" r="3.2" fill="#ffc107" className="minimap-dot-3" />
+              <circle cx="58" cy="52" r="3.2" fill="#ff9800" className="minimap-dot-4" />
+              <circle cx="66" cy="64" r="3.2" fill="#4caf50" className="minimap-dot-1" />
+              <circle cx="36" cy="70" r="3.2" fill="#ff9800" className="minimap-dot-2" />
+              <circle cx="50" cy="78" r="3.2" fill="#00bcd4" className="minimap-dot-3" />
+              <circle cx="76" cy="72" r="3.2" fill="#ff9800" className="minimap-dot-4" />
             </svg>
           </div>
           <div className="minimap-tag">Mini-Map</div>
         </div>
 
-        {/* 5. CÁC PHẬT TỬ TRÊN SÂN ĐÁ: CÚI XUỐNG ĐẶT LỒNG CHIM MỞ NẮP THẢ CHIM */}
+        {/* 5. CÁC PHẬT TỬ DI CHUYỂN TRÊN SÂN ĐÁ: ĐI RA, ĐI VÔ, ĐI QUA ĐI LẠI VÀ CÚI THẢ CHIM */}
         <div className="phongsinh-devotees-layer">
-          {DEVOTEES_PLATFORM.map((dev, idx) => {
+          {/* A. NGƯỜI ĐI BỘ CHIỀU SÂU 3D VÀ ĐI NGANG SÂN (WALKERS) */}
+          {walkers.map((w, idx) => {
             const matchedLeader = state?.leaderboard?.[idx];
-            const displayName = matchedLeader?.name || dev.defaultName;
-            const releasedCount = matchedLeader?.birdsReleased || dev.count;
-            const isCrouching = Boolean(devoteeStates[dev.id]?.isCrouching);
+            const displayName = matchedLeader?.name || w.defaultName;
+            const releasedCount = matchedLeader?.birdsReleased || w.releasedCount;
+            const isCrouching = Boolean(crouchStates[w.id]?.isCrouching);
 
-            // Sprite: Khi cúi người phóng sinh thì chuyển sang động tác cúi gập người sát đất mở lồng
             const spriteImg = isCrouching
-              ? (CHARACTER_SPRITES[dev.crouchSprite] || crouchBoyImg)
-              : (CHARACTER_SPRITES[dev.sprite] || devoteeImg);
+              ? (CHARACTER_SPRITES[w.crouchSprite] || crouchBoyImg)
+              : (CHARACTER_SPRITES[w.sprite] || devoteeImg);
 
             return (
               <div
-                key={dev.id}
-                className={`terrace-devotee-wrapper ${isCrouching ? 'is-crouching' : ''}`}
-                style={{
-                  left: `${dev.x}px`,
-                  top: `${dev.y + (isCrouching ? 24 : 0)}px`,
-                  transform: `scale(${dev.scale})`
-                }}
+                key={`${w.id}_${w.cycle || 0}`}
+                className={`ps-walker ${w.route} ${isCrouching ? 'is-crouching' : ''}`}
+                style={{ animationDuration: `${w.duration}s` }}
+                onAnimationEnd={() => handleWalkerEnd(w)}
                 onClick={(e) => {
                   e.stopPropagation();
-                  triggerCrouchAndRelease(dev.id, 25);
+                  triggerCrouchAndRelease(w.id, 25);
                   callRpc('temple.releaseBirds', {
                     user: displayName,
                     count: 50,
@@ -459,16 +591,100 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
                   });
                 }}
               >
-                {/* BẢNG TÊN & SỐ LƯỢNG ĐÃ PHÓNG TRÊN ĐẦU */}
-                <div className={`devotee-badge ${isCrouching ? 'badge-crouching-glow' : ''}`}>
+                <div
+                  className="ps-walker-flip"
+                  style={{ transform: w.dir === -1 ? 'scaleX(-1)' : 'scaleX(1)' }}
+                >
+                  <div className="ps-walker-bob">
+                    {/* BẢNG TÊN & SỐ LƯỢNG ĐÃ PHÓNG (ĐẢO NGƯỢC X ĐỂ CHỮ KHÔNG BỊ NGƯỢC CHIỀU) */}
+                    <div
+                      className={`devotee-badge ${isCrouching ? 'badge-crouching-glow' : ''}`}
+                      style={{ transform: w.dir === -1 ? 'scaleX(-1)' : 'scaleX(1)' }}
+                    >
+                      <div className="badge-name">{displayName}</div>
+                      <div className="badge-count">
+                        {isCrouching ? '🕊️ Đang thả chim...' : `Đã phóng: ${releasedCount}`}
+                      </div>
+                    </div>
+
+                    {/* HÌNH ẢNH NHÂN VẬT ĐI BỘ CẦM LỒNG CHIM */}
+                    <div className="devotee-character-container">
+                      <img
+                        src={spriteImg}
+                        alt={displayName}
+                        className={`devotee-sprite-img ${isCrouching ? 'crouching-pose' : ''}`}
+                        draggable={false}
+                      />
+
+                      {/* Lồng chim: khi đi bộ thì cầm đung đưa; khi cúi thả thì hào quang nở rộ */}
+                      {!isCrouching ? (
+                        <div className="bamboo-bird-cage">
+                          <svg viewBox="0 0 32 36" className="cage-svg">
+                            <path d="M16,2 L16,6" stroke="#d7ccc8" strokeWidth="2" />
+                            <path d="M6,8 Q16,4 26,8 L24,30 Q16,33 8,30 Z" fill="#8d6e63" stroke="#5d4037" strokeWidth="1.5" />
+                            <line x1="11" y1="8" x2="11" y2="30" stroke="#d7ccc8" strokeWidth="1" />
+                            <line x1="16" y1="6" x2="16" y2="31" stroke="#d7ccc8" strokeWidth="1" />
+                            <line x1="21" y1="8" x2="21" y2="30" stroke="#d7ccc8" strokeWidth="1" />
+                            <circle cx="16" cy="18" r="2.5" fill="#ffffff" />
+                          </svg>
+                        </div>
+                      ) : (
+                        <div className="crouch-release-burst">
+                          <div className="cage-aura-burst" />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+
+          {/* B. PHẬT TỬ ĐỨNG NGẮM CẢNH TẠI CÁC GÓC ĐẸP TRÊN SÂN ĐÁ (VANTAGE DEVOTEES) */}
+          {vantageDevotees.map((v, idx) => {
+            const leaderOffset = idx + walkers.length;
+            const matchedLeader = state?.leaderboard?.[leaderOffset];
+            const displayName = matchedLeader?.name || v.defaultName;
+            const releasedCount = matchedLeader?.birdsReleased || v.count;
+            const isCrouching = Boolean(crouchStates[v.id]?.isCrouching);
+
+            const spriteImg = isCrouching
+              ? (CHARACTER_SPRITES[v.crouchSprite] || crouchBoyImg)
+              : (CHARACTER_SPRITES[v.sprite] || devoteeImg);
+
+            return (
+              <div
+                key={v.id}
+                className={`terrace-devotee-wrapper ${isCrouching ? 'is-crouching' : ''}`}
+                style={{
+                  left: `${v.x}px`,
+                  top: `${v.y + (isCrouching ? 20 : 0)}px`,
+                  transform: `scale(${v.scale})`
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  triggerCrouchAndRelease(v.id, 25);
+                  callRpc('temple.releaseBirds', {
+                    user: displayName,
+                    count: 50,
+                    wish: 'Phóng sinh chim tích đức, vạn sự cát tường'
+                  });
+                }}
+              >
+                <div
+                  className={`devotee-badge ${isCrouching ? 'badge-crouching-glow' : ''}`}
+                  style={{ transform: v.dir === -1 ? 'scaleX(-1)' : 'scaleX(1)' }}
+                >
                   <div className="badge-name">{displayName}</div>
                   <div className="badge-count">
                     {isCrouching ? '🕊️ Đang thả chim...' : `Đã phóng: ${releasedCount}`}
                   </div>
                 </div>
 
-                {/* HÌNH ẢNH NHÂN VẬT CÚI XUỐNG CẦM LỒNG CHIM */}
-                <div className="devotee-character-container">
+                <div
+                  className="devotee-character-container"
+                  style={{ transform: v.dir === -1 ? 'scaleX(-1)' : 'scaleX(1)' }}
+                >
                   <img
                     src={spriteImg}
                     alt={displayName}
@@ -476,7 +692,6 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
                     draggable={false}
                   />
 
-                  {/* Lồng chim: khi đứng thì cầm lồng tre trên tay; khi cúi xuống thì có lồng chim trong sprite và hào quang bung nở */}
                   {!isCrouching ? (
                     <div className="bamboo-bird-cage">
                       <svg viewBox="0 0 32 36" className="cage-svg">
