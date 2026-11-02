@@ -217,8 +217,8 @@ export default function BothiStage({ state, activeEvent, audio, callRpc, obsMode
   const fitStage = useCallback(() => {
     if (!stageWrapperRef.current || !stage9x16Ref.current) return;
     const rect = stageWrapperRef.current.getBoundingClientRect();
-    if (rect && rect.width > 0) {
-      const scale = rect.width / 1080;
+    if (rect && rect.width > 0 && rect.height > 0) {
+      const scale = Math.min(rect.width / 1080, rect.height / 1920);
       stage9x16Ref.current.style.transform = `scale(${scale})`;
     }
   }, []);

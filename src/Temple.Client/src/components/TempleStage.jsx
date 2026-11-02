@@ -69,8 +69,10 @@ export default function TempleStage({ state, activeEvent, audio, callRpc, obsMod
   const fitStage = useCallback(() => {
     if (!stageWrapperRef.current || !stage9x16Ref.current) return;
     const rect = stageWrapperRef.current.getBoundingClientRect();
-    const scale = rect.width / 1080;
-    stage9x16Ref.current.style.transform = `scale(${scale})`;
+    if (rect && rect.width > 0 && rect.height > 0) {
+      const scale = Math.min(rect.width / 1080, rect.height / 1920);
+      stage9x16Ref.current.style.transform = `scale(${scale})`;
+    }
   }, []);
 
   useEffect(() => {

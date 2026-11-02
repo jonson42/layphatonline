@@ -56,18 +56,28 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
     time: Date.now()
   });
 
-  // Tự động co dãn chuẩn tỉ lệ 9:16 (1080x1920)
+  // Tự động co dãn chuẩn tỉ lệ 9:16 (1080x1920) vừa khít khung màn hình
   const fitStage = useCallback(() => {
     if (!stageWrapperRef.current || !stage9x16Ref.current) return;
     const rect = stageWrapperRef.current.getBoundingClientRect();
-    const scale = rect.width / 1080;
-    stage9x16Ref.current.style.transform = `scale(${scale})`;
+    if (rect && rect.width > 0 && rect.height > 0) {
+      const scale = Math.min(rect.width / 1080, rect.height / 1920);
+      stage9x16Ref.current.style.transform = `scale(${scale})`;
+    }
   }, []);
 
   useEffect(() => {
     window.addEventListener('resize', fitStage);
     fitStage();
-    return () => window.removeEventListener('resize', fitStage);
+    const t1 = requestAnimationFrame(fitStage);
+    const t2 = setTimeout(fitStage, 60);
+    const t3 = setTimeout(fitStage, 250);
+    return () => {
+      window.removeEventListener('resize', fitStage);
+      cancelAnimationFrame(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+    };
   }, [fitStage]);
 
   // Hàm tạo đàn chim bay vút lên bầu trời từ một vị trí (x, y)
@@ -466,3 +476,4 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
     </div>
   );
 }
+
