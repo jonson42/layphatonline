@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react'
 import phongsinhBgImg from '../assets/phongsinh_bg.jpg';
 import monkAvatarImg from '../assets/phongsinh_monk.jpg';
 import devoteeImg from '../assets/phongsinh_devotee.png';
+import crouchBoyImg from '../assets/crouch_boy.png';
+import crouchGirlImg from '../assets/crouch_girl.png';
 
 // Import thêm các nhân vật 3D cho đàn người đa dạng phong phú
 import boyGreenImg from '../assets/pedestrian_boy.png';
@@ -18,27 +20,32 @@ const CHARACTER_SPRITES = {
   man_yellow: manYellowImg,
   girl_blue: girlBlueImg,
   man_orange: manOrangeImg,
-  girl_purple: girlPurpleImg
+  girl_purple: girlPurpleImg,
+  crouch_boy: crouchBoyImg,
+  crouch_girl: crouchGirlImg
 };
 
 // Vị trí các Phật tử đứng trên sân đá phóng sinh (Tọa độ tự nhiên theo phối cảnh 3D)
 const DEVOTEES_PLATFORM = [
-  { id: 'dev_1', defaultName: 'Nguyễn Nhân', count: 50, x: 230, y: 1040, scale: 0.80, sprite: 'devotee' },
-  { id: 'dev_2', defaultName: 'Mai Lan', count: 50, x: 740, y: 1030, scale: 0.80, sprite: 'girl_blue' },
-  { id: 'dev_3', defaultName: 'Anh Tuấn', count: 50, x: 360, y: 1140, scale: 0.86, sprite: 'boy' },
-  { id: 'dev_4', defaultName: 'Bảo Châu', count: 50, x: 530, y: 1080, scale: 0.83, sprite: 'girl' },
-  { id: 'dev_5', defaultName: 'Thanh Bình', count: 50, x: 680, y: 1160, scale: 0.88, sprite: 'man_orange' },
-  { id: 'dev_6', defaultName: 'Mai Lan', count: 50, x: 860, y: 1070, scale: 0.82, sprite: 'girl_purple' },
-  { id: 'dev_7', defaultName: 'Anh Tuấn', count: 50, x: 160, y: 1260, scale: 0.94, sprite: 'devotee' },
-  { id: 'dev_8', defaultName: 'Thanh Bình A', count: 50, x: 490, y: 1360, scale: 0.98, sprite: 'man_yellow' },
-  { id: 'dev_9', defaultName: 'Nguyen Van A', count: 50, x: 820, y: 1250, scale: 0.93, sprite: 'devotee' },
-  { id: 'dev_10', defaultName: 'Thanh Vân', count: 50, x: 920, y: 1380, scale: 1.00, sprite: 'girl' }
+  { id: 'dev_1', defaultName: 'Nguyễn Nhân', count: 50, x: 230, y: 1040, scale: 0.80, sprite: 'devotee', crouchSprite: 'crouch_boy' },
+  { id: 'dev_2', defaultName: 'Mai Lan', count: 50, x: 740, y: 1030, scale: 0.80, sprite: 'girl_blue', crouchSprite: 'crouch_girl' },
+  { id: 'dev_3', defaultName: 'Anh Tuấn', count: 50, x: 360, y: 1140, scale: 0.86, sprite: 'boy', crouchSprite: 'crouch_boy' },
+  { id: 'dev_4', defaultName: 'Bảo Châu', count: 50, x: 530, y: 1080, scale: 0.83, sprite: 'girl', crouchSprite: 'crouch_girl' },
+  { id: 'dev_5', defaultName: 'Thanh Bình', count: 50, x: 680, y: 1160, scale: 0.88, sprite: 'man_orange', crouchSprite: 'crouch_boy' },
+  { id: 'dev_6', defaultName: 'Mai Lan', count: 50, x: 860, y: 1070, scale: 0.82, sprite: 'girl_purple', crouchSprite: 'crouch_girl' },
+  { id: 'dev_7', defaultName: 'Anh Tuấn', count: 50, x: 160, y: 1260, scale: 0.94, sprite: 'devotee', crouchSprite: 'crouch_boy' },
+  { id: 'dev_8', defaultName: 'Thanh Bình A', count: 50, x: 490, y: 1360, scale: 0.98, sprite: 'man_yellow', crouchSprite: 'crouch_boy' },
+  { id: 'dev_9', defaultName: 'Nguyen Van A', count: 50, x: 820, y: 1250, scale: 0.93, sprite: 'devotee', crouchSprite: 'crouch_boy' },
+  { id: 'dev_10', defaultName: 'Thanh Vân', count: 50, x: 920, y: 1380, scale: 1.00, sprite: 'girl', crouchSprite: 'crouch_girl' }
 ];
 
 export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obsMode }) {
   const stageWrapperRef = useRef(null);
   const stage9x16Ref = useRef(null);
   const processedEventIdRef = useRef(null);
+
+  // Trạng thái hành động cúi người thả chim của từng Phật tử trên sân đá
+  const [devoteeStates, setDevoteeStates] = useState({});
 
   // Danh sách chim đang bay trên màn hình
   const [birds, setBirds] = useState([]);
@@ -112,6 +119,59 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
     }
   }, [audio]);
 
+  // Kích hoạt Phật tử cúi xuống đặt lồng chim mở nắp thả đàn chim
+  const triggerCrouchAndRelease = useCallback((devId, birdsCount = 14) => {
+    const dev = DEVOTEES_PLATFORM.find(d => d.id === devId);
+    if (!dev) return;
+
+    // Cập nhật trạng thái nhân vật: cúi người xuống sàn đá
+    setDevoteeStates(prev => ({
+      ...prev,
+      [devId]: {
+        isCrouching: true,
+        until: Date.now() + 3800
+      }
+    }));
+
+    // Chim bắt đầu vỗ cánh bay vút ra từ chiếc lồng chim trên mặt đất
+    setTimeout(() => {
+      spawnFlock(dev.x + 35, dev.y + 130 * dev.scale, birdsCount);
+    }, 350);
+  }, [spawnFlock]);
+
+  // Luân phiên liên tục trên sân đá: mỗi 3.2s chọn 1-2 người cúi xuống thả chim cho sống động
+  useEffect(() => {
+    const timer = setInterval(() => {
+      const now = Date.now();
+
+      // Dọn dẹp những người đã hết thời gian cúi -> đứng dậy
+      setDevoteeStates(prev => {
+        let changed = false;
+        const next = { ...prev };
+        for (const [id, st] of Object.entries(next)) {
+          if (st.isCrouching && now >= st.until) {
+            delete next[id];
+            changed = true;
+          }
+        }
+        return changed ? next : prev;
+      });
+
+      // Chọn ngẫu nhiên 1 người đang đứng thẳng để cúi xuống thả chim
+      const standing = DEVOTEES_PLATFORM.filter(d => {
+        const st = devoteeStates[d.id];
+        return !st || !st.isCrouching;
+      });
+
+      if (standing.length > 0) {
+        const pick = standing[Math.floor(Math.random() * standing.length)];
+        triggerCrouchAndRelease(pick.id, Math.floor(10 + Math.random() * 8));
+      }
+    }, 3200);
+
+    return () => clearInterval(timer);
+  }, [devoteeStates, triggerCrouchAndRelease]);
+
   // Tự động dọn dẹp các chú chim đã bay khỏi màn hình
   useEffect(() => {
     if (birds.length === 0) return;
@@ -149,16 +209,6 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
     return () => clearInterval(timer);
   }, [floatingHearts.length]);
 
-  // Thỉnh thoảng có vài chú chim tự do bay lượn ngẫu nhiên trên bầu trời cho sinh động
-  useEffect(() => {
-    const ambientTimer = setInterval(() => {
-      const randX = 200 + Math.random() * 680;
-      const randY = 1100 + Math.random() * 300;
-      spawnFlock(randX, randY, Math.floor(3 + Math.random() * 5));
-    }, 4500);
-    return () => clearInterval(ambientTimer);
-  }, [spawnFlock]);
-
   // Xử lý sự kiện Realtime từ Server (.NET JSON-RPC WebSocket)
   useEffect(() => {
     if (!activeEvent || activeEvent.id === processedEventIdRef.current) return;
@@ -172,7 +222,11 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
       audio.queueTts(ttsText, activeEvent.ttsVoice || 'maichi');
     }
 
-    // 2. Cập nhật Banner đối thoại phía dưới
+    // 2. Kích hoạt người ở hàng trước cúi xuống phóng sinh chim
+    const frontDevotees = ['dev_8', 'dev_10', 'dev_7', 'dev_9', 'dev_3'];
+    const chosenDevId = frontDevotees[Math.floor(Math.random() * frontDevotees.length)];
+
+    // 3. Cập nhật Banner đối thoại phía dưới & chim bay
     if (type === 'phongsinhGreet' || type === 'bothiGreet' || type === 'templeGreet') {
       setSpeech({
         user: cleanUser,
@@ -180,8 +234,7 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
         text: ttsText || `Chào mừng ${cleanUser} đã đến với buổi phóng sinh chim tích đức!`,
         time: Date.now()
       });
-      // Chim bay chào đón
-      spawnFlock(540, 1200, 8);
+      triggerCrouchAndRelease(chosenDevId, 12);
     } else if (type === 'phongsinhRelease' || type === 'bothiDonate' || type === 'offerGift' || type === 'grandCeremony') {
       const birdsCount = count > 1 ? count : (coins ? coins * 5 : 50);
       setSpeech({
@@ -190,9 +243,9 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
         text: ttsText || `Cảm ơn anh/chị ${cleanUser} đã ủng hộ phóng sinh ${birdsCount} chú chim về với thiên nhiên! Công đức vô lượng!`,
         time: Date.now()
       });
-      // Phóng thích đàn chim bay rợp trời
-      spawnFlock(380, 1150, 16);
-      spawnFlock(680, 1180, 16);
+      // 2 người cùng cúi xuống phóng sinh đàn chim lớn
+      triggerCrouchAndRelease('dev_8', 18);
+      triggerCrouchAndRelease('dev_10', 18);
       spawnHearts(540, 1300, 10);
     } else if (type === 'phongsinhHeart' || type === 'bothiHeart' || type === 'strikeWoodenFish') {
       setSpeech({
@@ -201,8 +254,8 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
         text: ttsText || `Cảm ơn anh/chị ${cleanUser} đã thả tim trợ duyên phóng sinh chim!`,
         time: Date.now()
       });
+      triggerCrouchAndRelease(chosenDevId, 10);
       spawnHearts(540, 1400, 8);
-      spawnFlock(540, 1100, 6);
     } else if (type === 'phongsinhFollow' || type === 'bothiFollow' || type === 'templeFollow') {
       setSpeech({
         user: cleanUser,
@@ -210,8 +263,8 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
         text: ttsText || `Cảm ơn anh/chị ${cleanUser} đã follow kênh đồng hành cùng hoạt động phóng sinh tích đức!`,
         time: Date.now()
       });
-      spawnFlock(350, 1150, 12);
-      spawnFlock(720, 1150, 12);
+      triggerCrouchAndRelease('dev_7', 15);
+      triggerCrouchAndRelease('dev_9', 15);
     } else if (type === 'phongsinhShare' || type === 'bothiShare' || type === 'templeShare') {
       setSpeech({
         user: cleanUser,
@@ -219,20 +272,30 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
         text: ttsText || `Cảm ơn anh/chị ${cleanUser} đã chia sẻ buổi live lan tỏa phước báu đến muôn nơi!`,
         time: Date.now()
       });
-      spawnFlock(540, 1150, 14);
+      triggerCrouchAndRelease(chosenDevId, 16);
     }
-  }, [activeEvent, audio, spawnFlock, spawnHearts]);
+  }, [activeEvent, audio, triggerCrouchAndRelease, spawnHearts]);
 
   // Click thủ công trên màn hình để phóng sinh thử nghiệm
   const handleStageClick = (e) => {
-    // Lấy tọa độ click tương đối trên canvas 1080x1920
     const rect = stage9x16Ref.current.getBoundingClientRect();
-    const scale = rect.width / 1080;
+    const scale = Math.min(rect.width / 1080, rect.height / 1920);
     const clickX = (e.clientX - rect.left) / scale;
     const clickY = (e.clientY - rect.top) / scale;
 
     if (clickY > 800 && clickY < 1600) {
-      spawnFlock(clickX, clickY, 15);
+      // Tìm người gần vị trí click nhất để cho cúi xuống thả chim
+      let nearestDev = DEVOTEES_PLATFORM[0];
+      let minDist = 999999;
+      DEVOTEES_PLATFORM.forEach(d => {
+        const dist = Math.hypot(d.x - clickX, d.y - clickY);
+        if (dist < minDist) {
+          minDist = dist;
+          nearestDev = d;
+        }
+      });
+
+      triggerCrouchAndRelease(nearestDev.id, 20);
       spawnHearts(clickX, clickY, 6);
       callRpc('temple.releaseBirds', {
         user: speech.user || 'Phật Tử Hữu Duyên',
@@ -331,26 +394,31 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
           <div className="minimap-tag">Mini-Map</div>
         </div>
 
-        {/* 5. CÁC PHẬT TỬ ĐỨNG TRÊN SÂN ĐÁ CẦM LỒNG CHIM PHÓNG SINH */}
+        {/* 5. CÁC PHẬT TỬ TRÊN SÂN ĐÁ: CÚI XUỐNG ĐẶT LỒNG CHIM MỞ NẮP THẢ CHIM */}
         <div className="phongsinh-devotees-layer">
           {DEVOTEES_PLATFORM.map((dev, idx) => {
             const matchedLeader = state?.leaderboard?.[idx];
             const displayName = matchedLeader?.name || dev.defaultName;
             const releasedCount = matchedLeader?.birdsReleased || dev.count;
-            const spriteImg = CHARACTER_SPRITES[dev.sprite] || devoteeImg;
+            const isCrouching = Boolean(devoteeStates[dev.id]?.isCrouching);
+
+            // Sprite: Khi cúi người phóng sinh thì chuyển sang động tác cúi gập người sát đất mở lồng
+            const spriteImg = isCrouching
+              ? (CHARACTER_SPRITES[dev.crouchSprite] || crouchBoyImg)
+              : (CHARACTER_SPRITES[dev.sprite] || devoteeImg);
 
             return (
               <div
                 key={dev.id}
-                className="terrace-devotee-wrapper"
+                className={`terrace-devotee-wrapper ${isCrouching ? 'is-crouching' : ''}`}
                 style={{
                   left: `${dev.x}px`,
-                  top: `${dev.y}px`,
+                  top: `${dev.y + (isCrouching ? 24 : 0)}px`,
                   transform: `scale(${dev.scale})`
                 }}
                 onClick={(e) => {
                   e.stopPropagation();
-                  spawnFlock(dev.x + 30, dev.y - 40, 15);
+                  triggerCrouchAndRelease(dev.id, 25);
                   callRpc('temple.releaseBirds', {
                     user: displayName,
                     count: 50,
@@ -358,31 +426,40 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
                   });
                 }}
               >
-                {/* BẢNG TÊN & SỐ LƯỢNG ĐÃ PHÓNG TRÊN ĐẦU (Y HỆT HÌNH MẪU) */}
-                <div className="devotee-badge">
+                {/* BẢNG TÊN & SỐ LƯỢNG ĐÃ PHÓNG TRÊN ĐẦU */}
+                <div className={`devotee-badge ${isCrouching ? 'badge-crouching-glow' : ''}`}>
                   <div className="badge-name">{displayName}</div>
-                  <div className="badge-count">Đã phóng: {releasedCount}</div>
+                  <div className="badge-count">
+                    {isCrouching ? '🕊️ Đang thả chim...' : `Đã phóng: ${releasedCount}`}
+                  </div>
                 </div>
 
-                {/* HÌNH ẢNH NHÂN VẬT CẦM LỒNG CHIM */}
+                {/* HÌNH ẢNH NHÂN VẬT CÚI XUỐNG CẦM LỒNG CHIM */}
                 <div className="devotee-character-container">
                   <img
                     src={spriteImg}
                     alt={displayName}
-                    className="devotee-sprite-img"
+                    className={`devotee-sprite-img ${isCrouching ? 'crouching-pose' : ''}`}
                     draggable={false}
                   />
-                  {/* Lồng chim nhỏ trên tay nhân vật */}
-                  <div className="bamboo-bird-cage">
-                    <svg viewBox="0 0 32 36" className="cage-svg">
-                      <path d="M16,2 L16,6" stroke="#d7ccc8" strokeWidth="2" />
-                      <path d="M6,8 Q16,4 26,8 L24,30 Q16,33 8,30 Z" fill="#8d6e63" stroke="#5d4037" strokeWidth="1.5" />
-                      <line x1="11" y1="8" x2="11" y2="30" stroke="#d7ccc8" strokeWidth="1" />
-                      <line x1="16" y1="6" x2="16" y2="31" stroke="#d7ccc8" strokeWidth="1" />
-                      <line x1="21" y1="8" x2="21" y2="30" stroke="#d7ccc8" strokeWidth="1" />
-                      <circle cx="16" cy="18" r="2.5" fill="#ffffff" />
-                    </svg>
-                  </div>
+
+                  {/* Lồng chim: khi đứng thì cầm lồng tre trên tay; khi cúi xuống thì có lồng chim trong sprite và hào quang bung nở */}
+                  {!isCrouching ? (
+                    <div className="bamboo-bird-cage">
+                      <svg viewBox="0 0 32 36" className="cage-svg">
+                        <path d="M16,2 L16,6" stroke="#d7ccc8" strokeWidth="2" />
+                        <path d="M6,8 Q16,4 26,8 L24,30 Q16,33 8,30 Z" fill="#8d6e63" stroke="#5d4037" strokeWidth="1.5" />
+                        <line x1="11" y1="8" x2="11" y2="30" stroke="#d7ccc8" strokeWidth="1" />
+                        <line x1="16" y1="6" x2="16" y2="31" stroke="#d7ccc8" strokeWidth="1" />
+                        <line x1="21" y1="8" x2="21" y2="30" stroke="#d7ccc8" strokeWidth="1" />
+                        <circle cx="16" cy="18" r="2.5" fill="#ffffff" />
+                      </svg>
+                    </div>
+                  ) : (
+                    <div className="crouch-release-burst">
+                      <div className="cage-aura-burst" />
+                    </div>
+                  )}
                 </div>
               </div>
             );
@@ -468,7 +545,7 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
           </div>
         </div>
 
-        {/* 9. GỢI Ý CHẠM MÀN HÌNH ĐỂ PHÓNG SINH (Chỉ hiển thị nhẹ nhàng) */}
+        {/* 9. GỢI Ý CHẠM MÀN HÌNH ĐỂ PHÓNG SINH */}
         <div className="phongsinh-interactive-hint">
           <span>✨ Chạm vào người hoặc sân đá để thả chim phóng sinh tích đức! 🕊️🙏</span>
         </div>
@@ -476,4 +553,3 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
     </div>
   );
 }
-

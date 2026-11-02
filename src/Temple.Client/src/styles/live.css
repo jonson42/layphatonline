@@ -2851,7 +2851,7 @@ body.obs-mode .phongsinh-stage-wrapper {
   flex-direction: column;
   align-items: center;
   cursor: pointer;
-  transition: transform 0.2s ease, filter 0.2s ease;
+  transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1), filter 0.3s ease;
   z-index: 30;
 }
 
@@ -2861,6 +2861,64 @@ body.obs-mode .phongsinh-stage-wrapper {
 
 .terrace-devotee-wrapper:active {
   transform: scale(0.96);
+}
+
+/* Động tác cúi người xuống sát đất thả chim */
+.terrace-devotee-wrapper.is-crouching {
+  filter: brightness(1.12) drop-shadow(0 0 20px rgba(255, 215, 0, 0.85));
+  z-index: 35;
+}
+
+.badge-crouching-glow {
+  background: linear-gradient(180deg, #d48806 0%, #874d00 100%) !important;
+  border-color: #ffd700 !important;
+  box-shadow: 0 0 16px rgba(255, 215, 0, 0.8) !important;
+  animation: badgeCrouchPulse 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes badgeCrouchPulse {
+  0% { transform: scale(1); }
+  100% { transform: scale(1.08); }
+}
+
+.devotee-sprite-img.crouching-pose {
+  animation: crouchBob 1.8s ease-in-out infinite alternate !important;
+  filter: drop-shadow(0 8px 18px rgba(0, 0, 0, 0.75));
+  transform-origin: center bottom;
+}
+
+@keyframes crouchBob {
+  0% { transform: translateY(0) scaleY(1); }
+  100% { transform: translateY(4px) scaleY(0.97); }
+}
+
+.crouch-release-burst {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 80px;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.cage-aura-burst {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 235, 59, 0.95) 0%, rgba(255, 193, 7, 0.5) 45%, rgba(255, 215, 0, 0) 75%);
+  animation: cageAuraExpand 1.1s ease-out infinite;
+  pointer-events: none;
+}
+
+@keyframes cageAuraExpand {
+  0% { transform: translateX(-50%) scale(0.5); opacity: 1; }
+  100% { transform: translateX(-50%) scale(2.4); opacity: 0; }
 }
 
 /* Bảng tên nâu gỗ bo tròn trên đầu nhân vật */
