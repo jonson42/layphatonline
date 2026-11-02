@@ -954,36 +954,7 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
           ))}
         </div>
 
-        {/* 8. BẢNG ĐỐI THOẠI CHÀO MỪNG / CẢM ƠN (Y HỆT HÌNH MẪU PHÍA DƯỚI) */}
-        <div className="phongsinh-dialog-bubble">
-          {/* Avatar Nhà Sư hiền hòa đội nón lá */}
-          <div className="dialog-avatar-wrap">
-            <img
-              src={monkAvatarImg}
-              alt="Thiền Sư Trụ Trì"
-              className="dialog-avatar-img"
-            />
-          </div>
-
-          {/* Lời thoại chào mừng / cảm ơn */}
-          <div className="dialog-text-content">
-            {speech.user && (
-              <div className="dialog-user-badge">
-                <span className="badge-author">@{speech.user}</span>
-                {speech.tag && <span className="badge-tag">{speech.tag}</span>}
-              </div>
-            )}
-            <div className="dialog-message-body">
-              {speech.text.split('\n').map((line, i) => (
-                <div key={i} className={`dialog-line ${i === 0 ? 'main-line' : 'sub-line'}`}>
-                  {line}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* 9. GỢI Ý CHẠM MÀN HÌNH ĐỂ PHÓNG SINH */}
+        {/* 8. GỢI Ý CHẠM MÀN HÌNH ĐỂ PHÓNG SINH */}
         <div
           className="phongsinh-interactive-hint"
           onClick={(e) => {

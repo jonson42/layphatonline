@@ -3830,7 +3830,7 @@ body.obs-mode .phongsinh-stage-wrapper {
 
 .phongsinh-interactive-hint {
   position: absolute;
-  bottom: 275px;
+  bottom: 140px;
   left: 50%;
   transform: translateX(-50%);
   display: inline-flex;
