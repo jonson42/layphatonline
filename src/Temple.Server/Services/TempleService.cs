@@ -139,7 +139,14 @@ public class TempleService : ITempleService
             _state.Devotees[key] = dev;
         }
 
-        dev.Name = displayName;
+        if (!string.IsNullOrWhiteSpace(displayName) && displayName != "Thí Chủ Hữu Duyên" && !displayName.Equals(uniqueId, StringComparison.OrdinalIgnoreCase))
+        {
+            dev.Name = displayName;
+        }
+        else if (string.IsNullOrWhiteSpace(dev.Name) || dev.Name == "Thí Chủ Hữu Duyên")
+        {
+            dev.Name = displayName;
+        }
         if (!string.IsNullOrEmpty(avatar)) dev.Avatar = avatar;
         dev.Merit += meritDelta;
         dev.Incense += incenseDelta;

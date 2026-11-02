@@ -27,8 +27,8 @@ const recentMembers = new Map();
 
 function extractUser(data) {
   const u = data?.user || data || {};
-  const uniqueId = u.uniqueId || u.displayId || data?.uniqueId || '';
-  const user = u.nickname || uniqueId || data?.nickname || 'Thí Chủ';
+  const uniqueId = u.uniqueId || u.displayId || data?.uniqueId || data?.displayId || '';
+  const user = u.nickname || data?.nickname || uniqueId || 'Thí Chủ';
   const avatar =
     u.profilePictureUrl ||
     u.avatarLarge?.urlList?.[0] ||
