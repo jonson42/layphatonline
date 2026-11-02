@@ -984,8 +984,17 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
         </div>
 
         {/* 9. GỢI Ý CHẠM MÀN HÌNH ĐỂ PHÓNG SINH */}
-        <div className="phongsinh-interactive-hint">
-          <span>✨ Chạm vào người hoặc sân đá để thả chim phóng sinh tích đức! 🕊️🙏</span>
+        <div
+          className="phongsinh-interactive-hint"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleStageClick(e);
+          }}
+          title="Bấm vào đây để phóng sinh chim"
+        >
+          <span className="hint-sparkle">✨</span>
+          <span className="hint-text">Hãy nhấn vào màn hình để thả chim để tạo phước lành</span>
+          <span className="hint-icon">🕊️🙏</span>
         </div>
       </div>
     </div>
