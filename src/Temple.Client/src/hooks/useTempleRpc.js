@@ -85,7 +85,14 @@ export function useTempleRpc() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       });
-      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(`Máy chủ C# chưa bật hoặc đang bận (HTTP ${res.status}). Vui lòng khởi động start.bat!`);
+      }
+      const text = await res.text();
+      if (!text || !text.trim()) {
+        throw new Error('Máy chủ trả về dữ liệu rỗng. Vui lòng kiểm tra tiến trình Backend C# (port 5000)!');
+      }
+      const data = JSON.parse(text);
       if (data.error) throw new Error(data.error.message);
       return data.result;
     } catch (err) {
@@ -96,9 +103,14 @@ export function useTempleRpc() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
           });
-          const data2 = await res2.json();
-          if (data2.error) throw new Error(data2.error.message);
-          return data2.result;
+          if (res2.ok) {
+            const text2 = await res2.text();
+            if (text2 && text2.trim()) {
+              const data2 = JSON.parse(text2);
+              if (data2.error) throw new Error(data2.error.message);
+              return data2.result;
+            }
+          }
         } catch (_) {}
       }
       throw err;
