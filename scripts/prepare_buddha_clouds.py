@@ -55,3 +55,4 @@ if __name__ == "__main__":
     process_deity_image(p_quanam, out_quanam)
     process_deity_image(p_thichca, out_thichca)
     print("Done generating feathered cloud PNGs!")
+
