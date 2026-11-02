@@ -12,6 +12,9 @@
   margin: 0;
   padding: 0;
   user-select: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 html,
@@ -20,8 +23,11 @@ body {
   height: 100%;
   overflow: hidden;
   background: #120403;
-  font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-family: 'Be Vietnam Pro', 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   color: var(--ivory);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 .app-workspace {
@@ -32,6 +38,8 @@ body {
   height: 100vh;
   gap: 24px;
   padding: 12px;
+  overflow-x: auto;
+  overflow-y: hidden;
 }
 
 body.obs-mode {
@@ -62,6 +70,8 @@ body.obs-mode .quick-dock {
   background: #000;
   contain: layout paint style;
   margin: 0 auto;
+  flex-shrink: 0;
+  image-rendering: -webkit-optimize-contrast;
 }
 
 body.obs-mode .stage-wrapper,
@@ -894,19 +904,20 @@ body.obs-mode .phongsinh-stage-wrapper {
 .hud-lb-header {
   text-align: center;
   font-family: 'Noto Serif', serif;
-  font-size: 19px;
+  font-size: 22px;
   font-weight: 900;
   color: var(--gold-bright);
   letter-spacing: 1.5px;
-  padding-bottom: 6px;
-  margin-bottom: 6px;
-  border-bottom: 1px solid rgba(244, 193, 80, 0.3);
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+  border-bottom: 1.5px solid rgba(244, 193, 80, 0.4);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
 }
 
 .hud-lb-list {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   flex: 1;
   justify-content: center;
 }
@@ -915,18 +926,20 @@ body.obs-mode .phongsinh-stage-wrapper {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 16px;
+  font-size: 18px;
+  font-weight: 800;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
 }
 
 .leader-rank {
-  width: 22px;
-  height: 22px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
   background: rgba(244, 193, 80, 0.25);
-  border: 1px solid var(--gold-main);
+  border: 1.5px solid var(--gold-main);
   color: var(--gold-bright);
-  font-size: 13px;
-  font-weight: 800;
+  font-size: 15px;
+  font-weight: 900;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1229,6 +1242,12 @@ body.obs-mode .phongsinh-stage-wrapper {
   overflow: hidden;
   background: #000;
   user-select: none;
+  contain: strict;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 .bothi-background-layer {
@@ -2270,13 +2289,13 @@ body.obs-mode .phongsinh-stage-wrapper {
 }
 
 .viewer-to-bowl-walker .capsule-username {
-  font-size: 15px;
-  max-width: 190px;
+  font-size: 19px;
+  max-width: 240px;
 }
 
 .viewer-to-bowl-walker .capsule-metric-pill {
-  font-size: 13px;
-  padding: 2.5px 9px;
+  font-size: 16px;
+  padding: 3px 12px;
 }
 
 /* ==========================================================================
@@ -2345,8 +2364,8 @@ body.obs-mode .phongsinh-stage-wrapper {
 
 /* Vòng tròn Avatar góc trái của capsule */
 .capsule-avatar-ring {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   border-radius: 50%;
   border: 2px solid #ffd54f;
   background: #ffffff;
@@ -2397,10 +2416,10 @@ body.obs-mode .phongsinh-stage-wrapper {
 
 /* Tên người dùng trong capsule */
 .capsule-username {
-  font-size: 13px;
-  max-width: 130px;
+  font-size: 18px;
+  max-width: 180px;
   color: #ffffff;
-  font-weight: 800;
+  font-weight: 900;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -2409,8 +2428,8 @@ body.obs-mode .phongsinh-stage-wrapper {
 
 /* Huy hiệu điểm số / hành động bên phải capsule */
 .capsule-metric-pill {
-  font-size: 11px;
-  padding: 2px 7px;
+  font-size: 15px;
+  padding: 3px 10px;
   display: inline-flex;
   align-items: center;
   gap: 3px;
@@ -2651,6 +2670,12 @@ body.obs-mode .phongsinh-stage-wrapper {
   overflow: hidden;
   background: #000;
   user-select: none;
+  contain: strict;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 .phongsinh-bg-image {
@@ -2769,16 +2794,16 @@ body.obs-mode .phongsinh-stage-wrapper {
 .phongsinh-stats-pill {
   display: flex;
   align-items: center;
-  gap: 10px;
-  background: rgba(20, 20, 20, 0.85);
-  border: 1.5px solid rgba(255, 215, 0, 0.5);
+  gap: 12px;
+  background: rgba(20, 20, 20, 0.90);
+  border: 2px solid rgba(255, 215, 0, 0.7);
   border-radius: 999px;
-  padding: 6px 18px;
+  padding: 8px 22px;
   color: #ffffff;
-  font-size: 15px;
-  font-weight: 800;
+  font-size: 19px;
+  font-weight: 900;
   backdrop-filter: blur(8px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.55);
 }
 
 .stat-bird { color: #81d4fa; }
@@ -2791,63 +2816,69 @@ body.obs-mode .phongsinh-stage-wrapper {
   position: absolute;
   top: 80px;
   left: 24px;
-  width: 320px;
-  background: rgba(26, 18, 12, 0.84);
-  border: 1.5px solid rgba(224, 169, 109, 0.6);
-  border-radius: 16px;
-  padding: 10px 14px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
-  backdrop-filter: blur(10px);
+  width: 380px;
+  background: rgba(22, 14, 9, 0.92);
+  border: 2px solid rgba(244, 193, 80, 0.75);
+  border-radius: 18px;
+  padding: 12px 18px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(12px);
   z-index: 45;
 }
 
 .lb-header {
-  font-size: 13px;
+  font-size: 19px;
   font-weight: 900;
   color: #ffd54f;
   text-transform: uppercase;
-  letter-spacing: 0.8px;
-  border-bottom: 1px solid rgba(255, 213, 79, 0.25);
-  padding-bottom: 6px;
-  margin-bottom: 6px;
+  letter-spacing: 1px;
+  border-bottom: 1.5px solid rgba(255, 213, 79, 0.35);
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.85);
 }
 
 .lb-list {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 7px;
 }
 
 .lb-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 13px;
-  font-weight: 700;
+  font-size: 17px;
+  font-weight: 800;
   color: #fff;
-  padding: 2px 0;
+  padding: 3px 0;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.85);
 }
 
 .lb-rank {
   font-weight: 900;
-  width: 26px;
+  font-size: 18px;
+  width: 34px;
 }
-.rank-1 { color: #ffd700; text-shadow: 0 0 6px rgba(255, 215, 0, 0.6); }
-.rank-2 { color: #b0bec5; }
-.rank-3 { color: #cd7f32; }
-.rank-4, .rank-5 { color: rgba(255, 255, 255, 0.65); }
+.rank-1 { color: #ffd700; text-shadow: 0 0 8px rgba(255, 215, 0, 0.8); }
+.rank-2 { color: #d1d5db; text-shadow: 0 0 6px rgba(209, 213, 219, 0.6); }
+.rank-3 { color: #f59e0b; text-shadow: 0 0 6px rgba(245, 158, 11, 0.6); }
+.rank-4, .rank-5 { color: rgba(255, 255, 255, 0.85); }
 
 .lb-name {
   flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  padding: 0 6px;
+  padding: 0 8px;
+  font-size: 17px;
+  font-weight: 800;
 }
 
 .lb-val {
-  color: #81d4fa;
-  font-weight: 800;
+  color: #67e8f9;
+  font-weight: 900;
+  font-size: 17px;
 }
 
 /* Mini-Map góc phải trên đỉnh núi */
@@ -3534,28 +3565,31 @@ body.obs-mode .phongsinh-stage-wrapper {
 /* Bảng tên nâu gỗ bo tròn trên đầu nhân vật */
 .devotee-badge {
   background: linear-gradient(180deg, #7c481e 0%, #4e290b 100%);
-  border: 2px solid #deb887;
-  border-radius: 16px;
-  padding: 3px 14px;
+  border: 2px solid #facc15;
+  border-radius: 18px;
+  padding: 4px 16px;
   text-align: center;
   color: #ffffff;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.55), inset 0 1px 2px rgba(255, 255, 255, 0.3);
-  margin-bottom: 4px;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.75), inset 0 1px 2px rgba(255, 255, 255, 0.35);
+  margin-bottom: 6px;
   pointer-events: none;
+  backdrop-filter: blur(4px);
 }
 
 .badge-name {
-  font-size: 17px;
-  font-weight: 800;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  font-size: 21px;
+  font-weight: 900;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.95);
   white-space: nowrap;
+  letter-spacing: 0.3px;
 }
 
 .badge-count {
-  font-size: 14px;
-  font-weight: 700;
+  font-size: 17px;
+  font-weight: 800;
   color: #ffe082;
   white-space: nowrap;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
 }
 
 .devotee-character-container {

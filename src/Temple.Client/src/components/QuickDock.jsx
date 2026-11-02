@@ -107,12 +107,33 @@ export default function QuickDock({ state, audio, callRpc, onOpenAdmin }) {
   };
 
   const handleConnectTikTok = async () => {
-    if (!tiktokInput.trim()) return;
+    const target = (tiktokInput || '').trim();
+    if (!target) {
+      alert('Vui lòng nhập @username hoặc link tài khoản TikTok Live!');
+      return;
+    }
     setConnecting(true);
     try {
-      await callRpc('live.connect', { username: tiktokInput });
+      const res = await callRpc('live.connect', { username: target });
+      if (res?.connected) {
+        alert(`✅ Đã kết nối thành công phòng Live TikTok của @${target}!`);
+      } else if (res?.lastError) {
+        alert(`⚠️ Thông báo kết nối TikTok:\n\n${res.lastError}`);
+      }
     } catch (err) {
       alert(`Lỗi kết nối TikTok: ${err.message}`);
+    } finally {
+      setConnecting(false);
+    }
+  };
+
+  const handleDisconnectTikTok = async () => {
+    setConnecting(true);
+    try {
+      await callRpc('live.disconnect', {});
+      alert('Đã ngắt kết nối TikTok Live.');
+    } catch (err) {
+      alert(`Lỗi ngắt kết nối: ${err.message}`);
     } finally {
       setConnecting(false);
     }
@@ -389,13 +410,23 @@ export default function QuickDock({ state, audio, callRpc, onOpenAdmin }) {
             onChange={(e) => setTiktokInput(e.target.value)}
             placeholder="Nhập @username hoặc link TikTok Live..."
           />
-          <button
-            className="dock-btn gold"
-            onClick={handleConnectTikTok}
-            disabled={connecting}
-          >
-            {connecting ? 'Đang nối...' : 'Kết Nối'}
-          </button>
+          {state?.tiktok?.connected ? (
+            <button
+              className="dock-btn red"
+              onClick={handleDisconnectTikTok}
+              disabled={connecting}
+            >
+              {connecting ? 'Đang xử lý...' : 'Ngắt Nối'}
+            </button>
+          ) : (
+            <button
+              className="dock-btn gold"
+              onClick={handleConnectTikTok}
+              disabled={connecting}
+            >
+              {connecting ? 'Đang nối...' : 'Kết Nối'}
+            </button>
+          )}
         </div>
         {state?.tiktok?.lastError && (
           <div style={{ color: '#ff8585', fontSize: '12px', background: 'rgba(255,60,60,0.15)', padding: '6px 10px', borderRadius: '8px', border: '1px solid rgba(255,100,100,0.3)', margin: '4px 0' }}>

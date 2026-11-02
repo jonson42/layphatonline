@@ -103,12 +103,27 @@ async function connect(rawUser) {
     }
   });
 
-  conn.on(ControlEvent.ERROR, (err) => {
-    let msg = err?.message || (typeof err === 'string' ? err : 'Lỗi kết nối phòng Live');
-    if (msg.includes('illegal secret key') || msg.includes('RoomId not found') || msg.includes('status code 417')) {
-      msg = `Tài khoản @${cleanUser} hiện không phát Live hoặc TikTok yêu cầu phiên Live đang hoạt động.`;
+  let lastEmittedError = '';
+  const emitError = (rawErr) => {
+    let msg = rawErr?.exception?.message || rawErr?.message || (typeof rawErr === 'string' ? rawErr : '') || 'Không thể kết nối phòng Live';
+    if (
+      msg.includes('illegal secret key') ||
+      msg.includes('RoomId not found') ||
+      msg.includes('status code 417') ||
+      msg.includes("isn't online") ||
+      msg.includes('offline') ||
+      msg.includes('not online')
+    ) {
+      msg = `Tài khoản @${cleanUser} hiện KHÔNG PHÁT TRỰC TIẾP (Offline) trên TikTok. Vui lòng đảm bảo tài khoản đang mở Live trên TikTok trước khi bấm Kết nối, hoặc bật 'Tự động giả lập đông người' để trải nghiệm thử.`;
     }
-    emit({ type: 'error', message: msg });
+    if (msg !== lastEmittedError) {
+      lastEmittedError = msg;
+      emit({ type: 'error', message: msg });
+    }
+  };
+
+  conn.on(ControlEvent.ERROR, (err) => {
+    emitError(err);
   });
 
   conn.on(WebcastEvent.ROOM_USER, (data) => {
@@ -213,11 +228,7 @@ async function connect(rawUser) {
     const roomState = await conn.connect();
     // ControlEvent.CONNECTED already emits connected event, no duplicate emit here
   } catch (err) {
-    let msg = err?.message || 'Không thể kết nối phòng Live';
-    if (msg.includes('illegal secret key') || msg.includes('RoomId not found') || msg.includes('status code 417') || msg.includes("isn't online") || msg.includes('offline') || msg.includes('not online')) {
-      msg = `Tài khoản @${cleanUser} hiện KHÔNG PHÁT TRỰC TIẾP (Offline) trên TikTok. Vui lòng đảm bảo tài khoản đang mở Live trên TikTok trước khi bấm Kết nối, hoặc bật 'Tự động giả lập đông người' để trải nghiệm thử.`;
-    }
-    emit({ type: 'error', message: msg });
+    emitError(err);
   }
 }
 

@@ -188,7 +188,7 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
   const [speech, setSpeech] = useState({
     user: '',
     tag: '',
-    text: 'Chào mừng các User mới!\nHãy cùng nhau phóng sinh chim để tích đức.\n(Số lượng chim hiện tại: >2000)',
+    text: 'Chào mừng quý Phật tử & Thí chủ hữu duyên!\nHãy cùng nhau phóng sinh chim để tích đức tu tâm.\n(Cầu chúc vạn sự cát tường, bình an và may mắn 🙏)',
     time: Date.now()
   });
 
@@ -785,49 +785,46 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
                   });
                 }}
               >
-                <div
-                  className="ps-walker-flip"
-                  style={{ transform: w.dir === -1 ? 'scaleX(-1)' : 'scaleX(1)' }}
-                >
-                  <div className="ps-walker-bob">
-                    {/* BẢNG TÊN & SỐ LƯỢNG ĐÃ PHÓNG (ĐẢO NGƯỢC X ĐỂ CHỮ KHÔNG BỊ NGƯỢC CHIỀU) */}
-                    <div
-                      className={`devotee-badge ${isCrouching ? 'badge-crouching-glow' : ''}`}
-                      style={{ transform: w.dir === -1 ? 'scaleX(-1)' : 'scaleX(1)' }}
-                    >
-                      <div className="badge-name">{displayName}</div>
-                      <div className="badge-count">
-                        {isCrouching ? '🕊️ Đang thả chim...' : `Đã phóng: ${releasedCount}`}
+                <div className="ps-walker-bob">
+                  {/* BẢNG TÊN & SỐ LƯỢNG ĐÃ PHÓNG (LUÔN ĐỨNG THẲNG RÕ RÀNG, KHÔNG BỊ NGƯỢC) */}
+                  <div
+                    className={`devotee-badge ${isCrouching ? 'badge-crouching-glow' : ''}`}
+                  >
+                    <div className="badge-name">{displayName}</div>
+                    <div className="badge-count">
+                      {isCrouching ? '🕊️ Đang thả chim...' : `Đã phóng: ${releasedCount}`}
+                    </div>
+                  </div>
+
+                  {/* HÌNH ẢNH NHÂN VẬT ĐI BỘ CẦM LỒNG CHIM (CHỈ LẬT HÌNH NHÂN VẬT THEO HƯỚNG BƯỚC ĐI) */}
+                  <div
+                    className="devotee-character-container"
+                    style={{ transform: w.dir === -1 ? 'scaleX(-1)' : 'scaleX(1)' }}
+                  >
+                    <img
+                      src={spriteImg}
+                      alt={displayName}
+                      className={`devotee-sprite-img ${isCrouching ? 'crouching-pose' : ''}`}
+                      draggable={false}
+                    />
+
+                    {/* Lồng chim: khi đi bộ thì cầm đung đưa; khi cúi thả thì hào quang nở rộ */}
+                    {!isCrouching ? (
+                      <div className="bamboo-bird-cage">
+                        <svg viewBox="0 0 32 36" className="cage-svg">
+                          <path d="M16,2 L16,6" stroke="#d7ccc8" strokeWidth="2" />
+                          <path d="M6,8 Q16,4 26,8 L24,30 Q16,33 8,30 Z" fill="#8d6e63" stroke="#5d4037" strokeWidth="1.5" />
+                          <line x1="11" y1="8" x2="11" y2="30" stroke="#d7ccc8" strokeWidth="1" />
+                          <line x1="16" y1="6" x2="16" y2="31" stroke="#d7ccc8" strokeWidth="1" />
+                          <line x1="21" y1="8" x2="21" y2="30" stroke="#d7ccc8" strokeWidth="1" />
+                          <circle cx="16" cy="18" r="2.5" fill="#ffffff" />
+                        </svg>
                       </div>
-                    </div>
-
-                    {/* HÌNH ẢNH NHÂN VẬT ĐI BỘ CẦM LỒNG CHIM */}
-                    <div className="devotee-character-container">
-                      <img
-                        src={spriteImg}
-                        alt={displayName}
-                        className={`devotee-sprite-img ${isCrouching ? 'crouching-pose' : ''}`}
-                        draggable={false}
-                      />
-
-                      {/* Lồng chim: khi đi bộ thì cầm đung đưa; khi cúi thả thì hào quang nở rộ */}
-                      {!isCrouching ? (
-                        <div className="bamboo-bird-cage">
-                          <svg viewBox="0 0 32 36" className="cage-svg">
-                            <path d="M16,2 L16,6" stroke="#d7ccc8" strokeWidth="2" />
-                            <path d="M6,8 Q16,4 26,8 L24,30 Q16,33 8,30 Z" fill="#8d6e63" stroke="#5d4037" strokeWidth="1.5" />
-                            <line x1="11" y1="8" x2="11" y2="30" stroke="#d7ccc8" strokeWidth="1" />
-                            <line x1="16" y1="6" x2="16" y2="31" stroke="#d7ccc8" strokeWidth="1" />
-                            <line x1="21" y1="8" x2="21" y2="30" stroke="#d7ccc8" strokeWidth="1" />
-                            <circle cx="16" cy="18" r="2.5" fill="#ffffff" />
-                          </svg>
-                        </div>
-                      ) : (
-                        <div className="crouch-release-burst">
-                          <div className="cage-aura-burst" />
-                        </div>
-                      )}
-                    </div>
+                    ) : (
+                      <div className="crouch-release-burst">
+                        <div className="cage-aura-burst" />
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -867,7 +864,6 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
               >
                 <div
                   className={`devotee-badge ${isCrouching ? 'badge-crouching-glow' : ''}`}
-                  style={{ transform: v.dir === -1 ? 'scaleX(-1)' : 'scaleX(1)' }}
                 >
                   <div className="badge-name">{displayName}</div>
                   <div className="badge-count">

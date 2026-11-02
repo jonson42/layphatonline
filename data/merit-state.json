@@ -1,4 +1,4 @@
-{
+﻿{
   "totalIncense": 3748,
   "totalMerit": 399781,
   "woodenFishHits": 10670,
@@ -17239,8 +17239,8 @@
       "birdsReleased": 0,
       "lastWish": "C\u1EA7u c\u00F4ng danh s\u1EF1 nghi\u1EC7p thu\u1EADn bu\u1ED3m xu\u00F4i gi\u00F3, hanh th\u00F4ng t\u1EA5n t\u1EDBi"
     },
-    "Nguy n Nh n": {
-      "name": "Nguy n Nh n",
+    "Nguyễn Nhẫn": {
+      "name": "Nguyễn Nhẫn",
       "uniqueId": "nguynnhn",
       "avatar": "",
       "merit": 300,
@@ -17259,8 +17259,8 @@
       "birdsReleased": 15,
       "lastWish": "\u0110\u00E3 th\u1EA3 15 tim tr\u1EE3 duy\u00EAn ph\u00F3ng sinh chim"
     },
-    "Thanh B nh": {
-      "name": "Thanh B nh",
+    "Thanh Bình": {
+      "name": "Thanh Bình",
       "uniqueId": "thanhbnh",
       "avatar": "",
       "merit": 20,
@@ -17627,13 +17627,13 @@
       "id": "a1d51bdf91624eb19e36f89574cae45a",
       "timestamp": "2026-11-02T07:29:26.4760478Z",
       "type": "phongsinhFollow",
-      "user": "Thanh B nh",
+      "user": "Thanh Bình",
       "uniqueId": "thanhbnh",
       "avatar": "",
       "count": 1,
       "merit": 20,
       "wish": "\u0110\u00E3 follow k\u00EAnh chung tay ph\u00F3ng sinh chim! \uD83D\uDD4A\uFE0F\u2795",
-      "ttsText": "C\u1EA3m \u01A1n anh ch\u1ECB Thanh B nh \u0111\u00E3 b\u1EA5m follow k\u00EAnh \u0111\u1EC3 c\u00F9ng chung tay ph\u00F3ng sinh chim t\u00EDch \u0111\u1EE9c! Ch\u00FAc anh ch\u1ECB v\u1EA1n s\u1EF1 c\u00E1t t\u01B0\u1EDDng, ph\u01B0\u1EDBc b\u00E1u v\u00F4 l\u01B0\u1EE3ng!",
+      "ttsText": "C\u1EA3m \u01A1n anh ch\u1ECB Thanh Bình \u0111\u00E3 b\u1EA5m follow k\u00EAnh \u0111\u1EC3 c\u00F9ng chung tay ph\u00F3ng sinh chim t\u00EDch \u0111\u1EE9c! Ch\u00FAc anh ch\u1ECB v\u1EA1n s\u1EF1 c\u00E1t t\u01B0\u1EDDng, ph\u01B0\u1EDBc b\u00E1u v\u00F4 l\u01B0\u1EE3ng!",
       "ttsVoice": "maichi",
       "giftType": null,
       "giftName": null,
@@ -17663,13 +17663,13 @@
       "id": "288ca58d9a734a57b0173a33868cd4f0",
       "timestamp": "2026-11-02T07:29:06.7092335Z",
       "type": "phongsinhRelease",
-      "user": "Nguy n Nh n",
+      "user": "Nguyễn Nhẫn",
       "uniqueId": "nguynnhn",
       "avatar": "",
       "count": 50,
       "merit": 300,
       "wish": "\u1EE6ng h\u1ED9 10 \u0111\u1ED3ng ph\u00F3ng sinh 50 ch\u00FA chim! \uD83D\uDD4A\uFE0F\u2728",
-      "ttsText": "C\u1EA3m \u01A1n anh ch\u1ECB Nguy n Nh n \u0111\u00E3 \u1EE7ng h\u1ED9 10 \u0111\u1ED3ng ph\u00F3ng sinh th\u00EAm 50 ch\u00FA chim t\u00EDch \u0111\u1EE9c! C\u00F4ng \u0111\u1EE9c v\u00F4 l\u01B0\u1EE3ng, c\u1EA7u ch\u00FAc anh ch\u1ECB v\u1EA1n \u0111i\u1EC1u nh\u01B0 \u00FD!",
+      "ttsText": "C\u1EA3m \u01A1n anh ch\u1ECB Nguyễn Nhẫn \u0111\u00E3 \u1EE7ng h\u1ED9 10 \u0111\u1ED3ng ph\u00F3ng sinh th\u00EAm 50 ch\u00FA chim t\u00EDch \u0111\u1EE9c! C\u00F4ng \u0111\u1EE9c v\u00F4 l\u01B0\u1EE3ng, c\u1EA7u ch\u00FAc anh ch\u1ECB v\u1EA1n \u0111i\u1EC1u nh\u01B0 \u00FD!",
       "ttsVoice": "maichi",
       "giftType": null,
       "giftName": "50 Ch\u00FA Chim T\u1EF1 Do",
@@ -18011,14 +18011,14 @@
     "autoSim": false,
     "autoSimIntervalMs": 9500,
     "youtubeUrl": "https://www.youtube.com/watch?v=MRv1QAT9_o8",
-    "mode": "bothi"
+    "mode": "phongsinh"
   },
   "tiktok": {
-    "connected": true,
+    "connected": false,
     "connecting": false,
-    "username": "tranyennhi0987",
+    "username": "thienkim20060402",
     "roomId": "7703490752492817204",
     "viewerCount": 1,
-    "lastError": null
+    "lastError": "T\u251C\u00E1i kho\u00DF\u2551\u00FAn @thienkim20060402 hi\u00DF\u2557\u00E7n KH\u251C\u00F6NG PH\u251C\u00FCT TR\u00DF\u2557\u2591C TI\u00DF\u2551\u255BP (Offline) tr\u251C\u00ACn TikTok. Vui l\u251C\u2593ng \u2500\u00E6\u00DF\u2551\u00FAm b\u00DF\u2551\u00FAo t\u251C\u00E1i kho\u00DF\u2551\u00FAn \u2500\u00E6ang m\u00DF\u2557\u0192 Live tr\u251C\u00ACn TikTok tr\u255E\u2591\u00DF\u2557\u00A2c khi b\u00DF\u2551\u00D1m K\u00DF\u2551\u2510t n\u00DF\u2557\u00E6i, ho\u00DF\u2551\u2556c b\u00DF\u2551\u00A1t \u0027T\u00DF\u2557\u2592 \u2500\u00E6\u00DF\u2557\u00D6ng gi\u00DF\u2551\u00FA l\u00DF\u2551\u00A1p \u2500\u00E6\u251C\u2524ng ng\u255E\u2591\u00DF\u2557\u00A5i\u0027 \u2500\u00E6\u00DF\u2557\u00E2 tr\u00DF\u2551\u00FAi nghi\u00DF\u2557\u00E7m th\u00DF\u2557\u00A1."
   }
 }
