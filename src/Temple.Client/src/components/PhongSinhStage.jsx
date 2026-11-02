@@ -465,67 +465,111 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
     const { type, user, avatar, coins, count, ttsText } = activeEvent;
     const cleanUser = user || 'Thí Chủ Hữu Duyên';
 
-    // 1. Nếu có ttsText -> Phát âm thanh cảm ơn / chúc phúc
-    if (ttsText && audio?.queueTts) {
-      audio.queueTts(ttsText, activeEvent.ttsVoice || 'maichi');
+    // Xác định nội dung văn bản nói (TTS) và phụ đề chào mừng/cảm ơn
+    let defaultSpeech = '';
+    let speechTag = '';
+    if (type === 'phongsinhGreet' || type === 'bothiGreet' || type === 'templeGreet') {
+      speechTag = 'Vừa vào phòng Live ✨';
+      defaultSpeech = `Chào mừng ${cleanUser} đã đến với buổi phóng sinh chim tích đức! Cầu chúc bạn vạn sự cát tường, bình an và may mắn!`;
+    } else if (type === 'phongsinhRelease' || type === 'bothiDonate' || type === 'offerGift' || type === 'grandCeremony') {
+      const birdsCount = count > 1 ? count : (coins ? coins * 5 : 50);
+      speechTag = `Đã phóng sinh ${birdsCount} chú chim 🕊️`;
+      defaultSpeech = `Cảm ơn anh chị ${cleanUser} đã ủng hộ phóng sinh ${birdsCount} chú chim về với thiên nhiên! Công đức vô lượng!`;
+    } else if (type === 'phongsinhHeart' || type === 'bothiHeart' || type === 'strikeWoodenFish') {
+      speechTag = `Đã thả ${count || 1} tim trợ duyên ❤️`;
+      defaultSpeech = `Cảm ơn anh chị ${cleanUser} đã thả tim trợ duyên phóng sinh chim! Cầu chúc bạn bình an!`;
+    } else if (type === 'phongsinhFollow' || type === 'bothiFollow' || type === 'templeFollow') {
+      speechTag = 'Đã follow kênh ➕';
+      defaultSpeech = `Cảm ơn anh chị ${cleanUser} đã bấm follow kênh để cùng chung tay phóng sinh chim tích đức!`;
+    } else if (type === 'phongsinhShare' || type === 'bothiShare' || type === 'templeShare') {
+      speechTag = 'Đã chia sẻ live 🔄';
+      defaultSpeech = `Cảm ơn anh chị ${cleanUser} đã chia sẻ buổi live lan tỏa phước báu đến muôn nơi!`;
+    }
+
+    const resolvedSpeechText = ttsText || defaultSpeech;
+
+    // 1. Kích hoạt âm thanh TTS giọng đọc cảm ơn / chúc phúc
+    if (resolvedSpeechText && audio) {
+      if (typeof audio.enqueueTts === 'function') {
+        audio.enqueueTts(resolvedSpeechText, { voice: activeEvent.ttsVoice || 'maichi' });
+      } else if (typeof audio.queueTts === 'function') {
+        audio.queueTts(resolvedSpeechText, { voice: activeEvent.ttsVoice || 'maichi' });
+      }
     }
 
     // 2. Kích hoạt FOCUS NGƯỜI MỚI VÀO LIVE / ĐÓNG GÓP TƯƠNG TÁC + Cập nhật Banner đối thoại
     if (type === 'phongsinhGreet' || type === 'bothiGreet' || type === 'templeGreet') {
       setSpeech({
         user: cleanUser,
-        tag: 'Vừa vào phòng Live ✨',
-        text: ttsText || `Chào mừng ${cleanUser} đã đến với buổi phóng sinh chim tích đức!`,
+        tag: speechTag || 'Vừa vào phòng Live ✨',
+        text: resolvedSpeechText,
         time: Date.now()
       });
-      triggerFocusViewer(cleanUser, avatar, 'greet', ttsText);
+      triggerFocusViewer(cleanUser, avatar, 'greet', resolvedSpeechText);
     } else if (type === 'phongsinhRelease' || type === 'bothiDonate' || type === 'offerGift' || type === 'grandCeremony') {
       const birdsCount = count > 1 ? count : (coins ? coins * 5 : 50);
       setSpeech({
         user: cleanUser,
-        tag: `Đã phóng sinh ${birdsCount} chú chim 🕊️`,
-        text: ttsText || `Cảm ơn anh/chị ${cleanUser} đã ủng hộ phóng sinh ${birdsCount} chú chim về với thiên nhiên! Công đức vô lượng!`,
+        tag: speechTag || `Đã phóng sinh ${birdsCount} chú chim 🕊️`,
+        text: resolvedSpeechText,
         time: Date.now()
       });
-      triggerFocusViewer(cleanUser, avatar, 'donate', ttsText, birdsCount);
+      triggerFocusViewer(cleanUser, avatar, 'donate', resolvedSpeechText, birdsCount);
       spawnHearts(540, 1300, 10);
     } else if (type === 'phongsinhHeart' || type === 'bothiHeart' || type === 'strikeWoodenFish') {
       setSpeech({
         user: cleanUser,
-        tag: `Đã thả ${count || 1} tim trợ duyên ❤️`,
-        text: ttsText || `Cảm ơn anh/chị ${cleanUser} đã thả tim trợ duyên phóng sinh chim!`,
+        tag: speechTag || `Đã thả ${count || 1} tim trợ duyên ❤️`,
+        text: resolvedSpeechText,
         time: Date.now()
       });
-      triggerFocusViewer(cleanUser, avatar, 'heart', ttsText, count || 1);
+      triggerFocusViewer(cleanUser, avatar, 'heart', resolvedSpeechText, count || 1);
       spawnHearts(540, 1400, 8);
     } else if (type === 'phongsinhFollow' || type === 'bothiFollow' || type === 'templeFollow') {
       setSpeech({
         user: cleanUser,
-        tag: 'Đã follow kênh ➕',
-        text: ttsText || `Cảm ơn anh/chị ${cleanUser} đã follow kênh đồng hành cùng hoạt động phóng sinh tích đức!`,
+        tag: speechTag || 'Đã follow kênh ➕',
+        text: resolvedSpeechText,
         time: Date.now()
       });
-      triggerFocusViewer(cleanUser, avatar, 'follow', ttsText);
+      triggerFocusViewer(cleanUser, avatar, 'follow', resolvedSpeechText);
     } else if (type === 'phongsinhShare' || type === 'bothiShare' || type === 'templeShare') {
       setSpeech({
         user: cleanUser,
-        tag: 'Đã chia sẻ live 🔄',
-        text: ttsText || `Cảm ơn anh/chị ${cleanUser} đã chia sẻ buổi live lan tỏa phước báu đến muôn nơi!`,
+        tag: speechTag || 'Đã chia sẻ live 🔄',
+        text: resolvedSpeechText,
         time: Date.now()
       });
-      triggerFocusViewer(cleanUser, avatar, 'greet', ttsText);
+      triggerFocusViewer(cleanUser, avatar, 'greet', resolvedSpeechText);
     }
   }, [activeEvent, audio, triggerFocusViewer, spawnHearts]);
 
   // Click thủ công trên màn hình để phóng sinh thử nghiệm và test Focus người xem
   const handleStageClick = (e) => {
+    if (audio?.unlockAudio) {
+      audio.unlockAudio();
+    }
     const rect = stage9x16Ref.current.getBoundingClientRect();
     const scale = Math.min(rect.width / 1080, rect.height / 1920);
     const clickX = (e.clientX - rect.left) / scale;
     const clickY = (e.clientY - rect.top) / scale;
 
     if (clickY > 850 && clickY < 1650) {
-      triggerFocusViewer('Phật Tử Hữu Duyên', '', 'greet', 'Chào mừng đến với buổi phóng sinh chim!');
+      const demoMsg = 'Chào mừng bạn đã đến với buổi phóng sinh chim tích đức! Cầu chúc bạn vạn sự cát tường, bình an và may mắn!';
+      setSpeech({
+        user: 'Phật Tử Hữu Duyên',
+        tag: 'Vừa vào phòng Live ✨',
+        text: demoMsg,
+        time: Date.now()
+      });
+      triggerFocusViewer('Phật Tử Hữu Duyên', '', 'greet', demoMsg);
+      if (audio) {
+        if (typeof audio.enqueueTts === 'function') {
+          audio.enqueueTts(demoMsg, { voice: 'maichi' });
+        } else if (typeof audio.queueTts === 'function') {
+          audio.queueTts(demoMsg, { voice: 'maichi' });
+        }
+      }
       spawnHearts(clickX, clickY, 6);
       callRpc('temple.releaseBirds', {
         user: 'Phật Tử Hữu Duyên',

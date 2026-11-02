@@ -68,6 +68,10 @@ class TempleAudioEngine {
     return this.ctx;
   }
 
+  unlockAudio() {
+    this.ensureContext();
+  }
+
   // --------------------------------------------------------------------------
   // 1. NHẠC NỀN "NAM MÔ A DI ĐÀ PHẬT.M4A" (CÓ AUTO-DUCKING KHI ĐỌC LỜI KHẤN)
   // --------------------------------------------------------------------------
@@ -711,6 +715,11 @@ class TempleAudioEngine {
   // --------------------------------------------------------------------------
   // 6. ZEROTTS VOICE QUEUE & PREFETCHER
   // --------------------------------------------------------------------------
+  queueTts(text, optionsOrVoice = {}) {
+    const opts = typeof optionsOrVoice === 'string' ? { voice: optionsOrVoice } : (optionsOrVoice || {});
+    return this.enqueueTts(text, opts);
+  }
+
   enqueueTts(text, options = {}) {
     const onStart = typeof options.onStart === 'function' ? options.onStart : null;
     const onEnd = typeof options.onEnd === 'function' ? options.onEnd : null;
@@ -728,9 +737,9 @@ class TempleAudioEngine {
     }
 
     const now = Date.now();
-    if (this.lastTtsText === clean && (now - (this.lastTtsTime || 0) < 20000)) {
+    if (this.lastTtsText === clean && (now - (this.lastTtsTime || 0) < 4000)) {
       if (onStart) onStart();
-      if (onEnd) setTimeout(onEnd, 3000);
+      if (onEnd) setTimeout(onEnd, 2500);
       return;
     }
     this.lastTtsText = clean;
@@ -801,14 +810,35 @@ class TempleAudioEngine {
         if (item.onEnd) item.onEnd();
       } else if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
         this.setBgDucking(true);
+        if (this.onTtsStateChange) {
+          this.onTtsStateChange({ speaking: true, synthesizing: false, text: item.text });
+        }
         if (item.onStart) item.onStart();
         await new Promise((resolve) => {
-          const utt = new SpeechSynthesisUtterance(item.text);
-          utt.lang = 'vi-VN';
-          utt.rate = 0.92;
-          utt.onend = () => resolve();
-          utt.onerror = () => resolve();
-          window.speechSynthesis.speak(utt);
+          try {
+            if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+              window.speechSynthesis.cancel();
+            }
+            const utt = new SpeechSynthesisUtterance(item.text);
+            utt.lang = 'vi-VN';
+            const voices = window.speechSynthesis.getVoices();
+            const viVoice = voices.find(v => v.lang === 'vi-VN' || v.lang.startsWith('vi'));
+            if (viVoice) utt.voice = viVoice;
+            utt.rate = 0.95;
+            utt.volume = this.ttsVolume;
+            let finished = false;
+            const done = () => {
+              if (finished) return;
+              finished = true;
+              resolve();
+            };
+            utt.onend = done;
+            utt.onerror = done;
+            window.speechSynthesis.speak(utt);
+            setTimeout(done, 9000);
+          } catch (_) {
+            resolve();
+          }
         });
         if (item.onEnd) item.onEnd();
       } else {
