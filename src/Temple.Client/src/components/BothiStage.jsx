@@ -553,14 +553,6 @@ export default function BothiStage({ state, activeEvent, audio, callRpc, obsMode
   }, [activeEvent, audio, spawnCoins, spawnHearts, triggerViewerInteraction]);
 
   // Handle manual clicks on hotspots
-  const handleBowlClick = () => {
-    callRpc('temple.offerGift', {
-      user: speech.user !== 'Anh/Chị' ? speech.user : 'Mạnh Thường Quân',
-      coins: 10,
-      giftName: '10 Đồng Tiền Lẻ'
-    });
-  };
-
   const handleSignClick = () => {
     // Luân phiên thả tim, follow hoặc share khi người dùng bấm vào biển carton
     const roll = Math.random();
@@ -663,34 +655,7 @@ export default function BothiStage({ state, activeEvent, audio, callRpc, obsMode
           <div className="cardboard-shadow" />
         </div>
 
-        {/* 4. CHIẾC BÁT NHÔM XIN TIỀN VÀ TIỀN TRÊN MẶT ĐƯỜNG */}
-        <div
-          className="alms-bowl-container"
-          title="Bấm vào bát để Bỏ Tiền Vào Bát (+10đ)"
-          onClick={handleBowlClick}
-        >
-          <div className="metal-bowl-3d">
-            <div className="bowl-rim-shine" />
-            <div className="bowl-inner-shadow" />
-            <div className="bowl-money-pile">
-              <div className="cash-bill bill-1" />
-              <div className="cash-bill bill-2" />
-              <div className="cash-bill bill-3" />
-              <span className="bowl-coin c1">🪙</span>
-              <span className="bowl-coin c2">🪙</span>
-              <span className="bowl-coin c3">🪙</span>
-              <span className="bowl-coin c4">🪙</span>
-            </div>
-          </div>
 
-          <div className="scattered-coins">
-            <span className="ground-coin gc1">🪙</span>
-            <span className="ground-coin gc2">🪙</span>
-            <span className="ground-coin gc3">🪙</span>
-          </div>
-
-          <span className="bowl-hint-tag">🪙 Bỏ tiền vào bát (+10đ)</span>
-        </div>
 
         {/* 5. CHÚ CÚN CON VÀNG LON TON TRÊN ĐƯỜNG PHỐ */}
         <div
