@@ -4,6 +4,8 @@ import monkAvatarImg from '../assets/phongsinh_monk.jpg';
 import devoteeImg from '../assets/phongsinh_devotee.png';
 import crouchBoyImg from '../assets/crouch_boy.png';
 import crouchGirlImg from '../assets/crouch_girl.png';
+import quanAmCloudImg from '../assets/quan_am_cloud.png';
+import phatThichCaCloudImg from '../assets/phat_thich_ca_cloud.png';
 
 // 6 Nhân vật 3D Pixar đa dạng màu áo và quần riêng biệt
 import boyGreenImg from '../assets/pedestrian_boy.png';
@@ -183,6 +185,58 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
       if (audio) audio.onPhongsinhTrackChange = null;
     };
   }, [audio]);
+
+  // HIỆN THÂN MẸ QUAN THẾ ÂM & PHẬT THÍCH CA TỪ TRÊN MÂY BAN PHƯỚC LÀNH
+  const [divineState, setDivineState] = useState({
+    visible: true,
+    deity: 'quanam' // 'quanam' | 'thichca'
+  });
+
+  const divineCycleRef = useRef({
+    nextDeity: 'thichca'
+  });
+
+  useEffect(() => {
+    let isMounted = true;
+    
+    // Mở đầu: hiện thân 14s để người xem thấy ngay phước lành
+    const initialTimer = setTimeout(() => {
+      if (isMounted) setDivineState(prev => ({ ...prev, visible: false }));
+    }, 14000);
+
+    // Chu kỳ: Cứ mỗi 45 giây sẽ hiện thân trong 16 giây rồi hòa vào mây trời
+    const interval = setInterval(() => {
+      if (!isMounted) return;
+      const next = divineCycleRef.current.nextDeity === 'quanam' ? 'thichca' : 'quanam';
+      divineCycleRef.current.nextDeity = next;
+
+      setDivineState({
+        visible: true,
+        deity: next
+      });
+
+      setTimeout(() => {
+        if (isMounted) setDivineState(prev => ({ ...prev, visible: false }));
+      }, 16000);
+    }, 45000);
+
+    return () => {
+      isMounted = false;
+      clearTimeout(initialTimer);
+      clearInterval(interval);
+    };
+  }, []);
+
+  // Khi có sự kiện ủng hộ / thả tim / thả chim lớn, Phật & Mẹ Quan Âm hiện thân phóng quang
+  useEffect(() => {
+    if (!activeEvent) return;
+    if (activeEvent.type === 'GIFT' || activeEvent.type === 'DONATE' || (activeEvent.birdsCount && activeEvent.birdsCount >= 20)) {
+      setDivineState(prev => ({
+        visible: true,
+        deity: prev.deity === 'quanam' ? 'thichca' : 'quanam'
+      }));
+    }
+  }, [activeEvent]);
 
   // Thông điệp hiển thị trong Speech Banner phía dưới
   const [speech, setSpeech] = useState({
@@ -604,41 +658,36 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
           draggable={false}
         />
 
-        {/* 2. THANH TRẠNG THÁI TRÊN CÙNG */}
-        <div className="phongsinh-top-bar">
-          <div className="phongsinh-top-left-wrap">
-            <div className="phongsinh-mode-chip">
-              <span className="live-dot-pulse" />
-              <span>🕊️ PHÓNG SINH CHIM • TÍCH ĐỨC TÂM LINH</span>
-            </div>
-            {currentTrack && (
-              <div
-                className="phongsinh-music-pill"
-                title="Nhạc Phật Giáo Không Lời Dễ Ngủ (NhacCuaTui) - Bấm để chuyển bài"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  audio?.nextPhongsinhTrack?.();
-                }}
-              >
-                <span className="music-pulse-icon">🎵</span>
-                <span className="music-track-text">
-                  {currentTrack.title} {currentTrack.artist ? `– ${currentTrack.artist}` : ''}
-                </span>
-                <span className="music-skip-btn">⏭️</span>
-              </div>
-            )}
-          </div>
-          <div className="phongsinh-stats-pill">
-            <span className="stat-bird">🕊️ {totalBirds.toLocaleString('vi-VN')} chim</span>
-            <span className="stat-sep">•</span>
-            <span className="stat-heart">❤️ {totalHearts.toLocaleString('vi-VN')} tim</span>
+        {/* 2. HIỆN THÂN ĐỨC PHẬT / MẸ QUAN THẾ ÂM TỪ TRÊN MÂY BAN PHƯỚC LÀNH */}
+        <div className={`divine-apparition-box ${divineState.visible ? 'visible' : ''}`}>
+          <div className="divine-halo-rays" />
+          <div className="divine-halo-glow" />
+          <img
+            src={divineState.deity === 'quanam' ? quanAmCloudImg : phatThichCaCloudImg}
+            alt="Đức Phật & Mẹ Quan Âm Hiện Thân"
+            className="divine-deity-img"
+            draggable={false}
+          />
+          <div className="divine-clouds-soft-base" />
+          <div className="divine-blessing-pill">
+            <span className="divine-blessing-title">
+              {divineState.deity === 'quanam'
+                ? '🌸 Nam Mô Quán Thế Âm Bồ Tát 🌸'
+                : '☸️ Nam Mô Bổn Sư Thích Ca Mâu Ni Phật ☸️'}
+            </span>
+            <span className="divine-blessing-sub">
+              {divineState.deity === 'quanam'
+                ? 'Từ Bi Cứu Khổ • Ban Nước Cam Lồ Bình An'
+                : 'Phật Quang Phổ Chiếu • Gia Hộ Vạn Sự Cát Tường'}
+            </span>
           </div>
         </div>
 
-        {/* 3. BẢNG XẾP HẠNG TOP PHÓNG SINH (GÓC TRÊN BÊN TRÁI) */}
+        {/* 3. BẢNG XẾP HẠNG TOP PHÓNG SINH (HẠ THẤP KHỎI GIAO DIỆN TIKTOK NATIVE) */}
         <div className="phongsinh-leaderboard-box">
           <div className="lb-header">
-            <span>🏆 TOP PHÓNG SINH TÍCH ĐỨC</span>
+            <span>🏆 TOP PHÓNG SINH</span>
+            <span className="lb-total-badge">🕊️ {totalBirds.toLocaleString('vi-VN')}</span>
           </div>
           <div className="lb-list">
             {topDevotees.length > 0 ? (
@@ -662,6 +711,24 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
             )}
           </div>
         </div>
+
+        {/* 3B. NHẠC PHẬT GIÁO KHÔNG LỜI (GỌN GÀNG DƯỚI BẢNG XẾP HẠNG, BẤM ĐỂ CHUYỂN BÀI) */}
+        {currentTrack && (
+          <div
+            className="phongsinh-music-pill compact"
+            title="Nhạc Phật Giáo Không Lời (Bấm để chuyển bài)"
+            onClick={(e) => {
+              e.stopPropagation();
+              audio?.nextPhongsinhTrack?.();
+            }}
+          >
+            <span className="music-pulse-icon">🎵</span>
+            <span className="music-track-text">
+              {currentTrack.title} {currentTrack.artist ? `– ${currentTrack.artist}` : ''}
+            </span>
+            <span className="music-skip-btn">⏭️</span>
+          </div>
+        )}
 
         {/* 4. MINI-MAP GÓC TRÊN BÊN PHẢI VỚI CÁC CHẤM CHUYỂN ĐỘNG TRỰC QUAN */}
         <div className="phongsinh-minimap-box">
