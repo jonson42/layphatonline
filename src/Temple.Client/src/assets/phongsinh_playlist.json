@@ -1,0 +1,178 @@
+[
+  {
+    "id": "37nqdACPUHnT",
+    "title": "Tri Túc Thường Lạc",
+    "artist": "Cổ Nhân Chỉ Lộ",
+    "src": "/assets/phongsinh_music/01_Tri_Túc_Thường_Lạc.mp3",
+    "streamFallback": "https://stream.nct.vn/resa/2506/39/ee/i5xmnwh4xk_hq.mp3?st=6TKl3EIc_tJd5dqoBMKLOg&e=1794207020&a=6&p=0&r=31833dc8594a501c1dc186359ee2119f",
+    "size": 11318883
+  },
+  {
+    "id": "yWhOyQGDp05X",
+    "title": "Thuận Theo Tự Nhiên",
+    "artist": "Cổ Nhân Chỉ Lộ",
+    "src": "/assets/phongsinh_music/02_Thuận_Theo_Tự_Nhiên.mp3",
+    "streamFallback": "https://stream.nct.vn/resa/2506/2f/7d/ccboctxy97_hq.mp3?st=EPbWA9gu66Jx_242FIrHqQ&e=1794207020&a=6&p=0&r=31833dc8594a501c1dc186359ee2119f",
+    "size": 11157971
+  },
+  {
+    "id": "TBPZ92Z88w3F",
+    "title": "Tích Đức Hành Thiện",
+    "artist": "Cổ Nhân Chỉ Lộ",
+    "src": "/assets/phongsinh_music/03_Tích_Đức_Hành_Thiện.mp3",
+    "streamFallback": "https://a01.nct.vn/resa/2506/3b/5c/0vpzcakg1m_hq.mp3?st=h2_QYtGg6c2HeBifa1t5Tw&e=1794207020&a=6&p=0&r=31833dc8594a501c1dc186359ee2119f",
+    "size": 12946836
+  },
+  {
+    "id": "OwrJ52Ulujgt",
+    "title": "Biết Đủ Luôn Vui",
+    "artist": "Cổ Nhân Chỉ Lộ",
+    "src": "/assets/phongsinh_music/04_Biết_Đủ_Luôn_Vui.mp3",
+    "streamFallback": "https://stream.nct.vn/resa/2506/20/84/xahoag32zf_hq.mp3?st=StuRKxJWnztgwFnyEzBeHQ&e=1794207020&a=6&p=0&r=31833dc8594a501c1dc186359ee2119f",
+    "size": 11147516
+  },
+  {
+    "id": "SA2qBGm5p8xm",
+    "title": "Trí Tuệ Bát Nhã",
+    "artist": "Tâm Thanh Tịnh Sống An Nhiên",
+    "src": "/assets/phongsinh_music/05_Trí_Tuệ_Bát_Nhã.mp3",
+    "streamFallback": "https://stream.nct.vn/Warner_Audio240/TriTueBatNha-TamThanhTinhSongAnNhien-14969987_hq.mp3?st=wpNQ5-SvzdiVglRf6AKeMA&e=1794207020&a=6&p=0&r=31833dc8594a501c1dc186359ee2119f",
+    "size": 13538321
+  },
+  {
+    "id": "rY4o2bV6XadM",
+    "title": "Bát Nhã Tâm Kinh Chú Giác Ngộ",
+    "artist": "Phật Giáo Tĩnh Tâm",
+    "src": "/assets/phongsinh_music/06_Bát_Nhã_Tâm_Kinh_Chú_Giác_Ngộ.mp3",
+    "streamFallback": "https://stream.nct.vn/resa/2507/43/58/rubhorbn1r_hq.mp3?st=yficRZ034Nfzu3zZg9dK5w&e=1794207020&a=6&p=0&r=31833dc8594a501c1dc186359ee2119f",
+    "size": 8841460
+  },
+  {
+    "id": "24g7cCzHav55",
+    "title": "Chú Đại Bi",
+    "artist": "Vu Huu Minh",
+    "src": "/assets/phongsinh_music/07_Chú_Đại_Bi.mp3",
+    "streamFallback": "https://stream.nct.vn/NCTSong/2409/80/8c/9ufhneoasb_hq.mp3?st=1mA9znEuOZe9Aj4ftNohcA&e=1794207020&a=6&p=0&r=31833dc8594a501c1dc186359ee2119f",
+    "size": 51232905
+  },
+  {
+    "id": "gzfHOgV1i0jC",
+    "title": "Dược Sư Tâm Chú (Tiếng Phạn)",
+    "artist": "Peto",
+    "src": "/assets/phongsinh_music/08_Dược_Sư_Tâm_Chú_Tiếng_Phạn.mp3",
+    "streamFallback": "https://a01.nct.vn/NhacCuaTui993/DuocSuTamChuTiengPhan-Peto-6181550_hq.mp3?st=YI9ZaYegKKAjrvfg_oB20g&e=1794207020&a=6&p=0&r=31833dc8594a501c1dc186359ee2119f",
+    "size": 19973641
+  },
+  {
+    "id": "8byWVB2CHMUm",
+    "title": "Om Mani Padme Hum",
+    "artist": "Vu Huu Minh",
+    "src": "/assets/phongsinh_music/09_Om_Mani_Padme_Hum.mp3",
+    "streamFallback": "https://a01.nct.vn/NCTSong/2409/1a/48/zcownkk74l_hq.mp3?st=RW8m6P6foVhkxlF5NqM7EA&e=1794207020&a=6&p=0&r=31833dc8594a501c1dc186359ee2119f",
+    "size": 29865781
+  },
+  {
+    "id": "NLewoYZq07uE",
+    "title": "Guanyinshan Inspired Song",
+    "artist": "Mantra Buddha's",
+    "src": "/assets/phongsinh_music/10_Guanyinshan_Inspired_Song.mp3",
+    "streamFallback": "https://stream.nct.vn/NCTSong/2310/a0/8d/rw1kh81jbw_hq.mp3?st=nV7w8V0Vz7TTsIcS51NiZA&e=1794207020&a=6&p=0&r=31833dc8594a501c1dc186359ee2119f",
+    "size": 13615540
+  },
+  {
+    "id": "7UD6mymflQ",
+    "title": "Peace and Quite Monk of Lingshan",
+    "artist": "V.A",
+    "src": "/assets/phongsinh_music/11_Peace_and_Quite_Monk_of_Lingshan.mp3",
+    "streamFallback": "https://a01.nct.vn/NhacCuaTui114/PeaceandQuiteMonkofLingshan-Variou_sa8m.mp3?st=8RFlo57Kk1bHOdJMRoGyFQ&e=1794207020&a=6&p=0&r=31833dc8594a501c1dc186359ee2119f",
+    "size": 11050210
+  },
+  {
+    "id": "Mb5rCyef3U",
+    "title": "问佛 Asking The Buddha",
+    "artist": "Funa",
+    "src": "/assets/phongsinh_music/12_问佛_Asking_The_Buddha.mp3",
+    "streamFallback": "https://stream.nct.vn/NhacCuaTui101/AskingTheBuddha-Funa-AlbumBuddh_nta5.mp3?st=MEJIsql4PELavQCWvT6PMw&e=1794207020&a=6&p=0&r=31833dc8594a501c1dc186359ee2119f",
+    "size": 4179526
+  },
+  {
+    "id": "eEzDbrw7oJ",
+    "title": "The Buddist Of The Yellow Crystal",
+    "artist": "V.A",
+    "src": "/assets/phongsinh_music/13_The_Buddist_Of_The_Yellow_Crystal.mp3",
+    "streamFallback": "https://stream.nct.vn/NhacCuaTui153/TheBuddistOfTheYellowCrystal-Variou_34q8p_hq.mp3?st=uXzYuXTcIXBwxSnFoWoBvA&e=1794207020&a=6&p=0&r=31833dc8594a501c1dc186359ee2119f",
+    "size": 16518150
+  },
+  {
+    "id": "eSQFIswTSg",
+    "title": "On Ma Bani Mo",
+    "artist": "V.A",
+    "src": "/assets/phongsinh_music/14_On_Ma_Bani_Mo.mp3",
+    "streamFallback": "https://stream.nct.vn/NhacCuaTui114/OnMaBaniMo-VariousArtists_sa68.mp3?st=pP13_2iiRgUgf9uE7DGSlA&e=1794207020&a=6&p=0&r=31833dc8594a501c1dc186359ee2119f",
+    "size": 23802306
+  },
+  {
+    "id": "z6u1yFBLPG",
+    "title": "The Ground Budda Hides The Heart Incantation",
+    "artist": "V.A",
+    "src": "/assets/phongsinh_music/15_The_Ground_Budda_Hides_The_Heart_Incantation.mp3",
+    "streamFallback": "https://stream.nct.vn/NhacCuaTui114/TheGroundBuddaHidesTheHeartIncanta_sa7w.mp3?st=qNvoSRr2mf19kBWOslQDgQ&e=1794207020&a=6&p=0&r=31833dc8594a501c1dc186359ee2119f",
+    "size": 24873358
+  },
+  {
+    "id": "CVHEslBax5",
+    "title": "Holding The Lotus",
+    "artist": "V.A",
+    "src": "/assets/phongsinh_music/16_Holding_The_Lotus.mp3",
+    "streamFallback": "https://stream.nct.vn/NhacCuaTui114/HoldingTheLotus-VariousArtists_sa8g.mp3?st=vRlaK3Gl_sn6HBZjH4rdoQ&e=1794207020&a=6&p=0&r=31833dc8594a501c1dc186359ee2119f",
+    "size": 26048841
+  },
+  {
+    "id": "pQ8NNhMMOo2W",
+    "title": "Buddha Says Reflections",
+    "artist": "Dharani Buddha's Gachchami Buddha's Mantra Buddha's Namo Buddha's",
+    "src": "/assets/phongsinh_music/17_Buddha_Says_Reflections.mp3",
+    "streamFallback": "https://stream.nct.vn/Warner_Audio270/BuddhaSaysReflections-DharaniBuddhasGachchamiBuddhasMantraBuddhasNamoBuddhas-16214034_hq.mp3?st=AwFXgQULRBc0XD162CswWQ&e=1794207020&a=6&p=0&r=31833dc8594a501c1dc186359ee2119f",
+    "size": 13916560
+  },
+  {
+    "id": "oRpDsRB4Smod",
+    "title": "Calm Waters",
+    "artist": "Dharani Buddha's Mantra Buddha's Namo Buddha's",
+    "src": "/assets/phongsinh_music/18_Calm_Waters.mp3",
+    "streamFallback": "https://a01.nct.vn/Warner_Audio262/CalmWaters-DharaniBuddhasMantraBuddhasNamoBuddhas-15894432_hq.mp3?st=pmCRZE-ak84M4xUfahBVHg&e=1794207020&a=6&p=0&r=31833dc8594a501c1dc186359ee2119f",
+    "size": 8494542
+  },
+  {
+    "id": "JOlBguCS3c3b",
+    "title": "Soothing Silence Music",
+    "artist": "Dharani Buddha's Mantra Buddha's Namo Buddha's",
+    "src": "/assets/phongsinh_music/19_Soothing_Silence_Music.mp3",
+    "streamFallback": "https://stream.nct.vn/Warner_Audio262/SoothingSilenceMusic-DharaniBuddhasMantraBuddhasNamoBuddhas-15894440_hq.mp3?st=EjDRVAGT0xDRf0J5_noWDw&e=1794207020&a=6&p=0&r=31833dc8594a501c1dc186359ee2119f",
+    "size": 12700278
+  },
+  {
+    "id": "aatdGCJamKZm",
+    "title": "Phật Chú A Di Đà",
+    "artist": "Peto",
+    "src": "/assets/phongsinh_music/20_Phật_Chú_A_Di_Đà.mp3",
+    "streamFallback": "https://stream.nct.vn/NhacCuaTui993/PhatChuADiDa-Peto-6181557_hq.mp3?st=aSX5vy5z7ot-IIfjrKdhLQ&e=1794207020&a=6&p=0&r=31833dc8594a501c1dc186359ee2119f",
+    "size": 9636068
+  },
+  {
+    "id": "fKQrX8locuB0",
+    "title": "Đại Thế Chí Thần Chú (Tiếng Phạn)",
+    "artist": "Peto",
+    "src": "/assets/phongsinh_music/21_Đại_Thế_Chí_Thần_Chú_Tiếng_Phạn.mp3",
+    "streamFallback": "https://stream.nct.vn/NhacCuaTui993/DaiTheChiThanChuTiengPhan-Peto-6181555_hq.mp3?st=487FVJDEmjbAegm8cs1zbw&e=1794207020&a=6&p=0&r=31833dc8594a501c1dc186359ee2119f",
+    "size": 11041490
+  },
+  {
+    "id": "HvBo1Tm4XNL1",
+    "title": "Bát Nhã Tâm Kinh (Tiếng Phạn)",
+    "artist": "Peto",
+    "src": "/assets/phongsinh_music/22_Bát_Nhã_Tâm_Kinh_Tiếng_Phạn.mp3",
+    "streamFallback": "https://a01.nct.vn/NhacCuaTui993/BatNhaTamKinhTiengPhan-Peto-6181553_hq.mp3?st=EffYS6iE4i33XYIup7ixtA&e=1794207020&a=6&p=0&r=31833dc8594a501c1dc186359ee2119f",
+    "size": 15021498
+  }
+]

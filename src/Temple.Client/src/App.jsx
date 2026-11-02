@@ -38,13 +38,13 @@ export default function App() {
     return () => window.removeEventListener('pointerdown', unlock);
   }, [audio]);
 
-  // Sync background music with mode ('bothi' vs 'temple') & YouTube
+  // Sync background music with mode ('bothi' vs 'temple' vs 'phongsinh') & YouTube
   useEffect(() => {
-    const isBothi = state?.settings?.mode === 'bothi';
-    audio.setMode(isBothi ? 'bothi' : 'temple');
+    const currentMode = state?.settings?.mode || 'temple';
+    audio.setMode(currentMode);
 
-    // In bothi mode, khong_can_di_lam.mp3 is the dedicated background track
-    if (isBothi) {
+    // In bothi and phongsinh mode, dedicated background tracks/playlist play
+    if (currentMode === 'bothi' || currentMode === 'phongsinh') {
       audio.stopYouTube();
     } else {
       const ytUrl = state?.settings?.youtubeUrl;

@@ -1,7 +1,11 @@
+import phongsinhPlaylistData from '../assets/phongsinh_playlist.json';
+
 /**
  * TempleAudioEngine
  * - Nhạc nền: Phát trực tiếp file "Nam Mô A Di Đà Phật.m4a" (/assets/bg_chant.m4a) lặp vô tận êm dịu,
  *   tự động hạ nhỏ âm lượng (ducking) khi có giọng đọc lời khấn để không bị đè tiếng hay rè/xước.
+ * - Chế độ Bố Thí: Nhạc nền "Không cần đi làm" (/assets/khong_can_di_lam.mp3).
+ * - Chế độ Phóng Sinh: Playlist 22 bài Nhạc Phật Giáo Không Lời Dễ Ngủ từ Nhaccuatui (/assets/phongsinh_music/...).
  * - Pháp khí: Tổng hợp tiếng Mõ gỗ, Đại Hồng Chung, Ống xăm nhẹ nhàng, không vượt ngưỡng 0dBFS.
  * - Giọng đọc: Hàng đợi ZeroTTS phát tuần tự mượt mà.
  */
@@ -13,6 +17,11 @@ class TempleAudioEngine {
     this.bgMusicEnabled = true;
     this.ttsEnabled = true;
     this.ttsVoice = 'maichi';
+
+    // Playlist Nhạc Phật Giáo Không Lời Dễ Ngủ (NhacCuaTui - 22 bài)
+    this.phongsinhPlaylist = Array.isArray(phongsinhPlaylistData) ? phongsinhPlaylistData : [];
+    this.phongsinhTrackIndex = 0;
+    this.onPhongsinhTrackChange = null;
 
     // Nhạc nền "Nam Mô A Di Đà Phật.m4a" — mặc định 65%, cho phép chỉnh trực tiếp 0% - 100%
     const savedMusicVol = parseFloat(localStorage.getItem('temple_music_vol'));
@@ -97,22 +106,31 @@ class TempleAudioEngine {
   }
 
   setMode(mode) {
-    const isBothi = mode === 'bothi';
-    const targetSrc = isBothi ? '/assets/khong_can_di_lam.mp3' : '/assets/bg_chant.m4a';
-
-    if (this.currentMode === mode && this.currentTrackSrc === targetSrc && this.bgAudio) {
+    if (this.currentMode === mode && this.bgAudio) {
       return;
     }
 
     this.currentMode = mode;
-    this.currentTrackSrc = targetSrc;
     this.useSynthMusicFallback = false;
 
     if (this.bgAudio) {
       try {
         this.bgAudio.pause();
+        this.bgAudio.onended = null;
+        this.bgAudio.onerror = null;
       } catch (_) {}
     }
+
+    // 1. Chế độ Phóng Sinh: Phát playlist 22 bài Nhạc Phật Giáo Không Lời Dễ Ngủ (NhacCuaTui)
+    if (mode === 'phongsinh') {
+      this.playPhongsinhTrack(this.phongsinhTrackIndex);
+      return;
+    }
+
+    // 2. Chế độ Bố Thí hoặc Lạy Phật Chùa
+    const isBothi = mode === 'bothi';
+    const targetSrc = isBothi ? '/assets/khong_can_di_lam.mp3' : '/assets/bg_chant.m4a';
+    this.currentTrackSrc = targetSrc;
 
     this.bgAudio = new Audio(targetSrc);
     this.bgAudio.loop = true;
@@ -135,6 +153,68 @@ class TempleAudioEngine {
     if (this.bgMusicEnabled && this.unlocked && !this.activeYoutubeId) {
       this.startZenAmbience();
     }
+  }
+
+  playPhongsinhTrack(index = 0) {
+    if (!this.phongsinhPlaylist || this.phongsinhPlaylist.length === 0) return;
+    if (index < 0) index = this.phongsinhPlaylist.length - 1;
+    if (index >= this.phongsinhPlaylist.length) index = 0;
+
+    this.phongsinhTrackIndex = index;
+    const track = this.phongsinhPlaylist[index];
+    this.currentTrackSrc = track.src;
+
+    if (this.bgAudio) {
+      try {
+        this.bgAudio.pause();
+        this.bgAudio.onended = null;
+        this.bgAudio.onerror = null;
+      } catch (_) {}
+    }
+
+    this.bgAudio = new Audio(track.src);
+    this.bgAudio.loop = false; // Tự động chuyển bài kế tiếp khi hết bài
+    this.bgAudio.preload = 'auto';
+    this.bgAudio.volume = this.ttsPlaying ? this.getDuckedVolume() : this.bgBaseVolume;
+
+    // Hết bài -> Tự động phát bài kế tiếp trong playlist NhacCuaTui
+    this.bgAudio.onended = () => {
+      this.nextPhongsinhTrack();
+    };
+
+    // Nếu lỗi file local -> Fallback sang stream online của NCT hoặc sang bài tiếp
+    this.bgAudio.onerror = () => {
+      if (track.streamFallback && this.bgAudio.src !== track.streamFallback) {
+        this.bgAudio.src = track.streamFallback;
+        if (this.bgMusicEnabled && this.unlocked && !this.activeYoutubeId) {
+          this.bgAudio.play().catch(() => {});
+        }
+      } else {
+        setTimeout(() => this.nextPhongsinhTrack(), 1200);
+      }
+    };
+
+    if (this.onPhongsinhTrackChange) {
+      try {
+        this.onPhongsinhTrackChange(track, index);
+      } catch (_) {}
+    }
+
+    if (this.bgMusicEnabled && this.unlocked && !this.activeYoutubeId) {
+      this.startZenAmbience();
+    }
+  }
+
+  nextPhongsinhTrack() {
+    this.playPhongsinhTrack(this.phongsinhTrackIndex + 1);
+  }
+
+  prevPhongsinhTrack() {
+    this.playPhongsinhTrack(this.phongsinhTrackIndex - 1);
+  }
+
+  getCurrentPhongsinhTrack() {
+    return this.phongsinhPlaylist?.[this.phongsinhTrackIndex] || null;
   }
 
   startZenAmbience() {

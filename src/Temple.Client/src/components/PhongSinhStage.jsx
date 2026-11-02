@@ -55,6 +55,21 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
   const [floatingHearts, setFloatingHearts] = useState([]);
   const heartIdGen = useRef(0);
 
+  // Bài nhạc đang phát trong playlist NhacCuaTui (22 bài Phật giáo không lời)
+  const [currentTrack, setCurrentTrack] = useState(() => audio?.getCurrentPhongsinhTrack?.() || null);
+
+  useEffect(() => {
+    if (audio) {
+      setCurrentTrack(audio.getCurrentPhongsinhTrack?.() || null);
+      audio.onPhongsinhTrackChange = (track) => {
+        setCurrentTrack(track);
+      };
+    }
+    return () => {
+      if (audio) audio.onPhongsinhTrackChange = null;
+    };
+  }, [audio]);
+
   // Thông điệp hiển thị trong Speech Banner phía dưới
   const [speech, setSpeech] = useState({
     user: '',
@@ -332,9 +347,27 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
 
         {/* 2. THANH TRẠNG THÁI TRÊN CÙNG */}
         <div className="phongsinh-top-bar">
-          <div className="phongsinh-mode-chip">
-            <span className="live-dot-pulse" />
-            <span>🕊️ PHÓNG SINH CHIM • TÍCH ĐỨC TÂM LINH</span>
+          <div className="phongsinh-top-left-wrap">
+            <div className="phongsinh-mode-chip">
+              <span className="live-dot-pulse" />
+              <span>🕊️ PHÓNG SINH CHIM • TÍCH ĐỨC TÂM LINH</span>
+            </div>
+            {currentTrack && (
+              <div
+                className="phongsinh-music-pill"
+                title="Nhạc Phật Giáo Không Lời Dễ Ngủ (NhacCuaTui) - Bấm để chuyển bài"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  audio?.nextPhongsinhTrack?.();
+                }}
+              >
+                <span className="music-pulse-icon">🎵</span>
+                <span className="music-track-text">
+                  {currentTrack.title} {currentTrack.artist ? `– ${currentTrack.artist}` : ''}
+                </span>
+                <span className="music-skip-btn">⏭️</span>
+              </div>
+            )}
           </div>
           <div className="phongsinh-stats-pill">
             <span className="stat-bird">🕊️ {totalBirds.toLocaleString('vi-VN')} chim</span>
