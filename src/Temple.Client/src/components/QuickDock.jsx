@@ -149,38 +149,54 @@ export default function QuickDock({ state, audio, callRpc, onOpenAdmin }) {
         <div style={{ fontSize: '12px', fontWeight: 700, color: '#ffd54f', marginBottom: '8px' }}>
           🔄 CHẾ ĐỘ PHÁT LIVE HIỆN TẠI:
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '6px' }}>
           <button
             style={{
-              padding: '10px 6px',
+              padding: '10px 4px',
               borderRadius: '8px',
-              border: (state?.settings?.mode !== 'bothi') ? '2px solid #ffd54f' : '1px solid rgba(255,255,255,0.15)',
-              background: (state?.settings?.mode !== 'bothi') ? 'linear-gradient(180deg, #d48806 0%, #ad6800 100%)' : 'rgba(255,255,255,0.06)',
+              border: (state?.settings?.mode === 'temple') ? '2px solid #ffd54f' : '1px solid rgba(255,255,255,0.15)',
+              background: (state?.settings?.mode === 'temple') ? 'linear-gradient(180deg, #d48806 0%, #ad6800 100%)' : 'rgba(255,255,255,0.06)',
               color: '#fff',
               fontWeight: 700,
-              fontSize: '12px',
+              fontSize: '11px',
               cursor: 'pointer',
-              boxShadow: (state?.settings?.mode !== 'bothi') ? '0 0 10px rgba(255,213,79,0.4)' : 'none'
+              boxShadow: (state?.settings?.mode === 'temple') ? '0 0 10px rgba(255,213,79,0.4)' : 'none'
             }}
             onClick={() => callRpc('temple.updateSettings', { mode: 'temple' })}
           >
-            🪷 Đi Chùa Lễ Phật
+            🪷 Đi Chùa
           </button>
           <button
             style={{
-              padding: '10px 6px',
+              padding: '10px 4px',
+              borderRadius: '8px',
+              border: (state?.settings?.mode === 'phongsinh') ? '2px solid #81d4fa' : '1px solid rgba(255,255,255,0.15)',
+              background: (state?.settings?.mode === 'phongsinh') ? 'linear-gradient(180deg, #0284c7 0%, #0369a1 100%)' : 'rgba(255,255,255,0.06)',
+              color: '#fff',
+              fontWeight: 700,
+              fontSize: '11px',
+              cursor: 'pointer',
+              boxShadow: (state?.settings?.mode === 'phongsinh') ? '0 0 10px rgba(2,132,199,0.5)' : 'none'
+            }}
+            onClick={() => callRpc('temple.updateSettings', { mode: 'phongsinh' })}
+          >
+            🕊️ Phóng Sinh
+          </button>
+          <button
+            style={{
+              padding: '10px 4px',
               borderRadius: '8px',
               border: (state?.settings?.mode === 'bothi') ? '2px solid #ff9800' : '1px solid rgba(255,255,255,0.15)',
               background: (state?.settings?.mode === 'bothi') ? 'linear-gradient(180deg, #f57c00 0%, #e65100 100%)' : 'rgba(255,255,255,0.06)',
               color: '#fff',
               fontWeight: 700,
-              fontSize: '12px',
+              fontSize: '11px',
               cursor: 'pointer',
               boxShadow: (state?.settings?.mode === 'bothi') ? '0 0 10px rgba(255,152,0,0.5)' : 'none'
             }}
             onClick={() => callRpc('temple.updateSettings', { mode: 'bothi' })}
           >
-            🍺 Bố Thí Uống Bia
+            🍺 Bố Thí
           </button>
         </div>
       </div>
@@ -401,7 +417,106 @@ export default function QuickDock({ state, audio, callRpc, onOpenAdmin }) {
 
       {/* 3. NGHI THỨC TƯƠNG TÁC */}
       <div className="dock-section">
-        {state?.settings?.mode === 'bothi' ? (
+        {state?.settings?.mode === 'phongsinh' ? (
+          <>
+            <div className="dock-section-title">🕊️ Kích Hoạt Phóng Sinh Chim (RPC)</div>
+            <input
+              type="text"
+              className="dock-input"
+              value={devoteeName}
+              onChange={(e) => setDevoteeName(e.target.value)}
+              placeholder="Tên người xem / Phật tử..."
+            />
+            <input
+              type="text"
+              className="dock-input"
+              value={devoteeWish}
+              onChange={(e) => setDevoteeWish(e.target.value)}
+              placeholder="Lời cầu nguyện / Chúc phúc..."
+            />
+
+            <button
+              className="dock-btn gold"
+              style={{ marginBottom: '10px', fontSize: '13px', padding: '10px' }}
+              onClick={() => {
+                const name = devoteeName.trim() || 'Phật Tử Hữu Duyên';
+                callRpc('temple.greetMember', {
+                  user: name,
+                  readTts: true
+                });
+              }}
+            >
+              👋 Thử Người Vào Live (Chào Mừng & Gửi Lời Chúc)
+            </button>
+
+            <button
+              className="dock-btn"
+              style={{
+                marginBottom: '10px',
+                fontSize: '13px',
+                padding: '10px',
+                background: 'linear-gradient(180deg, #0284c7 0%, #0369a1 100%)',
+                color: '#fff',
+                fontWeight: 800,
+                border: '1.5px solid #81d4fa',
+                boxShadow: '0 0 10px rgba(2, 132, 199, 0.4)'
+              }}
+              onClick={() => {
+                const name = devoteeName.trim() || 'Phật Tử Hữu Duyên';
+                callRpc('temple.releaseBirds', {
+                  user: name,
+                  count: 50,
+                  readTts: true
+                });
+              }}
+            >
+              🕊️ Phóng Sinh 50 Chú Chim (Cảm Ơn)
+            </button>
+
+            <div className="dock-grid-2">
+              <button
+                className="dock-btn gold"
+                onClick={() => callRpc('temple.releaseBirds', { user: devoteeName, count: 20 })}
+              >
+                🕊️ Thả 20 Chim
+              </button>
+              <button
+                className="dock-btn gold"
+                onClick={() => callRpc('temple.releaseBirds', { user: devoteeName, count: 100 })}
+              >
+                🕊️ Thả 100 Chim
+              </button>
+              <button
+                className="dock-btn"
+                style={{ background: 'linear-gradient(180deg, #e11d48 0%, #be123c 100%)', color: '#fff', border: '1px solid #fda4af' }}
+                onClick={() => callRpc('temple.strikeWoodenFish', { user: devoteeName, count: 15 })}
+              >
+                ❤️ Thả 15 Tim
+              </button>
+              <button
+                className="dock-btn"
+                style={{ background: 'linear-gradient(180deg, #e11d48 0%, #be123c 100%)', color: '#fff', border: '1px solid #fda4af' }}
+                onClick={() => callRpc('temple.strikeWoodenFish', { user: devoteeName, count: 50 })}
+              >
+                💖 Thả 50 Tim
+              </button>
+              <button
+                className="dock-btn"
+                style={{ background: 'linear-gradient(180deg, #10b981 0%, #059669 100%)', color: '#fff', border: '1.5px solid #a7f3d0' }}
+                onClick={() => callRpc('temple.follow', { user: devoteeName })}
+              >
+                ➕ Bấm Follow Kênh
+              </button>
+              <button
+                className="dock-btn"
+                style={{ background: 'linear-gradient(180deg, #0ea5e9 0%, #0284c7 100%)', color: '#fff', border: '1.5px solid #7dd3fc' }}
+                onClick={() => callRpc('temple.share', { user: devoteeName })}
+              >
+                🔄 Chia Sẻ Buổi Live
+              </button>
+            </div>
+          </>
+        ) : state?.settings?.mode === 'bothi' ? (
           <>
             <div className="dock-section-title">🍺 Kích Hoạt Tương Tác Bố Thí (RPC)</div>
             <input

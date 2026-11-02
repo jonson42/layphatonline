@@ -2632,3 +2632,520 @@ body.obs-mode .stage-wrapper {
   color: #ffd54f;
   font-size: 26px;
 }
+
+/* ==========================================================================
+   CHẾ ĐỘ PHÓNG SINH CHIM (PHONG SINH STAGE - NINH BÌNH TRÀNG AN MOUNTAIN PEAK)
+   ========================================================================== */
+.phongsinh-stage-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.phongsinh-stage-container {
+  width: 1080px;
+  height: 1920px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: top left;
+  overflow: hidden;
+  background: #000;
+  user-select: none;
+}
+
+.phongsinh-bg-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1080px;
+  height: 1920px;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+/* Thanh trạng thái đỉnh màn hình */
+.phongsinh-top-bar {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  right: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  z-index: 50;
+}
+
+.phongsinh-mode-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(18, 22, 16, 0.82);
+  border: 1.5px solid rgba(139, 195, 74, 0.7);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+  border-radius: 999px;
+  padding: 6px 16px;
+  color: #c8e6c9;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  backdrop-filter: blur(8px);
+}
+
+.live-dot-pulse {
+  width: 10px;
+  height: 10px;
+  background: #4caf50;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #4caf50;
+  animation: pulseDot 1.4s ease-in-out infinite alternate;
+}
+
+@keyframes pulseDot {
+  0% { transform: scale(0.8); opacity: 0.7; }
+  100% { transform: scale(1.3); opacity: 1; }
+}
+
+.phongsinh-stats-pill {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(20, 20, 20, 0.85);
+  border: 1.5px solid rgba(255, 215, 0, 0.5);
+  border-radius: 999px;
+  padding: 6px 18px;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 800;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.stat-bird { color: #81d4fa; }
+.stat-heart { color: #ff5252; }
+.stat-follow { color: #ffd54f; }
+.stat-sep { color: rgba(255, 255, 255, 0.35); }
+
+/* Bảng xếp hạng Top phóng sinh góc trái */
+.phongsinh-leaderboard-box {
+  position: absolute;
+  top: 80px;
+  left: 24px;
+  width: 320px;
+  background: rgba(26, 18, 12, 0.84);
+  border: 1.5px solid rgba(224, 169, 109, 0.6);
+  border-radius: 16px;
+  padding: 10px 14px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(10px);
+  z-index: 45;
+}
+
+.lb-header {
+  font-size: 13px;
+  font-weight: 900;
+  color: #ffd54f;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  border-bottom: 1px solid rgba(255, 213, 79, 0.25);
+  padding-bottom: 6px;
+  margin-bottom: 6px;
+}
+
+.lb-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.lb-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  padding: 2px 0;
+}
+
+.lb-rank {
+  font-weight: 900;
+  width: 26px;
+}
+.rank-1 { color: #ffd700; text-shadow: 0 0 6px rgba(255, 215, 0, 0.6); }
+.rank-2 { color: #b0bec5; }
+.rank-3 { color: #cd7f32; }
+.rank-4, .rank-5 { color: rgba(255, 255, 255, 0.65); }
+
+.lb-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 0 6px;
+}
+
+.lb-val {
+  color: #81d4fa;
+  font-weight: 800;
+}
+
+/* Mini-Map góc phải trên đỉnh núi */
+.phongsinh-minimap-box {
+  position: absolute;
+  top: 80px;
+  right: 24px;
+  width: 170px;
+  height: 170px;
+  background: rgba(18, 52, 86, 0.35);
+  border: 3px solid rgba(129, 212, 250, 0.85);
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6), inset 0 0 16px rgba(129, 212, 250, 0.25);
+  backdrop-filter: blur(8px);
+  z-index: 45;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.minimap-preview {
+  width: 125px;
+  height: 125px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.minimap-svg {
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
+}
+
+.minimap-tag {
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 2px 14px;
+  border-radius: 999px;
+  margin-top: -6px;
+  letter-spacing: 0.5px;
+}
+
+/* Nhân vật đứng trên sân đá cầm lồng chim */
+.phongsinh-devotees-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1080px;
+  height: 1920px;
+  pointer-events: auto;
+}
+
+.terrace-devotee-wrapper {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.2s ease, filter 0.2s ease;
+  z-index: 30;
+}
+
+.terrace-devotee-wrapper:hover {
+  filter: brightness(1.15) drop-shadow(0 0 14px rgba(255, 215, 0, 0.5));
+}
+
+.terrace-devotee-wrapper:active {
+  transform: scale(0.96);
+}
+
+/* Bảng tên nâu gỗ bo tròn trên đầu nhân vật */
+.devotee-badge {
+  background: linear-gradient(180deg, #7c481e 0%, #4e290b 100%);
+  border: 2px solid #deb887;
+  border-radius: 16px;
+  padding: 3px 14px;
+  text-align: center;
+  color: #ffffff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.55), inset 0 1px 2px rgba(255, 255, 255, 0.3);
+  margin-bottom: 4px;
+  pointer-events: none;
+}
+
+.badge-name {
+  font-size: 17px;
+  font-weight: 800;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  white-space: nowrap;
+}
+
+.badge-count {
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffe082;
+  white-space: nowrap;
+}
+
+.devotee-character-container {
+  position: relative;
+  width: 130px;
+  height: 250px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.devotee-sprite-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.55));
+  animation: devoteeIdle 3.2s ease-in-out infinite alternate;
+}
+
+@keyframes devoteeIdle {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-4px); }
+}
+
+.bamboo-bird-cage {
+  position: absolute;
+  bottom: 85px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 38px;
+  height: 42px;
+  filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.45));
+  animation: cageGentleSwing 2.4s ease-in-out infinite alternate;
+}
+
+@keyframes cageGentleSwing {
+  0% { transform: translateX(-50%) rotate(-3deg); }
+  100% { transform: translateX(-50%) rotate(3deg); }
+}
+
+.cage-svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Đàn chim bồ câu trắng bay tự do */
+.phongsinh-birds-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1080px;
+  height: 1920px;
+  pointer-events: none;
+  z-index: 38;
+}
+
+.flying-dove {
+  position: absolute;
+  width: 50px;
+  height: 35px;
+  animation: doveFlyPath var(--duration) cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  animation-delay: var(--delay);
+  left: var(--start-x);
+  top: var(--start-y);
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.35));
+}
+
+@keyframes doveFlyPath {
+  0% {
+    transform: translate(0, 0) scale(calc(var(--scale) * 0.9)) rotate(var(--rotation));
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 0.95;
+  }
+  100% {
+    transform: translate(calc(var(--target-x) - var(--start-x)), calc(var(--target-y) - var(--start-y))) scale(calc(var(--scale) * 0.4)) rotate(var(--rotation));
+    opacity: 0;
+  }
+}
+
+.dove-svg {
+  width: 100%;
+  height: 100%;
+}
+
+.left-wing {
+  transform-origin: 25px 18px;
+  animation: flapLeft 0.18s ease-in-out infinite alternate;
+}
+
+.right-wing {
+  transform-origin: 25px 18px;
+  animation: flapRight 0.18s ease-in-out infinite alternate;
+}
+
+@keyframes flapLeft {
+  0% { transform: rotate(-28deg); }
+  100% { transform: rotate(32deg); }
+}
+
+@keyframes flapRight {
+  0% { transform: rotate(28deg); }
+  100% { transform: rotate(-32deg); }
+}
+
+/* Hiệu ứng tim bay khi thả tim */
+.phongsinh-hearts-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1080px;
+  height: 1920px;
+  pointer-events: none;
+  z-index: 42;
+}
+
+.phongsinh-heart {
+  position: absolute;
+  font-size: 32px;
+  animation: floatHeart 2.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes floatHeart {
+  0% {
+    transform: translate(0, 0) scale(0.4);
+    opacity: 0;
+  }
+  20% {
+    transform: translate(calc(var(--vx) * 0.2), calc(var(--vy) * 0.2)) scale(var(--scale));
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--vx), var(--vy)) scale(calc(var(--scale) * 1.3));
+    opacity: 0;
+  }
+}
+
+/* Bảng đối thoại chào mừng / cảm ơn phía dưới */
+.phongsinh-dialog-bubble {
+  position: absolute;
+  bottom: 110px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 940px;
+  background: rgba(255, 255, 255, 0.96);
+  border: 4px solid #ffffff;
+  border-radius: 36px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.8);
+  padding: 16px 26px;
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  z-index: 60;
+  backdrop-filter: blur(12px);
+  animation: dialogFloat 3.6s ease-in-out infinite alternate;
+}
+
+@keyframes dialogFloat {
+  0% { transform: translateX(-50%) translateY(0); }
+  100% { transform: translateX(-50%) translateY(-6px); }
+}
+
+.dialog-avatar-wrap {
+  width: 104px;
+  height: 104px;
+  border-radius: 50%;
+  border: 4px solid #ff9800;
+  box-shadow: 0 4px 16px rgba(255, 152, 0, 0.35);
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #fff;
+}
+
+.dialog-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.dialog-text-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dialog-user-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+.badge-author {
+  background: #e8f5e9;
+  border: 1.5px solid #4caf50;
+  color: #2e7d32;
+  font-size: 16px;
+  font-weight: 800;
+  border-radius: 999px;
+  padding: 2px 12px;
+}
+
+.badge-tag {
+  background: #fff3e0;
+  border: 1.5px solid #ff9800;
+  color: #e65100;
+  font-size: 15px;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 2px 10px;
+}
+
+.dialog-message-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.dialog-line.main-line {
+  font-size: 24px;
+  font-weight: 900;
+  color: #1a1a1a;
+  line-height: 1.3;
+}
+
+.dialog-line.sub-line {
+  font-size: 20px;
+  font-weight: 700;
+  color: #37474f;
+  line-height: 1.35;
+}
+
+.phongsinh-interactive-hint {
+  position: absolute;
+  bottom: 45px;
+  width: 100%;
+  text-align: center;
+  font-size: 17px;
+  font-weight: 800;
+  color: #ffe082;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.9);
+  z-index: 55;
+  pointer-events: none;
+  animation: pulseHint 2s ease-in-out infinite alternate;
+}
+
+@keyframes pulseHint {
+  0% { opacity: 0.75; transform: scale(0.98); }
+  100% { opacity: 1; transform: scale(1.02); }
+}

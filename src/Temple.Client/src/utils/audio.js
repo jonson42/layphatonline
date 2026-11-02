@@ -497,6 +497,31 @@ class TempleAudioEngine {
   // --------------------------------------------------------------------------
   // 5. TIẾNG CHUÔNG NGỌC DÂNG LỄ / THẮP HƯƠNG (SINGING CHIME)
   // --------------------------------------------------------------------------
+  playBirdChirp() {
+    if (!this.sfxEnabled) return;
+    try {
+      const ctx = this.ensureContext();
+      if (!ctx) return;
+      const t = ctx.currentTime;
+      for (let i = 0; i < 2; i++) {
+        const offset = i * 0.08;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        const startFreq = 2200 + (i * 300) + Math.random() * 200;
+        osc.frequency.setValueAtTime(startFreq, t + offset);
+        osc.frequency.exponentialRampToValueAtTime(startFreq * 1.5, t + offset + 0.04);
+        osc.frequency.exponentialRampToValueAtTime(startFreq * 0.8, t + offset + 0.09);
+        gain.gain.setValueAtTime(0.08, t + offset);
+        gain.gain.exponentialRampToValueAtTime(0.001, t + offset + 0.1);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(t + offset);
+        osc.stop(t + offset + 0.12);
+      }
+    } catch (_) {}
+  }
+
   playIncenseChime() {
     if (!this.sfxEnabled) return;
     try {

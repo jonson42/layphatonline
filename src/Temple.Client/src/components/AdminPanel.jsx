@@ -302,36 +302,54 @@ export default function AdminPanel({ state, callRpc, onCloseAdmin }) {
               <span style={{ fontSize: '14px', fontWeight: 700, color: '#ffd54f' }}>
                 🔄 Chọn Chế Độ Phát Live:
               </span>
-              <div style={{ display: 'flex', gap: '10px' }}>
+              <div style={{ display: 'flex', gap: '8px' }}>
                 <button
                   onClick={() => callRpc('temple.updateSettings', { mode: 'temple' })}
                   style={{
                     flex: 1,
-                    padding: '10px',
+                    padding: '10px 4px',
                     borderRadius: '8px',
-                    border: (state?.settings?.mode !== 'bothi') ? '2px solid #ffd54f' : '1px solid rgba(255,255,255,0.15)',
-                    background: (state?.settings?.mode !== 'bothi') ? 'linear-gradient(180deg, #d48806 0%, #ad6800 100%)' : 'rgba(255,255,255,0.06)',
+                    border: (state?.settings?.mode === 'temple') ? '2px solid #ffd54f' : '1px solid rgba(255,255,255,0.15)',
+                    background: (state?.settings?.mode === 'temple') ? 'linear-gradient(180deg, #d48806 0%, #ad6800 100%)' : 'rgba(255,255,255,0.06)',
                     color: '#fff',
                     fontWeight: 700,
+                    fontSize: '12px',
                     cursor: 'pointer'
                   }}
                 >
-                  🪷 Đi Chùa Lễ Phật
+                  🪷 Đi Chùa
+                </button>
+                <button
+                  onClick={() => callRpc('temple.updateSettings', { mode: 'phongsinh' })}
+                  style={{
+                    flex: 1,
+                    padding: '10px 4px',
+                    borderRadius: '8px',
+                    border: (state?.settings?.mode === 'phongsinh') ? '2px solid #81d4fa' : '1px solid rgba(255,255,255,0.15)',
+                    background: (state?.settings?.mode === 'phongsinh') ? 'linear-gradient(180deg, #0284c7 0%, #0369a1 100%)' : 'rgba(255,255,255,0.06)',
+                    color: '#fff',
+                    fontWeight: 700,
+                    fontSize: '12px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  🕊️ Phóng Sinh
                 </button>
                 <button
                   onClick={() => callRpc('temple.updateSettings', { mode: 'bothi' })}
                   style={{
                     flex: 1,
-                    padding: '10px',
+                    padding: '10px 4px',
                     borderRadius: '8px',
                     border: (state?.settings?.mode === 'bothi') ? '2px solid #ff9800' : '1px solid rgba(255,255,255,0.15)',
                     background: (state?.settings?.mode === 'bothi') ? 'linear-gradient(180deg, #f57c00 0%, #e65100 100%)' : 'rgba(255,255,255,0.06)',
                     color: '#fff',
                     fontWeight: 700,
+                    fontSize: '12px',
                     cursor: 'pointer'
                   }}
                 >
-                  🍺 Bố Thí Uống Bia
+                  🍺 Bố Thí
                 </button>
               </div>
             </div>

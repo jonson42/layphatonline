@@ -3,6 +3,7 @@ import { useTempleRpc } from './hooks/useTempleRpc';
 import { TempleAudioEngine } from './utils/audio';
 import TempleStage from './components/TempleStage';
 import BothiStage from './components/BothiStage';
+import PhongSinhStage from './components/PhongSinhStage';
 import QuickDock from './components/QuickDock';
 import AdminPanel from './components/AdminPanel';
 
@@ -65,11 +66,19 @@ export default function App() {
     );
   }
 
-  const isBothiMode = state?.settings?.mode === 'bothi';
+  const currentMode = state?.settings?.mode || 'temple';
 
   return (
     <div className="app-workspace">
-      {isBothiMode ? (
+      {currentMode === 'phongsinh' ? (
+        <PhongSinhStage
+          state={state}
+          activeEvent={activeEvent}
+          audio={audio}
+          callRpc={callRpc}
+          obsMode={obsMode}
+        />
+      ) : currentMode === 'bothi' ? (
         <BothiStage
           state={state}
           activeEvent={activeEvent}

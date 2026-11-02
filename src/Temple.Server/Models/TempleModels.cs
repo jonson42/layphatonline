@@ -34,6 +34,9 @@ public class TempleState
     [JsonPropertyName("totalShares")]
     public long TotalShares { get; set; } = 0;
 
+    [JsonPropertyName("totalBirdsReleased")]
+    public long TotalBirdsReleased { get; set; } = 2088;
+
     [JsonPropertyName("activeIncenseSticks")]
     public int ActiveIncenseSticks { get; set; } = 9;
 
@@ -90,6 +93,9 @@ public class Devotee
 
     [JsonPropertyName("gifts")]
     public int Gifts { get; set; }
+
+    [JsonPropertyName("birdsReleased")]
+    public int BirdsReleased { get; set; } = 0;
 
     [JsonPropertyName("lastWish")]
     public string LastWish { get; set; } = string.Empty;
@@ -238,6 +244,9 @@ public class LeaderboardItem
     [JsonPropertyName("incense")]
     public int Incense { get; set; }
 
+    [JsonPropertyName("birdsReleased")]
+    public int BirdsReleased { get; set; }
+
     [JsonPropertyName("lastWish")]
     public string LastWish { get; set; } = string.Empty;
 }
@@ -273,6 +282,9 @@ public class PublicTempleState
 
     [JsonPropertyName("totalShares")]
     public long TotalShares { get; set; }
+
+    [JsonPropertyName("totalBirdsReleased")]
+    public long TotalBirdsReleased { get; set; }
 
     [JsonPropertyName("activeIncenseSticks")]
     public int ActiveIncenseSticks { get; set; }
@@ -355,4 +367,44 @@ public class TempleEventResult
     [JsonPropertyName("state")]
     public PublicTempleState State { get; set; } = null!;
 }
+
+public class GreetMemberParams
+{
+    [JsonPropertyName("user")]
+    public string User { get; set; } = string.Empty;
+
+    [JsonPropertyName("uniqueId")]
+    public string? UniqueId { get; set; }
+
+    [JsonPropertyName("avatar")]
+    public string? Avatar { get; set; }
+
+    [JsonPropertyName("wish")]
+    public string? Wish { get; set; }
+
+    [JsonPropertyName("readTts")]
+    public bool? ReadTts { get; set; } = true;
+}
+
+public class ReleaseBirdsParams
+{
+    [JsonPropertyName("user")]
+    public string User { get; set; } = string.Empty;
+
+    [JsonPropertyName("uniqueId")]
+    public string? UniqueId { get; set; }
+
+    [JsonPropertyName("avatar")]
+    public string? Avatar { get; set; }
+
+    [JsonPropertyName("count")]
+    public int Count { get; set; } = 50;
+
+    [JsonPropertyName("wish")]
+    public string? Wish { get; set; }
+
+    [JsonPropertyName("readTts")]
+    public bool? ReadTts { get; set; } = true;
+}
+
 

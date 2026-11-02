@@ -65,6 +65,14 @@ public class RpcDispatcher
                 var pShare = DeserializeParams<ShareStreamParams>(parameters);
                 return _templeService.ShareStream(pShare ?? new ShareStreamParams());
 
+            case "temple.greetMember":
+                var pGreet = DeserializeParams<GreetMemberParams>(parameters);
+                return _templeService.GreetMember(pGreet ?? new GreetMemberParams());
+
+            case "temple.releaseBirds":
+                var pBirds = DeserializeParams<ReleaseBirdsParams>(parameters);
+                return _templeService.ReleaseBirds(pBirds ?? new ReleaseBirdsParams());
+
             case "temple.updateSettings":
                 if (parameters.HasValue)
                 {

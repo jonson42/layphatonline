@@ -67,20 +67,75 @@ public class SimulationService : BackgroundService
         var pick = SimDevotees[_rnd.Next(SimDevotees.Length)];
         double roll = _rnd.NextDouble();
 
+        if (state.Settings.Mode == "phongsinh")
+        {
+            if (roll < 0.30)
+            {
+                // 1. Giả lập người xem vào phòng live phóng sinh chim -> Chào mừng và chúc phúc
+                _templeService.GreetMember(new GreetMemberParams
+                {
+                    User = pick.User,
+                    UniqueId = pick.UniqueId,
+                    ReadTts = true
+                });
+            }
+            else if (roll < 0.55)
+            {
+                // 2. Giả lập ủng hộ phóng sinh chim (20 - 200 chú chim)
+                int[] birdPicks = { 20, 50, 100, 200 };
+                int birds = birdPicks[_rnd.Next(birdPicks.Length)];
+                _templeService.ReleaseBirds(new ReleaseBirdsParams
+                {
+                    User = pick.User,
+                    UniqueId = pick.UniqueId,
+                    Count = birds,
+                    ReadTts = true
+                });
+            }
+            else if (roll < 0.72)
+            {
+                // 3. Giả lập thả tim trợ duyên
+                _templeService.StrikeWoodenFish(new StrikeWoodenFishParams
+                {
+                    User = pick.User,
+                    UniqueId = pick.UniqueId,
+                    Count = _rnd.Next(5, 20),
+                    ReadTts = true
+                });
+            }
+            else if (roll < 0.88)
+            {
+                // 4. Giả lập Follow kênh
+                _templeService.FollowChannel(new FollowChannelParams
+                {
+                    User = pick.User,
+                    UniqueId = pick.UniqueId,
+                    ReadTts = true
+                });
+            }
+            else
+            {
+                // 5. Giả lập Chia sẻ live
+                _templeService.ShareStream(new ShareStreamParams
+                {
+                    User = pick.User,
+                    UniqueId = pick.UniqueId,
+                    ReadTts = true
+                });
+            }
+            return;
+        }
+
         if (state.Settings.Mode == "bothi")
         {
             if (roll < 0.30)
             {
                 // 1. Giả lập người vào live chế độ Bố Thí
-                string greeting = $"Chào {pick.User}, nhờ anh chị cho em xin vài đồng, tim hoặc bấm follow để em có tiền đi uống bia.";
-                _templeService.BurnIncense(new BurnIncenseParams
+                _templeService.GreetMember(new GreetMemberParams
                 {
                     User = pick.User,
                     UniqueId = pick.UniqueId,
-                    Count = 1,
-                    Wish = "Nhờ anh/chị cho em xin vài đồng, tim hoặc follow để có tiền đi uống bia! 🍺🙏",
-                    ReadTts = true,
-                    CustomTts = greeting
+                    ReadTts = true
                 });
             }
             else if (roll < 0.55)
@@ -136,15 +191,12 @@ public class SimulationService : BackgroundService
         {
             // 1. Giả lập Phật tử vào Chánh Điện (Chào mừng & Chúc phúc cầu an)
             string wish = AuspiciousWishes[_rnd.Next(AuspiciousWishes.Length)];
-            string greeting = $"Nam mô A Di Đà Phật. Chùa Thiên Sơn xin kính chào thí chủ {pick.User} đã vào Chánh Điện bái Phật. Nguyện cầu cho thí chủ {wish.ToLowerInvariant()}.";
-            _templeService.BurnIncense(new BurnIncenseParams
+            _templeService.GreetMember(new GreetMemberParams
             {
                 User = pick.User,
                 UniqueId = pick.UniqueId,
-                Count = 1,
                 Wish = wish,
-                ReadTts = true,
-                CustomTts = greeting
+                ReadTts = true
             });
         }
         else if (roll < 0.65)

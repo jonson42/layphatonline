@@ -203,37 +203,13 @@ public class TikTokService : ITikTokService, IDisposable
                     }
 
                     _logger.LogInformation("[TikTokLive Member] Người xem vào phòng: {User} ({UniqueId})", mUser, mUnique);
-
-                    bool isBothiMode = _templeService.GetPublicState().Settings.Mode == "bothi";
-                    if (isBothiMode)
+                    _templeService.GreetMember(new GreetMemberParams
                     {
-                        string bothiGreeting = $"Chào {mUser}, nhờ anh chị cho em xin vài đồng, tim hoặc bấm follow để em có tiền đi uống bia.";
-                        _templeService.BurnIncense(new BurnIncenseParams
-                        {
-                            User = mUser,
-                            UniqueId = mUnique,
-                            Avatar = mAvatar,
-                            Count = 1,
-                            Wish = "Nhờ anh/chị cho em xin vài đồng, tim hoặc follow để có tiền đi uống bia! 🍺🙏",
-                            ReadTts = true,
-                            CustomTts = bothiGreeting
-                        });
-                    }
-                    else
-                    {
-                        string memberWish = AuspiciousWishes[Random.Shared.Next(AuspiciousWishes.Length)];
-                        string greeting = $"Nam mô A Di Đà Phật. Chùa Thiên Sơn xin kính chào thí chủ {mUser} đã vào Chánh Điện bái Phật. Nguyện cầu cho thí chủ {memberWish.ToLowerInvariant()}.";
-                        _templeService.BurnIncense(new BurnIncenseParams
-                        {
-                            User = mUser,
-                            UniqueId = mUnique,
-                            Avatar = mAvatar,
-                            Count = 1,
-                            Wish = memberWish,
-                            ReadTts = true,
-                            CustomTts = greeting
-                        });
-                    }
+                        User = mUser,
+                        UniqueId = mUnique,
+                        Avatar = mAvatar,
+                        ReadTts = true
+                    });
                     break;
 
                 case "chat":
