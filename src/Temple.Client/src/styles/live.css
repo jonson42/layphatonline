@@ -3061,36 +3061,37 @@ body.obs-mode .phongsinh-stage-wrapper,
 /* Banner phước lành bên dưới hiện thân */
 .divine-blessing-pill {
   position: absolute;
-  bottom: -5px;
+  bottom: -10px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(18, 10, 4, 0.94);
-  border: 2px solid #ffd54f;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.85), 0 0 18px rgba(255, 215, 0, 0.65);
+  background: rgba(18, 10, 4, 0.96);
+  border: 2.5px solid #ffd54f;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.9), 0 0 24px rgba(255, 215, 0, 0.75);
   border-radius: 999px;
-  padding: 8px 24px;
+  padding: 10px 34px;
   display: flex;
   flex-direction: column;
   align-items: center;
   white-space: nowrap;
-  backdrop-filter: blur(12px);
-  z-index: 4;
+  backdrop-filter: blur(14px);
+  z-index: 50;
 }
 
 .divine-blessing-title {
-  font-size: 19px;
+  font-size: 26px;
   font-weight: 900;
   color: #fff8e1;
-  text-shadow: 0 0 10px rgba(255, 215, 0, 0.9);
-  letter-spacing: 0.5px;
+  text-shadow: 0 0 12px rgba(255, 215, 0, 0.95), 0 2px 6px rgba(0, 0, 0, 0.9);
+  letter-spacing: 0.8px;
 }
 
 .divine-blessing-sub {
-  font-size: 14px;
-  font-weight: 700;
-  color: #ffd54f;
-  margin-top: 2px;
-  letter-spacing: 0.3px;
+  font-size: 18px;
+  font-weight: 800;
+  color: #ffe082;
+  margin-top: 3px;
+  letter-spacing: 0.5px;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
 }
 
 .music-pulse-icon {
@@ -3107,10 +3108,11 @@ body.obs-mode .phongsinh-stage-wrapper,
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 200px;
-  color: #ffe082;
-  font-size: 15px;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+  max-width: 230px;
+  color: #fff9c4;
+  font-size: 18px;
+  font-weight: 800;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
 }
 
 .music-skip-btn {
@@ -3723,15 +3725,15 @@ body.obs-mode .phongsinh-stage-wrapper,
 .focus-chat-bubble {
   background: rgba(255, 255, 255, 0.98);
   border: 2.5px solid #ff9800;
-  border-radius: 18px;
-  padding: 6px 16px;
-  font-size: 15px;
+  border-radius: 20px;
+  padding: 8px 20px;
+  font-size: 20px;
   font-weight: 800;
   color: #bf360c;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5), 0 0 14px rgba(255, 152, 0, 0.35);
   white-space: nowrap;
   position: relative;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
 }
 
 .focus-chat-tail {
@@ -3794,23 +3796,23 @@ body.obs-mode .phongsinh-stage-wrapper,
 }
 
 .focus-username {
-  font-size: 17px;
+  font-size: 22px;
   font-weight: 900;
   color: #fff9c4;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
   white-space: nowrap;
-  max-width: 260px;
+  max-width: 290px;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .focus-action-tag {
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 800;
-  padding: 2px 10px;
+  padding: 3px 12px;
   border-radius: 999px;
   white-space: nowrap;
-  letter-spacing: 0.3px;
+  letter-spacing: 0.4px;
 }
 
 .tag-greet {
@@ -3938,19 +3940,19 @@ body.obs-mode .phongsinh-stage-wrapper,
 }
 
 .badge-name {
-  font-size: 26px;
+  font-size: 29px;
   font-weight: 900;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.95);
   white-space: nowrap;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.6px;
 }
 
 .badge-count {
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 800;
   color: #fef08a;
   white-space: nowrap;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95);
 }
 
 .devotee-character-container {
@@ -4945,24 +4947,24 @@ body.obs-mode .phongsinh-stage-wrapper,
 }
 
 .v-word {
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 900;
   color: #fff9c4;
-  letter-spacing: 0.8px;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9), 0 0 8px rgba(255, 215, 0, 0.5);
+  letter-spacing: 1px;
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.95), 0 0 10px rgba(255, 215, 0, 0.6);
   line-height: 1.15;
 }
 
 .v-word.gold {
   color: #ffe082;
-  font-size: 22px;
-  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.95), 0 0 14px rgba(255, 215, 0, 0.9);
+  font-size: 27px;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.95), 0 0 16px rgba(255, 215, 0, 0.95);
 }
 
 .v-word.amber {
   color: #ffca28;
-  font-size: 19px;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.9);
+  font-size: 23px;
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.95);
 }
 
 .v-dot {
@@ -5001,16 +5003,16 @@ body.obs-mode .phongsinh-stage-wrapper,
 }
 
 .v-counter-num {
-  font-size: 17px;
+  font-size: 21px;
   font-weight: 900;
   color: #ffffff;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95);
 }
 
 .v-counter-txt {
-  font-size: 12px;
+  font-size: 14px;
   font-weight: 800;
   color: #ffd54f;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.6px;
 }
