@@ -351,6 +351,23 @@ export default function AdminPanel({ state, callRpc, onCloseAdmin }) {
                 >
                   🍺 Bố Thí
                 </button>
+                <button
+                  onClick={() => callRpc('temple.updateSettings', { mode: 'xinchu' })}
+                  style={{
+                    flex: 1,
+                    padding: '10px 4px',
+                    borderRadius: '8px',
+                    border: (state?.settings?.mode === 'xinchu') ? '2px solid #f59e0b' : '1px solid rgba(255,255,255,0.15)',
+                    background: (state?.settings?.mode === 'xinchu') ? 'linear-gradient(180deg, #b91c1c 0%, #991b1b 100%)' : 'rgba(255,255,255,0.06)',
+                    color: '#fff',
+                    fontWeight: 700,
+                    fontSize: '12px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  📜 Xin Chữ
+                </button>
+                
               </div>
             </div>
 

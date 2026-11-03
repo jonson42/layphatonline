@@ -116,6 +116,22 @@ public class TempleService : ITempleService
         "Cầu bách bệnh tiêu trừ, phước đức vô biên, vạn sự như ý"
     };
 
+    public static readonly (string Word, string Meaning, string TtsWish)[] AuspiciousCalligraphy = new[]
+    {
+        ("PHÚC", "Phúc như Đông Hải, vạn sự hanh thông, gia đạo bình an", "Thầy khai bút tặng chữ PHÚC! Kính chúc thí chủ phúc như Đông Hải, vạn sự hanh thông, gia đình luôn ấm êm hạnh phúc!"),
+        ("LỘC", "Tài lộc dồi dào, tiền vào như nước, kinh doanh phát đạt", "Thầy tặng thí chủ chữ LỘC! Cầu chúc tài lộc dồi dào, buôn may bán đắt, công việc hanh thông phát triển!"),
+        ("THỌ", "Thọ tỷ Nam Sơn, bách niên giai lão, thân tâm an lạc", "Thầy tặng thí chủ chữ THỌ! Chúc thí chủ dồi dào sức khỏe, sống lâu trăm tuổi, thân tâm luôn an lạc tươi vui!"),
+        ("AN", "Tâm an vạn sự an, bình an vô sự, thuận buồm xuôi gió", "Thầy tặng thí chủ chữ AN! Cầu chúc tâm an vạn sự an, cuộc sống luôn bình yên, thuận buồm xuôi gió!"),
+        ("TÂM", "Tâm sáng chí bền, giữ trọn chữ tâm giữa cuộc đời", "Thầy tặng thí chủ chữ TÂM! Chúc thí chủ giữ tâm sáng trí trong, mọi điều thiện lành đều đơm hoa kết trái!"),
+        ("TÀI", "Tấn tài tấn lộc, đại phú đại quý, may mắn ngập tràn", "Thầy tặng thí chủ chữ TÀI! Chúc thí chủ tấn tài tấn lộc, kinh doanh phát đạt, tiền của dồi dào!"),
+        ("NHẪN", "Nhẫn nại kiên cường, một bước lùi mở ngàn biển lớn", "Thầy tặng thí chủ chữ NHẪN! Chúc thí chủ trí dũng song toàn, nhẫn nại vượt qua mọi thử thách để gặt hái thành công!"),
+        ("ĐỨC", "Đức năng thắng số, tích đức hành thiện lưu quang muôn đời", "Thầy tặng thí chủ chữ ĐỨC! Đức năng thắng số, chúc thí chủ luôn tích nhiều phúc đức, vạn sự cát tường!"),
+        ("CÁT TƯỜNG", "Vạn sự như ý, cát tường như nguyện, phúc lộc song toàn", "Thầy kính chúc thí chủ chữ CÁT TƯỜNG! Vạn sự như ý, tỷ sự như mơ, bốn mùa bình an thịnh vượng!"),
+        ("DUYÊN", "Hữu duyên tương ngộ, vạn sự tùy duyên, hạnh phúc tràn đầy", "Thầy đề tặng chữ DUYÊN! Chúc thí chủ hữu duyên gặp được quý nhân phù trợ, gia đình hạnh phúc viên mãn!"),
+        ("ĐỖ ĐẠT", "Bảng vàng đề tên, công danh rạng rỡ, học hành tấn tới", "Thầy tặng chữ ĐỖ ĐẠT! Chúc thí chủ công thành danh toại, thi cử đỗ đạt, học hành và sự nghiệp thăng hoa!"),
+        ("PHÁT TÀI", "Khai xuân phát tài, mã đáo thành công, tiền tài rộng mở", "Thầy tặng chữ PHÁT TÀI! Chúc thí chủ năm mới phát tài phát lộc, vạn sự hanh thông thuận lợi!")
+    };
+
     private Devotee RecordDevotee(string? user, string? uniqueId, string? avatar, long meritDelta, int incenseDelta = 0, int giftDelta = 0, int birdsDelta = 0, string wish = "")
     {
         string displayName = TextSanitizer.SanitizeUserName(user ?? uniqueId);
@@ -209,6 +225,7 @@ public class TempleService : ITempleService
                 TotalFollows = _state.TotalFollows,
                 TotalShares = _state.TotalShares,
                 TotalBirdsReleased = _state.TotalBirdsReleased,
+                TotalCalligraphyWords = _state.TotalCalligraphyWords,
                 ActiveIncenseSticks = _state.ActiveIncenseSticks,
                 HaloIntensity = _state.HaloIntensity,
                 Offerings = new OfferingsState
@@ -290,7 +307,7 @@ public class TempleService : ITempleService
     public TempleEventResult StrikeWoodenFish(StrikeWoodenFishParams p)
     {
         string mode = _state.Settings.Mode;
-        if (mode == "bothi" || mode == "phongsinh")
+        if (mode == "bothi" || mode == "phongsinh" || mode == "xinchu")
         {
             return CommonThankYou(p.User, p.UniqueId, p.Avatar, "heart", p.Count, 0, null, p.ReadTts ?? true, p.TtsText);
         }
@@ -435,6 +452,8 @@ public class TempleService : ITempleService
             string ttsText;
             string wishText;
             string evtType;
+            string? calligraphyWord = null;
+            string? calligraphyMeaning = null;
 
             if (mode == "phongsinh")
             {
@@ -447,6 +466,12 @@ public class TempleService : ITempleService
                 ttsText = $"Chào {dev.Name}, nhờ anh chị cho em xin vài đồng, tim hoặc bấm follow để em có tiền đi uống bia. {wish}!";
                 wishText = "Nhờ anh/chị cho em xin vài đồng, tim hoặc follow để có tiền đi uống bia! 🍺🙏";
                 evtType = "bothiGreet";
+            }
+            else if (mode == "xinchu")
+            {
+                ttsText = $"Thầy Đồ kính chào {dev.Name} đã ghé gian hàng xin chữ! Nhờ thí chủ cho em xin vài đồng, thả tim hoặc follow để thầy đoán trọn quẻ, viết chữ giải hạn nghênh tài lộc ạ! {wish}.";
+                wishText = "Nhờ anh/chị vừa vào live cho em xin vài đồng, thả tim hoặc follow để thầy đoán trọn quẻ, viết chữ giải hạn ạ! 🔮🌸🙏";
+                evtType = "xinchuGreet";
             }
             else
             {
@@ -469,6 +494,8 @@ public class TempleService : ITempleService
                 Count = 1,
                 Merit = 10,
                 Wish = wishText,
+                CalligraphyWord = calligraphyWord,
+                CalligraphyMeaning = calligraphyMeaning,
                 TtsText = ttsText,
                 TtsVoice = _state.Settings.TtsVoice ?? "maichi"
             });
@@ -494,6 +521,56 @@ public class TempleService : ITempleService
             giftName: $"{count} Chú Chim Tự Do",
             readTts: p.ReadTts ?? true,
             customWish: p.Wish);
+    }
+
+    public TempleEventResult RequestCalligraphy(RequestCalligraphyParams p)
+    {
+        lock (_lock)
+        {
+            string user = TextSanitizer.SanitizeUserName(p.User);
+            string uniqueId = p.UniqueId ?? string.Empty;
+            string avatar = p.Avatar ?? string.Empty;
+            string word = (p.Word ?? string.Empty).Trim().ToUpperInvariant();
+            
+            var item = AuspiciousCalligraphy.FirstOrDefault(c => c.Word.Equals(word, StringComparison.OrdinalIgnoreCase));
+            if (string.IsNullOrEmpty(item.Word))
+            {
+                item = AuspiciousCalligraphy[Random.Shared.Next(AuspiciousCalligraphy.Length)];
+                word = item.Word;
+            }
+
+            int merit = 20;
+            _state.TotalCalligraphyWords += 1;
+            string wish = !string.IsNullOrWhiteSpace(p.Wish) ? TextSanitizer.SanitizeWishText(p.Wish) : item.Meaning;
+            var dev = RecordDevotee(user, uniqueId, avatar, merit, 0, 1, 0, $"Xin chữ: {word} ({wish})");
+
+            string ttsText = (p.ReadTts == false)
+                ? string.Empty
+                : (!string.IsNullOrWhiteSpace(p.CustomTts)
+                    ? p.CustomTts
+                    : $"Thầy Đồ xin khai bút đề tặng chữ {word} cho thí chủ {dev.Name}! {item.TtsWish}");
+
+            var evt = PushEvent(new TempleEvent
+            {
+                Type = "xinchuCalligraphy",
+                User = dev.Name,
+                UniqueId = dev.UniqueId,
+                Avatar = dev.Avatar,
+                Count = 1,
+                Merit = merit,
+                Wish = $"Thầy Đồ tặng chữ {word} - {wish} 📜✨",
+                CalligraphyWord = word,
+                CalligraphyMeaning = item.Meaning,
+                TtsText = ttsText,
+                TtsVoice = _state.Settings.TtsVoice ?? "maichi"
+            });
+
+            _ = SaveStateAsync();
+            var state = GetPublicState();
+            var result = new TempleEventResult { Event = evt, State = state };
+            Broadcast("temple.event", result);
+            return result;
+        }
     }
 
     public TempleEventResult CommonThankYou(
@@ -523,6 +600,8 @@ public class TempleService : ITempleService
             string ttsText = string.Empty;
             string wishText = string.Empty;
             string evtType = string.Empty;
+            string? calligraphyWord = null;
+            string? calligraphyMeaning = null;
 
             switch (actionType)
             {
@@ -542,6 +621,16 @@ public class TempleService : ITempleService
                         ttsText = $"Cảm ơn anh chị {cleanUser} đã bấm follow kênh để ủng hộ em kiếm tiền đi uống bia! Chúc anh chị luôn vui vẻ và nhiều may mắn!";
                         wishText = "Đã follow kênh ủng hộ em uống bia! 🍺➕";
                         evtType = "bothiFollow";
+                    }
+                    else if (mode == "xinchu")
+                    {
+                        var picked = AuspiciousCalligraphy[Random.Shared.Next(AuspiciousCalligraphy.Length)];
+                        calligraphyWord = picked.Word;
+                        calligraphyMeaning = picked.Meaning;
+                        _state.TotalCalligraphyWords += 1;
+                        ttsText = $"Cảm ơn anh chị {cleanUser} đã bấm follow kết duyên lành! Thầy khai bút tặng chữ {picked.Word}! {picked.Meaning}!";
+                        wishText = $"Đã follow! Thầy tặng chữ {picked.Word} 📜✨";
+                        evtType = "xinchuFollow";
                     }
                     else
                     {
@@ -569,6 +658,16 @@ public class TempleService : ITempleService
                         ttsText = $"Cảm ơn anh chị {cleanUser} đã thả {count} tim ủng hộ em kiếm tiền uống bia!";
                         wishText = "Đã thả tim ủng hộ em kiếm tiền uống bia! ❤️🍺";
                         evtType = "bothiHeart";
+                    }
+                    else if (mode == "xinchu")
+                    {
+                        var picked = AuspiciousCalligraphy[Random.Shared.Next(AuspiciousCalligraphy.Length)];
+                        calligraphyWord = picked.Word;
+                        calligraphyMeaning = picked.Meaning;
+                        _state.TotalCalligraphyWords += 1;
+                        ttsText = $"Cảm ơn anh chị {cleanUser} đã thả {count} tim trợ duyên! Thầy hạ bút đề tặng chữ {picked.Word} chúc {picked.Meaning}!";
+                        wishText = $"Thả {count} tim! Thầy đề tặng chữ {picked.Word} ❤️📜";
+                        evtType = "xinchuHeart";
                     }
                     else
                     {
@@ -602,6 +701,17 @@ public class TempleService : ITempleService
                         ttsText = $"Cảm ơn anh chị {cleanUser} đã bố thí {coins} đồng để em có tiền đi uống bia! Chúc anh chị luôn dồi dào sức khỏe và gặp nhiều may mắn!";
                         wishText = $"Bố thí {coins} đồng để em đi uống bia 🍺";
                         evtType = "bothiDonate";
+                    }
+                    else if (mode == "xinchu")
+                    {
+                        var picked = AuspiciousCalligraphy[Random.Shared.Next(AuspiciousCalligraphy.Length)];
+                        calligraphyWord = picked.Word;
+                        calligraphyMeaning = picked.Meaning;
+                        _state.TotalCalligraphyWords += 1;
+                        giftName ??= $"{coins} Đồng Gieo Duyên";
+                        ttsText = $"Đa tạ thí chủ {cleanUser} đã gieo duyên công đức {coins} đồng! Thầy khai bút tặng bức đại tự chữ {picked.Word}! Cầu chúc {picked.Meaning}!";
+                        wishText = $"Gieo duyên {coins} đồng! Thầy hạ bút tặng chữ {picked.Word} 📜🌸";
+                        evtType = "xinchuGift";
                     }
                     else
                     {
@@ -638,6 +748,16 @@ public class TempleService : ITempleService
                         wishText = "Đã chia sẻ live giúp em kiếm tiền uống bia! 🔄🍺";
                         evtType = "bothiShare";
                     }
+                    else if (mode == "xinchu")
+                    {
+                        var picked = AuspiciousCalligraphy[Random.Shared.Next(AuspiciousCalligraphy.Length)];
+                        calligraphyWord = picked.Word;
+                        calligraphyMeaning = picked.Meaning;
+                        _state.TotalCalligraphyWords += 1;
+                        ttsText = $"Cảm ơn anh chị {cleanUser} đã chia sẻ buổi xin chữ lan tỏa duyên may! Thầy đề tặng chữ {picked.Word}! Chúc {picked.Meaning}!";
+                        wishText = $"Chia sẻ live xin chữ! Thầy tặng chữ {picked.Word} 🔄📜";
+                        evtType = "xinchuShare";
+                    }
                     else
                     {
                         ttsText = $"Nam mô A Di Đà Phật. Cảm tạ thí chủ {cleanUser} đã chia sẻ buổi phát trực tiếp. Nguyện cầu Phật gia hộ cho thí chủ vạn sự cát tường.";
@@ -664,6 +784,8 @@ public class TempleService : ITempleService
                 GiftName = giftName,
                 Merit = merit,
                 Wish = wishText,
+                CalligraphyWord = calligraphyWord,
+                CalligraphyMeaning = calligraphyMeaning,
                 TtsText = ttsText,
                 TtsVoice = _state.Settings.TtsVoice ?? "maichi"
             });
@@ -679,7 +801,7 @@ public class TempleService : ITempleService
     public TempleEventResult OfferGift(OfferGiftParams p)
     {
         string mode = _state.Settings.Mode;
-        if (mode == "bothi" || mode == "phongsinh")
+        if (mode == "bothi" || mode == "phongsinh" || mode == "xinchu")
         {
             return CommonThankYou(p.User, p.UniqueId, p.Avatar, "bonus", 1, p.Coins, p.GiftName, p.ReadTts ?? true, null, p.Wish);
         }

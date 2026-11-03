@@ -17,6 +17,7 @@ public interface ITempleService
     TempleEventResult ShareStream(ShareStreamParams p);
     TempleEventResult GreetMember(GreetMemberParams p);
     TempleEventResult ReleaseBirds(ReleaseBirdsParams p);
+    TempleEventResult RequestCalligraphy(RequestCalligraphyParams p);
     PublicTempleState UpdateSettings(JsonElement p);
     PublicTempleState ResetMerit();
     object? HandleComment(string? comment, string? user, string? uniqueId, string? avatar);

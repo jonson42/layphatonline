@@ -4,6 +4,7 @@ import { TempleAudioEngine } from './utils/audio';
 import TempleStage from './components/TempleStage';
 import BothiStage from './components/BothiStage';
 import PhongSinhStage from './components/PhongSinhStage';
+import XinChuStage from './components/XinChuStage';
 import QuickDock from './components/QuickDock';
 import AdminPanel from './components/AdminPanel';
 
@@ -43,8 +44,8 @@ export default function App() {
     const currentMode = state?.settings?.mode || 'temple';
     audio.setMode(currentMode);
 
-    // In bothi and phongsinh mode, dedicated background tracks/playlist play
-    if (currentMode === 'bothi' || currentMode === 'phongsinh') {
+    // In bothi, phongsinh, and xinchu mode, dedicated background tracks/playlist play
+    if (currentMode === 'bothi' || currentMode === 'phongsinh' || currentMode === 'xinchu') {
       audio.stopYouTube();
     } else {
       const ytUrl = state?.settings?.youtubeUrl;
@@ -80,6 +81,14 @@ export default function App() {
         />
       ) : currentMode === 'bothi' ? (
         <BothiStage
+          state={state}
+          activeEvent={activeEvent}
+          audio={audio}
+          callRpc={callRpc}
+          obsMode={obsMode}
+        />
+      ) : currentMode === 'xinchu' ? (
+        <XinChuStage
           state={state}
           activeEvent={activeEvent}
           audio={audio}

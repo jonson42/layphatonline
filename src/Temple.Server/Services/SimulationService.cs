@@ -187,6 +187,80 @@ public class SimulationService : BackgroundService
             return;
         }
 
+        if (state.Settings.Mode == "xinchu")
+        {
+            if (roll < 0.25)
+            {
+                // 1. Giả lập người vào xem gian hàng Xin Chữ
+                _templeService.GreetMember(new GreetMemberParams
+                {
+                    User = pick.User,
+                    UniqueId = pick.UniqueId,
+                    ReadTts = true
+                });
+            }
+            else if (roll < 0.50)
+            {
+                // 2. Giả lập tặng quà / gieo duyên nhận chữ thư pháp
+                int[] coinPicks = { 5, 10, 20, 50, 100 };
+                int coins = coinPicks[_rnd.Next(coinPicks.Length)];
+                _templeService.OfferGift(new OfferGiftParams
+                {
+                    User = pick.User,
+                    UniqueId = pick.UniqueId,
+                    Coins = coins,
+                    GiftName = $"{coins} Đồng Gieo Duyên",
+                    Wish = "Cầu bình an tài lộc may mắn 🌸",
+                    ReadTts = true
+                });
+            }
+            else if (roll < 0.70)
+            {
+                // 3. Giả lập xin chữ thư pháp cụ thể
+                string[] words = { "PHÚC", "LỘC", "THỌ", "AN", "TÂM", "TÀI", "NHẪN", "ĐỨC", "CÁT TƯỜNG", "DUYÊN", "ĐỖ ĐẠT", "PHÁT TÀI" };
+                string pickedWord = words[_rnd.Next(words.Length)];
+                _templeService.RequestCalligraphy(new RequestCalligraphyParams
+                {
+                    User = pick.User,
+                    UniqueId = pick.UniqueId,
+                    Word = pickedWord,
+                    ReadTts = true
+                });
+            }
+            else if (roll < 0.85)
+            {
+                // 4. Giả lập thả tim trợ duyên
+                _templeService.StrikeWoodenFish(new StrikeWoodenFishParams
+                {
+                    User = pick.User,
+                    UniqueId = pick.UniqueId,
+                    Count = _rnd.Next(5, 25),
+                    ReadTts = true
+                });
+            }
+            else if (roll < 0.93)
+            {
+                // 5. Giả lập bấm Follow
+                _templeService.FollowChannel(new FollowChannelParams
+                {
+                    User = pick.User,
+                    UniqueId = pick.UniqueId,
+                    ReadTts = true
+                });
+            }
+            else
+            {
+                // 6. Giả lập chia sẻ live
+                _templeService.ShareStream(new ShareStreamParams
+                {
+                    User = pick.User,
+                    UniqueId = pick.UniqueId,
+                    ReadTts = true
+                });
+            }
+            return;
+        }
+
         if (roll < 0.35)
         {
             // 1. Giả lập Phật tử vào Chánh Điện (Chào mừng & Chúc phúc cầu an)

@@ -280,3 +280,27 @@ public class ShareStreamParams
     public string? CustomTts { get; set; }
 }
 
+public class RequestCalligraphyParams
+{
+    [JsonPropertyName("user")]
+    public string? User { get; set; }
+
+    [JsonPropertyName("uniqueId")]
+    public string? UniqueId { get; set; }
+
+    [JsonPropertyName("avatar")]
+    public string? Avatar { get; set; }
+
+    [JsonPropertyName("word")]
+    public string? Word { get; set; }
+
+    [JsonPropertyName("wish")]
+    public string? Wish { get; set; }
+
+    [JsonPropertyName("readTts")]
+    public bool? ReadTts { get; set; } = true;
+
+    [JsonPropertyName("customTts")]
+    public string? CustomTts { get; set; }
+}
+

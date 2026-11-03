@@ -37,6 +37,9 @@ public class TempleState
     [JsonPropertyName("totalBirdsReleased")]
     public long TotalBirdsReleased { get; set; } = 2088;
 
+    [JsonPropertyName("totalCalligraphyWords")]
+    public long TotalCalligraphyWords { get; set; } = 388;
+
     [JsonPropertyName("activeIncenseSticks")]
     public int ActiveIncenseSticks { get; set; } = 9;
 
@@ -199,6 +202,12 @@ public class TempleEvent
     [JsonPropertyName("topic")]
     public string? Topic { get; set; }
 
+    [JsonPropertyName("calligraphyWord")]
+    public string? CalligraphyWord { get; set; }
+
+    [JsonPropertyName("calligraphyMeaning")]
+    public string? CalligraphyMeaning { get; set; }
+
     [JsonPropertyName("fortune")]
     public FortuneStick? Fortune { get; set; }
 }
@@ -285,6 +294,9 @@ public class PublicTempleState
 
     [JsonPropertyName("totalBirdsReleased")]
     public long TotalBirdsReleased { get; set; }
+
+    [JsonPropertyName("totalCalligraphyWords")]
+    public long TotalCalligraphyWords { get; set; }
 
     [JsonPropertyName("activeIncenseSticks")]
     public int ActiveIncenseSticks { get; set; }

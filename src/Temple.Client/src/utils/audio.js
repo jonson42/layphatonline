@@ -136,13 +136,13 @@ class TempleAudioEngine {
   }
 
   setMode(mode) {
-    const isPlaylistMode = mode === 'phongsinh' || mode === 'bothi';
+    const isPlaylistMode = mode === 'phongsinh' || mode === 'bothi' || mode === 'xinchu';
     const targetSrc = isPlaylistMode
       ? (this.phongsinhPlaylist?.[this.phongsinhTrackIndex]?.src || '')
       : '/assets/bg_chant.m4a';
 
-    // Nếu chuyển đổi qua lại giữa Phóng Sinh và Bố Thí khi nhạc đang phát -> giữ nguyên mượt mà, không gián đoạn
-    if (isPlaylistMode && (this.currentMode === 'phongsinh' || this.currentMode === 'bothi') && this.bgAudio && !this.bgAudio.paused) {
+    // Nếu chuyển đổi qua lại giữa Phóng Sinh, Bố Thí và Xin Chữ khi nhạc đang phát -> giữ nguyên mượt mà, không gián đoạn
+    if (isPlaylistMode && (this.currentMode === 'phongsinh' || this.currentMode === 'bothi' || this.currentMode === 'xinchu') && this.bgAudio && !this.bgAudio.paused) {
       this.currentMode = mode;
       return;
     }

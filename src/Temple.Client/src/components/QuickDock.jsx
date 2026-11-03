@@ -170,7 +170,7 @@ export default function QuickDock({ state, audio, callRpc, onOpenAdmin }) {
         <div style={{ fontSize: '12px', fontWeight: 700, color: '#ffd54f', marginBottom: '8px' }}>
           🔄 CHẾ ĐỘ PHÁT LIVE HIỆN TẠI:
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '6px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '4px' }}>
           <button
             style={{
               padding: '10px 4px',
@@ -219,7 +219,23 @@ export default function QuickDock({ state, audio, callRpc, onOpenAdmin }) {
           >
             🍺 Bố Thí
           </button>
-        </div>
+          <button
+            style={{
+              padding: '10px 2px',
+              borderRadius: '8px',
+              border: (state?.settings?.mode === 'xinchu') ? '2px solid #f59e0b' : '1px solid rgba(255,255,255,0.15)',
+              background: (state?.settings?.mode === 'xinchu') ? 'linear-gradient(180deg, #b91c1c 0%, #991b1b 100%)' : 'rgba(255,255,255,0.06)',
+              color: '#fff',
+              fontWeight: 700,
+              fontSize: '11px',
+              cursor: 'pointer',
+              boxShadow: (state?.settings?.mode === 'xinchu') ? '0 0 10px rgba(245,158,11,0.5)' : 'none'
+            }}
+            onClick={() => callRpc('temple.updateSettings', { mode: 'xinchu' })}
+          >
+            📜 Xin Chữ
+          </button>
+          </div>
       </div>
 
       {/* LINK CLOUDFLARE TIKTOK LIVE STUDIO */}
@@ -293,7 +309,7 @@ export default function QuickDock({ state, audio, callRpc, onOpenAdmin }) {
             🎵 Nhạc Nền: {musicEnabled ? 'BẬT' : 'TẮT'}
           </button>
         </div>
-        {(state?.settings?.mode === 'bothi' || state?.settings?.mode === 'phongsinh') ? (
+        {(state?.settings?.mode === 'bothi' || state?.settings?.mode === 'phongsinh' || state?.settings?.mode === 'xinchu') ? (
           <div style={{ fontSize: '11.5px', color: '#ffe082', background: 'rgba(255, 152, 0, 0.15)', border: '1px solid rgba(255, 183, 77, 0.35)', borderRadius: '8px', padding: '6px 10px', margin: '4px 0 10px 0' }}>
             🎵 <strong>Nhạc nền:</strong> <em>Playlist 22 bài Phật giáo không lời (NhacCuaTui)</em> {musicEnabled ? '🟢 Đang phát' : '⚪ Đã tắt'}
           </div>
@@ -673,6 +689,144 @@ export default function QuickDock({ state, audio, callRpc, onOpenAdmin }) {
             >
               🎉 Đại Lễ Bố Thí Tiền Uống Bia (200 Đồng)
             </button>
+          </>
+        ) : state?.settings?.mode === 'xinchu' ? (
+          <>
+            <div className="dock-section-title">📜 Kích Hoạt Xin Chữ Đầu Xuân (RPC)</div>
+            <input
+              type="text"
+              className="dock-input"
+              value={devoteeName}
+              onChange={(e) => setDevoteeName(e.target.value)}
+              placeholder="Tên thí chủ xin chữ..."
+            />
+            <input
+              type="text"
+              className="dock-input"
+              value={devoteeWish}
+              onChange={(e) => setDevoteeWish(e.target.value)}
+              placeholder="Chữ muốn xin (PHÚC, LỘC, THỌ, AN, TÂM, TÀI...)"
+            />
+
+            <button
+              className="dock-btn gold"
+              style={{ marginBottom: '10px', fontSize: '13px', padding: '10px' }}
+              onClick={() => {
+                const name = devoteeName.trim() || 'Thí Chủ Hoan Hỷ';
+                const word = devoteeWish.trim() || 'PHÚC';
+                callRpc('temple.requestCalligraphy', {
+                  user: name,
+                  word: word,
+                  readTts: true
+                });
+              }}
+            >
+              📜 Thầy Đồ Khai Bút Cho Chữ
+            </button>
+
+            <button
+              className="dock-btn"
+              style={{
+                marginBottom: '10px',
+                fontSize: '13px',
+                padding: '10px',
+                background: 'linear-gradient(180deg, #b91c1c 0%, #991b1b 100%)',
+                color: '#fff',
+                fontWeight: 800,
+                border: '1.5px solid #f59e0b',
+                boxShadow: '0 0 10px rgba(245, 158, 11, 0.4)'
+              }}
+              onClick={() => {
+                const name = devoteeName.trim() || 'Thí Chủ Du Xuân';
+                callRpc('temple.greetMember', {
+                  user: name,
+                  readTts: true
+                });
+              }}
+            >
+              🌸 Thử Người Vào Live (Chào Khách Xin Chữ)
+            </button>
+
+            <div className="dock-grid-2">
+              <button
+                className="dock-btn"
+                style={{ background: 'linear-gradient(180deg, #10b981 0%, #059669 100%)', color: '#fff', fontWeight: 800, border: '1.5px solid #a7f3d0' }}
+                onClick={() => {
+                  const name = devoteeName.trim() || 'Thí Chủ Du Xuân';
+                  callRpc('temple.follow', { user: name, readTts: true });
+                }}
+              >
+                ➕ Bấm Follow Kênh
+              </button>
+              <button
+                className="dock-btn"
+                style={{ background: 'linear-gradient(180deg, #0284c7 0%, #0369a1 100%)', color: '#fff', fontWeight: 800, border: '1.5px solid #7dd3fc' }}
+                onClick={() => {
+                  const name = devoteeName.trim() || 'Thí Chủ Du Xuân';
+                  callRpc('temple.share', { user: name, readTts: true });
+                }}
+              >
+                🔄 Chia Sẻ Live
+              </button>
+            </div>
+
+            <div className="dock-grid-2" style={{ marginTop: '8px' }}>
+              <button
+                className="dock-btn gold"
+                onClick={() => callRpc('temple.offerGift', { user: devoteeName, coins: 10, giftName: '10 Đồng Gieo Duyên' })}
+              >
+                🪙 Gieo Duyên 10đ
+              </button>
+              <button
+                className="dock-btn gold"
+                onClick={() => callRpc('temple.offerGift', { user: devoteeName, coins: 50, giftName: '50 Đồng Gieo Duyên' })}
+              >
+                🪙 Gieo Duyên 50đ
+              </button>
+              <button
+                className="dock-btn"
+                onClick={() => callRpc('temple.strikeWoodenFish', { user: devoteeName, count: 20 })}
+              >
+                ❤️ Thả 20 Tim
+              </button>
+              <button
+                className="dock-btn"
+                onClick={() => callRpc('temple.strikeWoodenFish', { user: devoteeName, count: 50 })}
+              >
+                💖 Thả 50 Tim
+              </button>
+            </div>
+
+            <div className="dock-grid-2" style={{ marginTop: '8px' }}>
+              <button
+                className="dock-btn"
+                style={{ background: '#7f1d1d', border: '1px solid #f59e0b', color: '#fef08a', fontWeight: 800 }}
+                onClick={() => callRpc('temple.requestCalligraphy', { user: devoteeName, word: 'PHÚC', readTts: true })}
+              >
+                🧧 Chữ PHÚC
+              </button>
+              <button
+                className="dock-btn"
+                style={{ background: '#7f1d1d', border: '1px solid #f59e0b', color: '#fef08a', fontWeight: 800 }}
+                onClick={() => callRpc('temple.requestCalligraphy', { user: devoteeName, word: 'LỘC', readTts: true })}
+              >
+                🧧 Chữ LỘC
+              </button>
+              <button
+                className="dock-btn"
+                style={{ background: '#7f1d1d', border: '1px solid #f59e0b', color: '#fef08a', fontWeight: 800 }}
+                onClick={() => callRpc('temple.requestCalligraphy', { user: devoteeName, word: 'AN', readTts: true })}
+              >
+                🧧 Chữ AN
+              </button>
+              <button
+                className="dock-btn"
+                style={{ background: '#7f1d1d', border: '1px solid #f59e0b', color: '#fef08a', fontWeight: 800 }}
+                onClick={() => callRpc('temple.requestCalligraphy', { user: devoteeName, word: 'TÀI', readTts: true })}
+              >
+                🧧 Chữ TÀI
+              </button>
+            </div>
           </>
         ) : (
           <>
