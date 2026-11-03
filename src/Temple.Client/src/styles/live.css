@@ -2053,10 +2053,32 @@ body.obs-mode .phongsinh-stage-wrapper,
 }
 
 .depth-walker .depth-sprite-img {
-  height: 380px;
+  height: 210px;
+  max-height: 210px;
   width: auto;
   object-fit: contain;
-  filter: drop-shadow(0 14px 22px rgba(0, 0, 0, 0.55));
+  filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.5));
+}
+
+.pedestrian-sprite,
+.donor-sprite {
+  height: 210px;
+  max-height: 210px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.5));
+}
+
+.depth-walker .walker-capsule-badge,
+.stall-browser .walker-capsule-badge {
+  transform: scale(0.78);
+  transform-origin: center bottom;
+}
+
+.depth-walker .walker-chat-bubble,
+.stall-browser .walker-chat-bubble {
+  transform: scale(0.85);
+  transform-origin: center bottom;
 }
 
 .walker-bob-box {
@@ -2068,7 +2090,7 @@ body.obs-mode .phongsinh-stage-wrapper,
 
 @keyframes walkDepthBob {
   0% { transform: translateY(0); }
-  100% { transform: translateY(-13px); }
+  100% { transform: translateY(-10px); }
 }
 
 /* Route A: Tuyến tiền cảnh đi ngang TRÁI SANG PHẢI */
@@ -2079,9 +2101,9 @@ body.obs-mode .phongsinh-stage-wrapper,
 @keyframes animTraverseLeftToRight {
   0% {
     left: -200px;
-    top: 1240px;
-    transform: scale(0.92);
-    z-index: 36;
+    top: 1380px;
+    transform: scale(0.85);
+    z-index: 38;
     opacity: 0;
   }
   6% {
@@ -2092,9 +2114,9 @@ body.obs-mode .phongsinh-stage-wrapper,
   }
   100% {
     left: 1140px;
-    top: 1260px;
-    transform: scale(0.92);
-    z-index: 36;
+    top: 1400px;
+    transform: scale(0.85);
+    z-index: 38;
     opacity: 0;
   }
 }
@@ -2107,9 +2129,9 @@ body.obs-mode .phongsinh-stage-wrapper,
 @keyframes animTraverseRightToLeft {
   0% {
     left: 1140px;
-    top: 1250px;
-    transform: scale(0.94);
-    z-index: 37;
+    top: 1400px;
+    transform: scale(0.88);
+    z-index: 38;
     opacity: 0;
   }
   6% {
@@ -2120,9 +2142,9 @@ body.obs-mode .phongsinh-stage-wrapper,
   }
   100% {
     left: -200px;
-    top: 1230px;
-    transform: scale(0.94);
-    z-index: 37;
+    top: 1380px;
+    transform: scale(0.88);
+    z-index: 38;
     opacity: 0;
   }
 }
@@ -2135,8 +2157,8 @@ body.obs-mode .phongsinh-stage-wrapper,
 @keyframes animTraverseMidL2R {
   0% {
     left: -180px;
-    top: 1040px;
-    transform: scale(0.70);
+    top: 1100px;
+    transform: scale(0.65);
     z-index: 24;
     opacity: 0;
   }
@@ -2148,8 +2170,8 @@ body.obs-mode .phongsinh-stage-wrapper,
   }
   100% {
     left: 1120px;
-    top: 1010px;
-    transform: scale(0.70);
+    top: 1080px;
+    transform: scale(0.65);
     z-index: 24;
     opacity: 0;
   }
@@ -2163,8 +2185,8 @@ body.obs-mode .phongsinh-stage-wrapper,
 @keyframes animTraverseMidR2L {
   0% {
     left: 1120px;
-    top: 1020px;
-    transform: scale(0.68);
+    top: 1080px;
+    transform: scale(0.62);
     z-index: 24;
     opacity: 0;
   }
@@ -2176,9 +2198,65 @@ body.obs-mode .phongsinh-stage-wrapper,
   }
   100% {
     left: -180px;
-    top: 1050px;
-    transform: scale(0.68);
+    top: 1100px;
+    transform: scale(0.62);
     z-index: 24;
+    opacity: 0;
+  }
+}
+
+/* Route E: Tuyến dốc núi / ngõ xa TRÁI SANG PHẢI */
+.route-traverse-back-l2r {
+  animation: animTraverseBackL2R linear forwards;
+}
+
+@keyframes animTraverseBackL2R {
+  0% {
+    left: -150px;
+    top: 890px;
+    transform: scale(0.44);
+    z-index: 18;
+    opacity: 0;
+  }
+  6% {
+    opacity: 1;
+  }
+  94% {
+    opacity: 1;
+  }
+  100% {
+    left: 1100px;
+    top: 880px;
+    transform: scale(0.44);
+    z-index: 18;
+    opacity: 0;
+  }
+}
+
+/* Route F: Tuyến dốc núi / ngõ xa PHẢI SANG TRÁI */
+.route-traverse-back-r2l {
+  animation: animTraverseBackR2L linear forwards;
+}
+
+@keyframes animTraverseBackR2L {
+  0% {
+    left: 1100px;
+    top: 880px;
+    transform: scale(0.42);
+    z-index: 18;
+    opacity: 0;
+  }
+  6% {
+    opacity: 1;
+  }
+  94% {
+    opacity: 1;
+  }
+  100% {
+    left: -150px;
+    top: 890px;
+    transform: scale(0.42);
+    z-index: 18;
     opacity: 0;
   }
 }
@@ -2191,8 +2269,8 @@ body.obs-mode .phongsinh-stage-wrapper,
 @keyframes animDepthOutLeft {
   0% {
     left: 530px;
-    top: 850px;
-    transform: scale(0.44);
+    top: 860px;
+    transform: scale(0.40);
     z-index: 18;
     opacity: 0;
   }
@@ -2204,8 +2282,8 @@ body.obs-mode .phongsinh-stage-wrapper,
   }
   100% {
     left: -180px;
-    top: 1260px;
-    transform: scale(0.94);
+    top: 1380px;
+    transform: scale(0.85);
     z-index: 38;
     opacity: 0;
   }
@@ -2219,8 +2297,8 @@ body.obs-mode .phongsinh-stage-wrapper,
 @keyframes animDepthInRight {
   0% {
     left: 1120px;
-    top: 1240px;
-    transform: scale(0.92);
+    top: 1380px;
+    transform: scale(0.85);
     z-index: 38;
     opacity: 0;
   }
@@ -2232,8 +2310,8 @@ body.obs-mode .phongsinh-stage-wrapper,
   }
   100% {
     left: 540px;
-    top: 840px;
-    transform: scale(0.44);
+    top: 850px;
+    transform: scale(0.40);
     z-index: 18;
     opacity: 0;
   }
@@ -2247,8 +2325,8 @@ body.obs-mode .phongsinh-stage-wrapper,
 @keyframes animDepthOutRight {
   0% {
     left: 550px;
-    top: 850px;
-    transform: scale(0.44);
+    top: 860px;
+    transform: scale(0.40);
     z-index: 18;
     opacity: 0;
   }
@@ -2260,8 +2338,8 @@ body.obs-mode .phongsinh-stage-wrapper,
   }
   100% {
     left: 1140px;
-    top: 1250px;
-    transform: scale(0.94);
+    top: 1380px;
+    transform: scale(0.85);
     z-index: 38;
     opacity: 0;
   }
@@ -2275,8 +2353,8 @@ body.obs-mode .phongsinh-stage-wrapper,
 @keyframes animDepthInLeft {
   0% {
     left: -160px;
-    top: 1230px;
-    transform: scale(0.92);
+    top: 1380px;
+    transform: scale(0.85);
     z-index: 38;
     opacity: 0;
   }
@@ -2288,8 +2366,8 @@ body.obs-mode .phongsinh-stage-wrapper,
   }
   100% {
     left: 520px;
-    top: 840px;
-    transform: scale(0.44);
+    top: 850px;
+    transform: scale(0.40);
     z-index: 18;
     opacity: 0;
   }
@@ -2303,8 +2381,8 @@ body.obs-mode .phongsinh-stage-wrapper,
 @keyframes animCrossMid {
   0% {
     left: -160px;
-    top: 1040px;
-    transform: scale(0.70);
+    top: 1090px;
+    transform: scale(0.65);
     z-index: 24;
     opacity: 0;
   }
@@ -2316,8 +2394,8 @@ body.obs-mode .phongsinh-stage-wrapper,
   }
   100% {
     left: 1120px;
-    top: 1060px;
-    transform: scale(0.72);
+    top: 1080px;
+    transform: scale(0.65);
     z-index: 24;
     opacity: 0;
   }
@@ -2335,16 +2413,17 @@ body.obs-mode .phongsinh-stage-wrapper,
 }
 
 @keyframes browserSway {
-  0% { transform: scale(var(--browser-scale, 0.8)) translateY(0) rotate(-0.5deg); }
-  50% { transform: scale(var(--browser-scale, 0.8)) translateY(-6px) rotate(0.5deg); }
-  100% { transform: scale(var(--browser-scale, 0.8)) translateY(0) rotate(-0.5deg); }
+  0% { transform: scale(var(--browser-scale, 0.72)) translateY(0) rotate(-0.5deg); }
+  50% { transform: scale(var(--browser-scale, 0.72)) translateY(-4px) rotate(0.5deg); }
+  100% { transform: scale(var(--browser-scale, 0.72)) translateY(0) rotate(-0.5deg); }
 }
 
 .stall-browser .browser-sprite-img {
-  height: 380px;
+  height: 210px;
+  max-height: 210px;
   width: auto;
   object-fit: contain;
-  filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.55));
+  filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.5));
 }
 
 /* 3. NGƯỜI XEM LIVE VÀO PHÒNG SẢI BƯỚC LẠI BÁT TIỀN (ACTIVE VIEWER TO BOWL) */
@@ -4349,14 +4428,65 @@ body.obs-mode .phongsinh-stage-wrapper,
 /* Calligraphy Scroll Display (Trục Liễn Thư Pháp) */
 .xinchu-scroll-container {
   position: absolute;
-  top: 400px;
+  top: 410px;
   left: 540px;
   transform: translateX(-50%);
-  width: 820px;
+  width: 740px;
   z-index: 52;
   pointer-events: auto;
   cursor: pointer;
   animation: scrollUnroll 0.65s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.scroll-close-btn {
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 215, 0, 0.75);
+  background: rgba(0, 0, 0, 0.7);
+  color: #ffd54f;
+  font-size: 15px;
+  font-weight: 900;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  z-index: 15;
+}
+
+.scroll-close-btn:hover {
+  background: rgba(220, 38, 38, 0.9);
+  color: #fff;
+  transform: scale(1.1);
+}
+
+.xinchu-open-scroll-pill {
+  position: absolute;
+  top: 385px;
+  right: 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, rgba(160, 20, 20, 0.95) 0%, rgba(90, 10, 10, 0.95) 100%);
+  border: 2px solid #ffd54f;
+  border-radius: 999px;
+  padding: 8px 18px;
+  color: #ffd54f;
+  font-weight: 800;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5), 0 0 10px rgba(255, 215, 0, 0.4);
+  z-index: 45;
+  transition: all 0.2s;
+}
+
+.xinchu-open-scroll-pill:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 20px rgba(255, 215, 0, 0.6);
 }
 
 @keyframes scrollUnroll {

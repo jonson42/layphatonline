@@ -67,35 +67,37 @@ const INITIAL_BROWSERS = [
     name: 'Diệu Thảo',
     avatar: '',
     model: 'girl_blue',
-    x: 230,
-    y: 1100,
-    scale: 0.82,
-    zIndex: 28,
+    x: 280,
+    y: 1240,
+    scale: 0.72,
+    zIndex: 32,
     dir: 1,
     chat: 'Nhờ thầy đoán trọn quẻ giúp em! 🔮',
     metricText: '📜 XIN CHỮ'
   },
   {
     id: 'br_2',
-    name: 'Trần Minh Quân',
+    name: 'Minh Quân',
     avatar: '',
     model: 'man_orange',
-    x: 770,
-    y: 1100,
-    scale: 0.82,
-    zIndex: 28,
+    x: 740,
+    y: 1240,
+    scale: 0.72,
+    zIndex: 32,
     dir: -1,
     chat: 'Thầy giải quẻ rất có tâm! 🙏',
     metricText: '🔮 XEM QUẺ'
   }
 ];
 
-// Tuyến đường đi bộ di chuyển qua lại liên tục 3D (Trái qua phải, Phải qua trái, Chiều sâu)
+// Tuyến đường đi bộ di chuyển qua lại liên tục 3D (Đa tầng: Tiền cảnh, Trung cảnh, Dốc xa)
 const DEPTH_ROUTES = [
   { route: 'route-traverse-left-to-right', duration: 11.5, dir: 1 },
   { route: 'route-traverse-right-to-left', duration: 12.0, dir: -1 },
   { route: 'route-traverse-mid-l2r', duration: 13.5, dir: 1 },
   { route: 'route-traverse-mid-r2l', duration: 14.0, dir: -1 },
+  { route: 'route-traverse-back-l2r', duration: 15.0, dir: 1 },
+  { route: 'route-traverse-back-r2l', duration: 15.5, dir: -1 },
   { route: 'route-depth-out-left', duration: 11.0, dir: -1 },
   { route: 'route-depth-out-right', duration: 11.5, dir: 1 },
   { route: 'route-depth-in-left', duration: 12.0, dir: 1 },
@@ -109,7 +111,7 @@ const INITIAL_WALKERS = [
     avatar: '',
     model: 'boy_green',
     route: 'route-traverse-left-to-right',
-    duration: 11.5,
+    duration: 11.0,
     delay: 0,
     dir: 1,
     chat: 'Thầy bói đoán quẻ chuẩn lắm nè! 🔮',
@@ -121,8 +123,8 @@ const INITIAL_WALKERS = [
     avatar: '',
     model: 'girl_pink',
     route: 'route-traverse-right-to-left',
-    duration: 12.5,
-    delay: 1.5,
+    duration: 11.5,
+    delay: 1.2,
     dir: -1,
     chat: 'Hội xuân năm nay đông vui quá! ✨',
     metricText: 'DU XUÂN'
@@ -133,8 +135,8 @@ const INITIAL_WALKERS = [
     avatar: '',
     model: 'man_yellow',
     route: 'route-traverse-mid-l2r',
-    duration: 13.5,
-    delay: 3.2,
+    duration: 13.0,
+    delay: 2.4,
     dir: 1,
     chat: 'Bói quẻ khai xuân đầu năm! 🧧',
     metricText: 'XEM TƯỚNG'
@@ -145,34 +147,58 @@ const INITIAL_WALKERS = [
     avatar: '',
     model: 'girl_blue',
     route: 'route-traverse-mid-r2l',
-    duration: 14.0,
-    delay: 4.8,
+    duration: 13.5,
+    delay: 3.6,
     dir: -1,
     chat: 'Nhờ thầy cho chữ cầu tài lộc! 💰',
     metricText: 'XIN CHỮ'
   },
   {
     id: 'dw_5',
+    name: 'Bé Mai Cầu May',
+    avatar: '',
+    model: 'girl_purple',
+    route: 'route-traverse-back-l2r',
+    duration: 14.5,
+    delay: 4.8,
+    dir: 1,
+    chat: 'Chúc thầy bói vạn sự hanh thông! 🌸',
+    metricText: 'CẦU MAY'
+  },
+  {
+    id: 'dw_6',
+    name: 'Anh Bảy Xem Tướng',
+    avatar: '',
+    model: 'boy_green',
+    route: 'route-traverse-back-r2l',
+    duration: 15.0,
+    delay: 6.0,
+    dir: -1,
+    chat: 'Đông vui tấp nập quá bà con ơi! 🏮',
+    metricText: 'DẠO PHỐ'
+  },
+  {
+    id: 'dw_7',
     name: 'Hoàng Long',
     avatar: '',
     model: 'man_orange',
     route: 'route-depth-out-left',
     duration: 11.0,
-    delay: 2.2,
+    delay: 7.2,
     dir: -1,
-    chat: 'Thầy bói phán việc kinh doanh rất linh! 🔮',
+    chat: 'Thầy bói phán kinh doanh rất linh! 🔮',
     metricText: 'XEM QUẺ'
   },
   {
-    id: 'dw_6',
+    id: 'dw_8',
     name: 'Thu Trang',
     avatar: '',
-    model: 'girl_purple',
+    model: 'girl_pink',
     route: 'route-depth-in-right',
     duration: 12.0,
-    delay: 6.0,
+    delay: 8.4,
     dir: -1,
-    chat: 'Cầu chúc vạn sự cát tường bình an! 🌸',
+    chat: 'Cầu chúc vạn sự cát tường bình an! ✨',
     metricText: 'CẦU AN'
   }
 ];
@@ -192,7 +218,7 @@ export default function XinChuStage({ state, activeEvent, audio, callRpc, obsMod
 
   // Current active divination scroll
   const [activeScroll, setActiveScroll] = useState({
-    visible: true,
+    visible: false,
     user: 'Thí Chủ Hảo Tâm',
     avatar: '',
     word: 'CÁT TƯỜNG',
@@ -835,8 +861,18 @@ export default function XinChuStage({ state, activeEvent, audio, callRpc, obsMod
         </div>
 
         {/* 5. Trục Liễn Thư Pháp & Quẻ Luận Giải từ Thầy Bói (Gemini AI) */}
-        {activeScroll.visible && (
+        {activeScroll.visible ? (
           <div className="xinchu-scroll-container" key={`${activeScroll.user}_${activeScroll.word}_${activeScroll.intent}`}>
+            <button
+              className="scroll-close-btn"
+              title="Thu gọn liễn để ngắm cảnh"
+              onClick={(e) => {
+                e.stopPropagation();
+                setActiveScroll((prev) => ({ ...prev, visible: false }));
+              }}
+            >
+              ✕
+            </button>
             <div className="xinchu-scroll-roller-top" />
             <div className="xinchu-scroll-body">
               <div className="scroll-recipient-header">
@@ -889,6 +925,15 @@ export default function XinChuStage({ state, activeEvent, audio, callRpc, obsMod
               </div>
             </div>
             <div className="xinchu-scroll-roller-bottom" />
+          </div>
+        ) : (
+          <div
+            className="xinchu-open-scroll-pill"
+            onClick={() => setActiveScroll((prev) => ({ ...prev, visible: true }))}
+            title="Bấm để xem lại cuộn liễn quẻ Thầy Bói"
+          >
+            <span>📜</span>
+            <span>XEM QUẺ THẦY BÓI</span>
           </div>
         )}
 
