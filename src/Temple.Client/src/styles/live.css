@@ -2955,11 +2955,12 @@ body.obs-mode .phongsinh-stage-wrapper,
 
 .phongsinh-music-pill.compact {
   position: absolute;
-  top: 140px;
-  left: 115px;
-  max-width: 380px;
+  top: 315px;
+  right: 24px;
+  max-width: 290px;
   width: auto;
   z-index: 45;
+  padding: 6px 14px;
 }
 
 /* ============================================================
@@ -3106,9 +3107,9 @@ body.obs-mode .phongsinh-stage-wrapper,
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 420px;
+  max-width: 200px;
   color: #ffe082;
-  font-size: 18px;
+  font-size: 15px;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
 }
 
