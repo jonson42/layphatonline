@@ -250,7 +250,7 @@ Console.WriteLine("🔌 JSON-RPC 2.0 Endpoint: POST http://localhost:5000/rpc (w
 Console.WriteLine("============================================================");
 
 // Auto-connect default TikTok channel if specified
-var configUser = Environment.GetEnvironmentVariable("TIKTOK_USER") ?? "thienkim20060402";
+var configUser = Environment.GetEnvironmentVariable("TIKTOK_USER") ?? "tranyennhi0987";
 _ = Task.Run(async () =>
 {
     try

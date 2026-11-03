@@ -16,7 +16,7 @@ export default function QuickDock({ state, audio, callRpc, onOpenAdmin }) {
   const [tunnelUrl, setTunnelUrl] = useState('');
   const [copiedTunnel, setCopiedTunnel] = useState(false);
 
-  const [tiktokInput, setTiktokInput] = useState('@thienkim20060402');
+  const [tiktokInput, setTiktokInput] = useState('@tranyennhi0987');
   const [connecting, setConnecting] = useState(false);
 
   const [devoteeName, setDevoteeName] = useState('Quỳnh_Finn');

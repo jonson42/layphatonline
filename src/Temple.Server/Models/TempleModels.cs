@@ -143,7 +143,7 @@ public class TikTokState
     public bool Connecting { get; set; } = false;
 
     [JsonPropertyName("username")]
-    public string Username { get; set; } = "thienkim20060402";
+    public string Username { get; set; } = "tranyennhi0987";
 
     [JsonPropertyName("roomId")]
     public string? RoomId { get; set; }
