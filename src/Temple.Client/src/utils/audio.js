@@ -136,11 +136,16 @@ class TempleAudioEngine {
   }
 
   setMode(mode) {
-    const isBothi = mode === 'bothi';
-    const isPhongsinh = mode === 'phongsinh';
-    const targetSrc = isPhongsinh
+    const isPlaylistMode = mode === 'phongsinh' || mode === 'bothi';
+    const targetSrc = isPlaylistMode
       ? (this.phongsinhPlaylist?.[this.phongsinhTrackIndex]?.src || '')
-      : (isBothi ? '/assets/khong_can_di_lam.mp3' : '/assets/bg_chant.m4a');
+      : '/assets/bg_chant.m4a';
+
+    // Nếu chuyển đổi qua lại giữa Phóng Sinh và Bố Thí khi nhạc đang phát -> giữ nguyên mượt mà, không gián đoạn
+    if (isPlaylistMode && (this.currentMode === 'phongsinh' || this.currentMode === 'bothi') && this.bgAudio && !this.bgAudio.paused) {
+      this.currentMode = mode;
+      return;
+    }
 
     // Nếu đã ở đúng mode và đang có bgAudio chạy đúng file -> không làm gì để tránh phát đè lặp lại
     if (this.currentMode === mode && this.bgAudio && this.currentTrackSrc === targetSrc) {
@@ -155,13 +160,13 @@ class TempleAudioEngine {
     // 1. DỌN DẸP HOÀN TOÀN MỌI ÂM THANH NỀN, TIMER VÀ RESOURCE CỦA MODE CŨ
     this.stopAndUnloadBgAudio();
 
-    // 2. Chế độ Phóng Sinh: Phát playlist 22 bài Nhạc Phật Giáo Không Lời Dễ Ngủ (NhacCuaTui)
-    if (mode === 'phongsinh') {
+    // 2. Chế độ Phóng Sinh & Bố Thí: Cùng phát playlist 22 bài Nhạc Phật Giáo Không Lời Dễ Ngủ (NhacCuaTui)
+    if (isPlaylistMode) {
       this.playPhongsinhTrack(this.phongsinhTrackIndex);
       return;
     }
 
-    // 3. Chế độ Bố Thí hoặc Lạy Phật Chùa
+    // 3. Chế độ Đi Chùa Lạy Phật (Nam Mô A Di Đà Phật)
     this.currentTrackSrc = targetSrc;
 
     const audioEl = new Audio(targetSrc);
@@ -170,16 +175,9 @@ class TempleAudioEngine {
     audioEl.volume = this.ttsPlaying ? this.getDuckedVolume() : this.bgBaseVolume;
     audioEl.onerror = () => {
       if (this.currentMode !== mode) return;
-      if (isBothi && audioEl.src.indexOf('/tts-cache/') === -1) {
-        audioEl.src = '/tts-cache/khong_can_di_lam.mp3';
-        if (this.bgMusicEnabled && this.unlocked && !this.activeYoutubeId && this.currentMode === mode) {
-          audioEl.play().catch(() => {});
-        }
-      } else {
-        this.useSynthMusicFallback = true;
-        if (this.bgMusicEnabled && this.unlocked && !this.activeYoutubeId && this.currentMode === mode) {
-          this.startDefaultZenSynthLoop();
-        }
+      this.useSynthMusicFallback = true;
+      if (this.bgMusicEnabled && this.unlocked && !this.activeYoutubeId && this.currentMode === mode) {
+        this.startDefaultZenSynthLoop();
       }
     };
 
@@ -191,7 +189,7 @@ class TempleAudioEngine {
   }
 
   playPhongsinhTrack(index = 0) {
-    if (this.currentMode !== 'phongsinh') return;
+    if (this.currentMode !== 'phongsinh' && this.currentMode !== 'bothi') return;
     if (!this.phongsinhPlaylist || this.phongsinhPlaylist.length === 0) return;
     if (index < 0) index = this.phongsinhPlaylist.length - 1;
     if (index >= this.phongsinhPlaylist.length) index = 0;
@@ -202,32 +200,32 @@ class TempleAudioEngine {
 
     // Dọn dẹp bgAudio cũ trước khi tạo bài mới
     this.stopAndUnloadBgAudio();
-    if (this.currentMode !== 'phongsinh') return;
+    if (this.currentMode !== 'phongsinh' && this.currentMode !== 'bothi') return;
 
     const audioEl = new Audio(track.src);
     audioEl.loop = false; // Tự động chuyển bài kế tiếp khi hết bài
     audioEl.preload = 'auto';
     audioEl.volume = this.ttsPlaying ? this.getDuckedVolume() : this.bgBaseVolume;
 
-    // Hết bài -> Tự động phát bài kế tiếp trong playlist NhacCuaTui (CHỈ KHI VẪN Ở MODE PHONGSINH)
+    // Hết bài -> Tự động phát bài kế tiếp trong playlist NhacCuaTui (CHỈ KHI VẪN Ở MODE PHONGSINH HOẶC BOTHI)
     audioEl.onended = () => {
-      if (this.currentMode === 'phongsinh') {
+      if (this.currentMode === 'phongsinh' || this.currentMode === 'bothi') {
         this.nextPhongsinhTrack();
       }
     };
 
     // Nếu lỗi file local -> Fallback sang stream online của NCT hoặc sang bài tiếp
     audioEl.onerror = () => {
-      if (this.currentMode !== 'phongsinh') return;
+      if (this.currentMode !== 'phongsinh' && this.currentMode !== 'bothi') return;
       if (track.streamFallback && audioEl.src !== track.streamFallback) {
         audioEl.src = track.streamFallback;
-        if (this.bgMusicEnabled && this.unlocked && !this.activeYoutubeId && this.currentMode === 'phongsinh') {
+        if (this.bgMusicEnabled && this.unlocked && !this.activeYoutubeId && (this.currentMode === 'phongsinh' || this.currentMode === 'bothi')) {
           audioEl.play().catch(() => {});
         }
       } else {
         if (this.phongsinhTimer) clearTimeout(this.phongsinhTimer);
         this.phongsinhTimer = setTimeout(() => {
-          if (this.currentMode === 'phongsinh') {
+          if (this.currentMode === 'phongsinh' || this.currentMode === 'bothi') {
             this.nextPhongsinhTrack();
           }
         }, 1200);
@@ -242,18 +240,18 @@ class TempleAudioEngine {
       } catch (_) {}
     }
 
-    if (this.bgMusicEnabled && this.unlocked && !this.activeYoutubeId && this.currentMode === 'phongsinh') {
+    if (this.bgMusicEnabled && this.unlocked && !this.activeYoutubeId && (this.currentMode === 'phongsinh' || this.currentMode === 'bothi')) {
       this.startZenAmbience();
     }
   }
 
   nextPhongsinhTrack() {
-    if (this.currentMode !== 'phongsinh') return;
+    if (this.currentMode !== 'phongsinh' && this.currentMode !== 'bothi') return;
     this.playPhongsinhTrack(this.phongsinhTrackIndex + 1);
   }
 
   prevPhongsinhTrack() {
-    if (this.currentMode !== 'phongsinh') return;
+    if (this.currentMode !== 'phongsinh' && this.currentMode !== 'bothi') return;
     this.playPhongsinhTrack(this.phongsinhTrackIndex - 1);
   }
 
@@ -278,13 +276,8 @@ class TempleAudioEngine {
           p.catch((err) => {
             if (err && err.name === 'AbortError') return;
             if (this.bgAudio && this.bgAudio.error) {
-              if (this.currentMode === 'bothi' && this.bgAudio.src.indexOf('/tts-cache/') === -1) {
-                this.bgAudio.src = '/tts-cache/khong_can_di_lam.mp3';
-                this.bgAudio.play().catch(() => {});
-              } else {
-                this.useSynthMusicFallback = true;
-                this.startDefaultZenSynthLoop();
-              }
+              this.useSynthMusicFallback = true;
+              this.startDefaultZenSynthLoop();
             }
           });
         }

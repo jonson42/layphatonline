@@ -293,9 +293,9 @@ export default function QuickDock({ state, audio, callRpc, onOpenAdmin }) {
             🎵 Nhạc Nền: {musicEnabled ? 'BẬT' : 'TẮT'}
           </button>
         </div>
-        {state?.settings?.mode === 'bothi' ? (
+        {(state?.settings?.mode === 'bothi' || state?.settings?.mode === 'phongsinh') ? (
           <div style={{ fontSize: '11.5px', color: '#ffe082', background: 'rgba(255, 152, 0, 0.15)', border: '1px solid rgba(255, 183, 77, 0.35)', borderRadius: '8px', padding: '6px 10px', margin: '4px 0 10px 0' }}>
-            🎵 <strong>Nhạc nền Bố Thí:</strong> <em>Không Cần Đi Làm.mp3</em> {musicEnabled ? '🟢 Đang phát lặp' : '⚪ Đã tắt'}
+            🎵 <strong>Nhạc nền:</strong> <em>Playlist 22 bài Phật giáo không lời (NhacCuaTui)</em> {musicEnabled ? '🟢 Đang phát' : '⚪ Đã tắt'}
           </div>
         ) : (
           <div style={{ fontSize: '11px', color: '#cbb387', margin: '4px 0 10px 0', lineHeight: '1.4' }}>

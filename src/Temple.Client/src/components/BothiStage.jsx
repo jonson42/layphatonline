@@ -213,6 +213,21 @@ export default function BothiStage({ state, activeEvent, audio, callRpc, obsMode
   const [activeViewerWalker, setActiveViewerWalker] = useState(null);
   const viewerTimerRef = useRef(null);
 
+  // Bài nhạc đang phát trong playlist NhacCuaTui (22 bài Phật giáo không lời)
+  const [currentTrack, setCurrentTrack] = useState(() => audio?.getCurrentPhongsinhTrack?.() || null);
+
+  useEffect(() => {
+    if (audio) {
+      setCurrentTrack(audio.getCurrentPhongsinhTrack?.() || null);
+      audio.onPhongsinhTrackChange = (track) => {
+        setCurrentTrack(track);
+      };
+    }
+    return () => {
+      if (audio) audio.onPhongsinhTrackChange = null;
+    };
+  }, [audio]);
+
   // Auto-scaling 9:16 Stage
   const fitStage = useCallback(() => {
     if (!stageWrapperRef.current || !stage9x16Ref.current) return;
@@ -849,6 +864,19 @@ export default function BothiStage({ state, activeEvent, audio, callRpc, obsMode
                 : 'CHẾ ĐỘ BỐ THÍ • XIN TIỀN UỐNG BIA 🍺'}
             </span>
           </div>
+          {currentTrack && (
+            <div
+              className="phongsinh-music-pill"
+              title="Click để chuyển bài tiếp theo"
+              onClick={() => audio?.nextPhongsinhTrack?.()}
+              style={{ cursor: 'pointer', maxWidth: '380px', fontSize: '14px', padding: '4px 14px' }}
+            >
+              <span className="phongsinh-music-icon">🎵</span>
+              <span className="phongsinh-music-text">{currentTrack.title} – {currentTrack.artist}</span>
+              <span className="phongsinh-music-skip">⏭️</span>
+            </div>
+          )}
+
           <div className="top-Right-badges">
             <div className="mini-stat-pill bothi-stat-pill">
               🍺 <strong>{totalBeer.toLocaleString('vi-VN')}</strong> đ tiền bia • ❤️ <strong>{totalHearts.toLocaleString('vi-VN')}</strong> tim
