@@ -2063,15 +2063,127 @@ body.obs-mode .phongsinh-stage-wrapper,
   width: 100%;
   display: flex;
   justify-content: center;
-  animation: walkDepthBob 0.46s ease-in-out infinite alternate;
+  animation: walkDepthBob 0.44s ease-in-out infinite alternate;
 }
 
 @keyframes walkDepthBob {
   0% { transform: translateY(0); }
-  100% { transform: translateY(-11px); }
+  100% { transform: translateY(-13px); }
 }
 
-/* Route 1: Từ sâu trong ngõ chợ đi RA phía trước vỉa hè trái */
+/* Route A: Tuyến tiền cảnh đi ngang TRÁI SANG PHẢI */
+.route-traverse-left-to-right {
+  animation: animTraverseLeftToRight linear forwards;
+}
+
+@keyframes animTraverseLeftToRight {
+  0% {
+    left: -200px;
+    top: 1240px;
+    transform: scale(0.92);
+    z-index: 36;
+    opacity: 0;
+  }
+  6% {
+    opacity: 1;
+  }
+  94% {
+    opacity: 1;
+  }
+  100% {
+    left: 1140px;
+    top: 1260px;
+    transform: scale(0.92);
+    z-index: 36;
+    opacity: 0;
+  }
+}
+
+/* Route B: Tuyến tiền cảnh đi ngang PHẢI SANG TRÁI */
+.route-traverse-right-to-left {
+  animation: animTraverseRightToLeft linear forwards;
+}
+
+@keyframes animTraverseRightToLeft {
+  0% {
+    left: 1140px;
+    top: 1250px;
+    transform: scale(0.94);
+    z-index: 37;
+    opacity: 0;
+  }
+  6% {
+    opacity: 1;
+  }
+  94% {
+    opacity: 1;
+  }
+  100% {
+    left: -200px;
+    top: 1230px;
+    transform: scale(0.94);
+    z-index: 37;
+    opacity: 0;
+  }
+}
+
+/* Route C: Tuyến làn giữa đi ngang TRÁI SANG PHẢI */
+.route-traverse-mid-l2r {
+  animation: animTraverseMidL2R linear forwards;
+}
+
+@keyframes animTraverseMidL2R {
+  0% {
+    left: -180px;
+    top: 1040px;
+    transform: scale(0.70);
+    z-index: 24;
+    opacity: 0;
+  }
+  6% {
+    opacity: 1;
+  }
+  94% {
+    opacity: 1;
+  }
+  100% {
+    left: 1120px;
+    top: 1010px;
+    transform: scale(0.70);
+    z-index: 24;
+    opacity: 0;
+  }
+}
+
+/* Route D: Tuyến làn giữa đi ngang PHẢI SANG TRÁI */
+.route-traverse-mid-r2l {
+  animation: animTraverseMidR2L linear forwards;
+}
+
+@keyframes animTraverseMidR2L {
+  0% {
+    left: 1120px;
+    top: 1020px;
+    transform: scale(0.68);
+    z-index: 24;
+    opacity: 0;
+  }
+  6% {
+    opacity: 1;
+  }
+  94% {
+    opacity: 1;
+  }
+  100% {
+    left: -180px;
+    top: 1050px;
+    transform: scale(0.68);
+    z-index: 24;
+    opacity: 0;
+  }
+}
+
+/* Route 1: Từ sâu trong ngõ chợ đi RA phía trước vỉa hè trái và thoát khỏi màn hình */
 .route-depth-out-left {
   animation: animDepthOutLeft linear forwards;
 }
@@ -2080,19 +2192,22 @@ body.obs-mode .phongsinh-stage-wrapper,
   0% {
     left: 530px;
     top: 850px;
-    transform: scale(0.46);
+    transform: scale(0.44);
     z-index: 18;
     opacity: 0;
   }
   12% {
     opacity: 1;
   }
-  100% {
-    left: 170px;
-    top: 1240px;
-    transform: scale(0.92);
-    z-index: 38;
+  88% {
     opacity: 1;
+  }
+  100% {
+    left: -180px;
+    top: 1260px;
+    transform: scale(0.94);
+    z-index: 38;
+    opacity: 0;
   }
 }
 
@@ -2103,10 +2218,13 @@ body.obs-mode .phongsinh-stage-wrapper,
 
 @keyframes animDepthInRight {
   0% {
-    left: 850px;
-    top: 1220px;
+    left: 1120px;
+    top: 1240px;
     transform: scale(0.92);
     z-index: 38;
+    opacity: 0;
+  }
+  10% {
     opacity: 1;
   }
   88% {
@@ -2114,14 +2232,14 @@ body.obs-mode .phongsinh-stage-wrapper,
   }
   100% {
     left: 540px;
-    top: 850px;
-    transform: scale(0.46);
+    top: 840px;
+    transform: scale(0.44);
     z-index: 18;
     opacity: 0;
   }
 }
 
-/* Route 3: Từ sâu trong ngõ chợ đi RA sạp bên phải */
+/* Route 3: Từ sâu trong ngõ chợ đi RA vỉa hè bên phải và thoát khỏi màn hình */
 .route-depth-out-right {
   animation: animDepthOutRight linear forwards;
 }
@@ -2130,19 +2248,22 @@ body.obs-mode .phongsinh-stage-wrapper,
   0% {
     left: 550px;
     top: 850px;
-    transform: scale(0.46);
+    transform: scale(0.44);
     z-index: 18;
     opacity: 0;
   }
   12% {
     opacity: 1;
   }
-  100% {
-    left: 830px;
-    top: 1230px;
-    transform: scale(0.92);
-    z-index: 38;
+  88% {
     opacity: 1;
+  }
+  100% {
+    left: 1140px;
+    top: 1250px;
+    transform: scale(0.94);
+    z-index: 38;
+    opacity: 0;
   }
 }
 
@@ -2153,10 +2274,13 @@ body.obs-mode .phongsinh-stage-wrapper,
 
 @keyframes animDepthInLeft {
   0% {
-    left: 180px;
+    left: -160px;
     top: 1230px;
     transform: scale(0.92);
     z-index: 38;
+    opacity: 0;
+  }
+  10% {
     opacity: 1;
   }
   88% {
@@ -2164,36 +2288,38 @@ body.obs-mode .phongsinh-stage-wrapper,
   }
   100% {
     left: 520px;
-    top: 850px;
-    transform: scale(0.46);
+    top: 840px;
+    transform: scale(0.44);
     z-index: 18;
     opacity: 0;
   }
 }
 
-/* Route 5: Đi dạo băng qua đường phía sau cậu bé (Làn giữa) */
+/* Route 5: Đi dạo băng qua đường phía sau (Làn giữa) từ mép này sang mép kia */
 .route-cross-mid {
   animation: animCrossMid linear forwards;
 }
 
 @keyframes animCrossMid {
   0% {
-    left: 100px;
+    left: -160px;
     top: 1040px;
     transform: scale(0.70);
     z-index: 24;
+    opacity: 0;
   }
-  50% {
-    left: 480px;
-    top: 1005px;
-    transform: scale(0.66);
-    z-index: 24;
+  8% {
+    opacity: 1;
+  }
+  92% {
+    opacity: 1;
   }
   100% {
-    left: 880px;
+    left: 1120px;
     top: 1060px;
     transform: scale(0.72);
     z-index: 24;
+    opacity: 0;
   }
 }
 

@@ -29,3 +29,4 @@ public class GeminiCalligraphyDto
     [JsonPropertyName("ttsReading")]
     public string? TtsReading { get; set; }
 }
+

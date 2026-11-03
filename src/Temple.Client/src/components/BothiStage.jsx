@@ -118,13 +118,16 @@ const INITIAL_BROWSERS = [
   }
 ];
 
-// Tuyến đường đi bộ chiều sâu 3D (Đi ra, đi vô)
+// Tuyến đường đi bộ di chuyển qua lại liên tục 3D (Trái qua phải, Phải qua trái, Chiều sâu)
 const DEPTH_ROUTES = [
-  { route: 'route-depth-out-left', duration: 11.5, dir: 1 },
-  { route: 'route-depth-in-right', duration: 12.5, dir: -1 },
-  { route: 'route-depth-out-right', duration: 11.0, dir: -1 },
+  { route: 'route-traverse-left-to-right', duration: 11.5, dir: 1 },
+  { route: 'route-traverse-right-to-left', duration: 12.0, dir: -1 },
+  { route: 'route-traverse-mid-l2r', duration: 13.5, dir: 1 },
+  { route: 'route-traverse-mid-r2l', duration: 14.0, dir: -1 },
+  { route: 'route-depth-out-left', duration: 11.0, dir: -1 },
+  { route: 'route-depth-out-right', duration: 11.5, dir: 1 },
   { route: 'route-depth-in-left', duration: 12.0, dir: 1 },
-  { route: 'route-cross-mid', duration: 13.5, dir: 1 }
+  { route: 'route-depth-in-right', duration: 12.5, dir: -1 }
 ];
 
 const INITIAL_WALKERS = [
@@ -133,8 +136,9 @@ const INITIAL_WALKERS = [
     name: 'Vũ Đức Thịnh',
     avatar: '',
     model: 'boy_green', // Áo xanh lá cây, Quần xám
-    route: 'route-depth-out-left',
+    route: 'route-traverse-left-to-right',
     duration: 11.5,
+    delay: 0,
     dir: 1,
     chat: 'Cho em tiền uống bia nè! 🍺',
     metricText: '🪙 +10đ'
@@ -144,8 +148,9 @@ const INITIAL_WALKERS = [
     name: 'Ngọc Anh Nguyễn',
     avatar: '',
     model: 'girl_pink', // Áo hồng, Quần jean xanh
-    route: 'route-depth-in-right',
+    route: 'route-traverse-right-to-left',
     duration: 12.5,
+    delay: 1.5,
     dir: -1,
     chat: 'Matcha của T tới đây! 🍵',
     metricText: '❤️ +10'
@@ -155,9 +160,10 @@ const INITIAL_WALKERS = [
     name: 'Bác Ba Mua Rau',
     avatar: '',
     model: 'man_yellow', // Áo vàng, Quần short navy
-    route: 'route-depth-out-right',
-    duration: 11.0,
-    dir: -1,
+    route: 'route-traverse-mid-l2r',
+    duration: 13.5,
+    delay: 3.2,
+    dir: 1,
     chat: 'Mua rau củ tươi ngon nào! 🥦',
     metricText: 'DẠO PHỐ'
   },
@@ -166,10 +172,35 @@ const INITIAL_WALKERS = [
     name: 'Chị Tư Đi Chợ',
     avatar: '',
     model: 'girl_blue', // Áo xanh da trời, Quần trắng
-    route: 'route-cross-mid',
-    duration: 13.5,
-    dir: 1,
+    route: 'route-traverse-mid-r2l',
+    duration: 14.0,
+    delay: 4.8,
+    dir: -1,
     chat: 'Phố chợ đông vui quá! ✨',
+    metricText: 'DẠO PHỐ'
+  },
+  {
+    id: 'dw_5',
+    name: 'Hoàng Long',
+    avatar: '',
+    model: 'man_orange',
+    route: 'route-depth-out-left',
+    duration: 11.0,
+    delay: 2.2,
+    dir: -1,
+    chat: 'Ủng hộ bé trai mua sữa nào! 🥛',
+    metricText: '🪙 +20đ'
+  },
+  {
+    id: 'dw_6',
+    name: 'Thu Trang',
+    avatar: '',
+    model: 'girl_purple',
+    route: 'route-depth-in-right',
+    duration: 12.0,
+    delay: 6.0,
+    dir: -1,
+    chat: 'Cùng chung tay giúp đỡ nhé! 🌸',
     metricText: 'DẠO PHỐ'
   }
 ];
@@ -398,7 +429,7 @@ export default function BothiStage({ state, activeEvent, audio, callRpc, obsMode
     }, 8000);
   }, []);
 
-  // Luân chuyển người đi bộ chiều sâu 3D (Đi ra đi vô đường phố)
+  // Luân chuyển người đi bộ chiều sâu & qua lại liên tục 3D
   const handleWalkerEnd = useCallback((walker) => {
     setDepthWalkers((prev) => {
       return prev.map((w) => {
@@ -406,7 +437,7 @@ export default function BothiStage({ state, activeEvent, audio, callRpc, obsMode
         const routeObj = DEPTH_ROUTES[Math.floor(Math.random() * DEPTH_ROUTES.length)];
         const newModel = ALL_MODELS[Math.floor(Math.random() * ALL_MODELS.length)];
         const newName = AMBIENT_NAMES[Math.floor(Math.random() * AMBIENT_NAMES.length)];
-        const newChat = Math.random() < 0.45 ? AMBIENT_CHATS[Math.floor(Math.random() * AMBIENT_CHATS.length)] : null;
+        const newChat = Math.random() < 0.5 ? AMBIENT_CHATS[Math.floor(Math.random() * AMBIENT_CHATS.length)] : null;
         return {
           ...w,
           cycle: (w.cycle || 0) + 1,
@@ -414,6 +445,7 @@ export default function BothiStage({ state, activeEvent, audio, callRpc, obsMode
           name: newName,
           route: routeObj.route,
           duration: routeObj.duration + (Math.random() * 2 - 1),
+          delay: 0,
           dir: routeObj.dir,
           chat: newChat
         };
@@ -753,7 +785,10 @@ export default function BothiStage({ state, activeEvent, audio, callRpc, obsMode
             <div
               key={`${w.id}_${w.cycle || 0}`}
               className={`depth-walker ${w.route}`}
-              style={{ animationDuration: `${w.duration}s` }}
+              style={{
+                animationDuration: `${w.duration}s`,
+                animationDelay: w.delay ? `${w.delay}s` : '0s'
+              }}
               onAnimationEnd={() => handleWalkerEnd(w)}
             >
               <div className="walker-head-badge">

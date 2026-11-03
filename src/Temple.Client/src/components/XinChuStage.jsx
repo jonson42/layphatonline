@@ -64,64 +64,42 @@ const AMBIENT_CHATS = [
 const INITIAL_BROWSERS = [
   {
     id: 'br_1',
-    name: 'Diệu Thảo Tâm An',
+    name: 'Diệu Thảo',
     avatar: '',
     model: 'girl_blue',
-    x: 75,
-    y: 1140,
-    scale: 0.88,
-    zIndex: 36,
+    x: 230,
+    y: 1100,
+    scale: 0.82,
+    zIndex: 28,
     dir: 1,
-    chat: 'Thầy bói phán chuẩn quá! 🔮',
-    metricText: '📜 CHỮ AN'
+    chat: 'Nhờ thầy đoán trọn quẻ giúp em! 🔮',
+    metricText: '📜 XIN CHỮ'
   },
   {
     id: 'br_2',
     name: 'Trần Minh Quân',
     avatar: '',
     model: 'man_orange',
-    x: 235,
-    y: 975,
-    scale: 0.65,
-    zIndex: 22,
-    dir: 1,
+    x: 770,
+    y: 1100,
+    scale: 0.82,
+    zIndex: 28,
+    dir: -1,
     chat: 'Thầy giải quẻ rất có tâm! 🙏',
-    metricText: '📜 CHỮ LỘC'
-  },
-  {
-    id: 'br_3',
-    name: 'Phạm Thanh Hà',
-    avatar: '',
-    model: 'girl_purple',
-    x: 765,
-    y: 975,
-    scale: 0.65,
-    zIndex: 22,
-    dir: -1,
-    chat: 'Bói quẻ giải hạn cầu may! 🧧',
-    metricText: '📜 CHỮ TÀI'
-  },
-  {
-    id: 'br_4',
-    name: 'Lê Hoàng Nam',
-    avatar: '',
-    model: 'man_yellow',
-    x: 915,
-    y: 1140,
-    scale: 0.88,
-    zIndex: 36,
-    dir: -1,
-    chat: 'Thầy bói hạ bút như rồng múa! 🐉',
-    metricText: '👑 TOP 1'
+    metricText: '🔮 XEM QUẺ'
   }
 ];
 
+// Tuyến đường đi bộ di chuyển qua lại liên tục 3D (Trái qua phải, Phải qua trái, Chiều sâu)
 const DEPTH_ROUTES = [
-  { route: 'route-depth-out-left', duration: 11.5, dir: 1 },
-  { route: 'route-depth-in-right', duration: 12.5, dir: -1 },
-  { route: 'route-depth-out-right', duration: 11.0, dir: -1 },
+  { route: 'route-traverse-left-to-right', duration: 11.5, dir: 1 },
+  { route: 'route-traverse-right-to-left', duration: 12.0, dir: -1 },
+  { route: 'route-traverse-mid-l2r', duration: 13.5, dir: 1 },
+  { route: 'route-traverse-mid-r2l', duration: 14.0, dir: -1 },
+  { route: 'route-depth-out-left', duration: 11.0, dir: -1 },
+  { route: 'route-depth-out-right', duration: 11.5, dir: 1 },
   { route: 'route-depth-in-left', duration: 12.0, dir: 1 },
-  { route: 'route-cross-mid', duration: 13.5, dir: 1 }
+  { route: 'route-depth-in-right', duration: 12.5, dir: -1 }
 ];
 
 const INITIAL_WALKERS = [
@@ -130,21 +108,23 @@ const INITIAL_WALKERS = [
     name: 'Vũ Đức Thịnh',
     avatar: '',
     model: 'boy_green',
-    route: 'route-depth-out-left',
+    route: 'route-traverse-left-to-right',
     duration: 11.5,
+    delay: 0,
     dir: 1,
-    chat: 'Nhờ thầy bói đoán quẻ làm ăn! 🔮',
-    metricText: 'BÓI QUẺ'
+    chat: 'Thầy bói đoán quẻ chuẩn lắm nè! 🔮',
+    metricText: 'DẠO PHỐ'
   },
   {
     id: 'dw_2',
     name: 'Ngọc Anh Nguyễn',
     avatar: '',
     model: 'girl_pink',
-    route: 'route-depth-in-right',
+    route: 'route-traverse-right-to-left',
     duration: 12.5,
+    delay: 1.5,
     dir: -1,
-    chat: 'Năm mới vạn sự cát tường! ✨',
+    chat: 'Hội xuân năm nay đông vui quá! ✨',
     metricText: 'DU XUÂN'
   },
   {
@@ -152,22 +132,48 @@ const INITIAL_WALKERS = [
     name: 'Bác Ba Bói Quẻ',
     avatar: '',
     model: 'man_yellow',
-    route: 'route-depth-out-right',
-    duration: 11.0,
-    dir: -1,
-    chat: 'Thầy bói đoán trọn quẻ linh nghiệm! 🔮',
-    metricText: 'DU XUÂN'
+    route: 'route-traverse-mid-l2r',
+    duration: 13.5,
+    delay: 3.2,
+    dir: 1,
+    chat: 'Bói quẻ khai xuân đầu năm! 🧧',
+    metricText: 'XEM TƯỚNG'
   },
   {
     id: 'dw_4',
     name: 'Chị Tư Đi Hội',
     avatar: '',
     model: 'girl_blue',
-    route: 'route-cross-mid',
-    duration: 13.5,
-    dir: 1,
-    chat: 'Phố chợ đông vui quá! 🏮',
-    metricText: 'DU XUÂN'
+    route: 'route-traverse-mid-r2l',
+    duration: 14.0,
+    delay: 4.8,
+    dir: -1,
+    chat: 'Nhờ thầy cho chữ cầu tài lộc! 💰',
+    metricText: 'XIN CHỮ'
+  },
+  {
+    id: 'dw_5',
+    name: 'Hoàng Long',
+    avatar: '',
+    model: 'man_orange',
+    route: 'route-depth-out-left',
+    duration: 11.0,
+    delay: 2.2,
+    dir: -1,
+    chat: 'Thầy bói phán việc kinh doanh rất linh! 🔮',
+    metricText: 'XEM QUẺ'
+  },
+  {
+    id: 'dw_6',
+    name: 'Thu Trang',
+    avatar: '',
+    model: 'girl_purple',
+    route: 'route-depth-in-right',
+    duration: 12.0,
+    delay: 6.0,
+    dir: -1,
+    chat: 'Cầu chúc vạn sự cát tường bình an! 🌸',
+    metricText: 'CẦU AN'
   }
 ];
 
@@ -376,7 +382,7 @@ export default function XinChuStage({ state, activeEvent, audio, callRpc, obsMod
     }, 8000);
   }, []);
 
-  // Luân chuyển người đi bộ chiều sâu 3D
+  // Luân chuyển người đi bộ chiều sâu & qua lại liên tục 3D
   const handleWalkerEnd = useCallback((walker) => {
     setDepthWalkers((prev) => {
       return prev.map((w) => {
@@ -384,7 +390,7 @@ export default function XinChuStage({ state, activeEvent, audio, callRpc, obsMod
         const routeObj = DEPTH_ROUTES[Math.floor(Math.random() * DEPTH_ROUTES.length)];
         const newModel = ALL_MODELS[Math.floor(Math.random() * ALL_MODELS.length)];
         const newName = AMBIENT_NAMES[Math.floor(Math.random() * AMBIENT_NAMES.length)];
-        const newChat = Math.random() < 0.45 ? AMBIENT_CHATS[Math.floor(Math.random() * AMBIENT_CHATS.length)] : null;
+        const newChat = Math.random() < 0.55 ? AMBIENT_CHATS[Math.floor(Math.random() * AMBIENT_CHATS.length)] : null;
         return {
           ...w,
           cycle: (w.cycle || 0) + 1,
@@ -392,6 +398,7 @@ export default function XinChuStage({ state, activeEvent, audio, callRpc, obsMod
           name: newName,
           route: routeObj.route,
           duration: routeObj.duration + (Math.random() * 2 - 1),
+          delay: 0,
           dir: routeObj.dir,
           chat: newChat
         };
@@ -677,54 +684,103 @@ export default function XinChuStage({ state, activeEvent, audio, callRpc, obsMod
           </div>
         </div>
 
-        {/* 3. Khách mua sắm tại sạp 2 bên đường phố */}
+        {/* 3. Đám đông khách dạo phố & xin chữ (Đi qua lại liên tục 3D) */}
         <div className="bothi-crowd-layer">
+          {/* A. Hai người ngồi/đứng nghe Thầy Bói đoán quẻ bên chõng tre */}
           {stallBrowsers.map((b) => (
             <div
               key={b.id}
-              className="bothi-pedestrian-browser"
+              className="stall-browser"
               style={{
                 left: `${b.x}px`,
                 top: `${b.y}px`,
-                transform: `scale(${b.scale}) scaleX(${b.dir})`,
-                zIndex: b.zIndex
+                zIndex: b.zIndex,
+                '--browser-scale': b.scale
               }}
             >
-              {b.chat && (
-                <div className="pedestrian-chat-bubble" style={{ transform: `scaleX(${b.dir})` }}>
-                  <span>{b.chat}</span>
+              <div className="walker-head-badge">
+                {b.chat && (
+                  <div className="walker-chat-bubble">
+                    <span>{b.chat}</span>
+                    <div className="chat-bubble-tail" />
+                  </div>
+                )}
+                <div className="walker-capsule-badge">
+                  <div className="capsule-avatar-ring">
+                    {b.avatar ? (
+                      <img src={b.avatar} alt="" className="capsule-avatar-img" />
+                    ) : (
+                      <div className="capsule-avatar-fallback" style={{ background: b.avatarBg || getAvatarColor(b.name) }}>
+                        {b.name ? b.name.slice(0, 1).toUpperCase() : '✨'}
+                      </div>
+                    )}
+                    <span className="capsule-live-dot" />
+                  </div>
+                  <span className="capsule-username">@{b.name}</span>
+                  <div className="capsule-metric-pill pill-ambient">
+                    <span>🔮</span><strong>{b.metricText || 'XEM QUẺ'}</strong>
+                  </div>
                 </div>
-              )}
-              <div className="pedestrian-name-tag" style={{ transform: `scaleX(${b.dir})` }}>
-                <span className="pedestrian-name">{b.name}</span>
-                <span className="pedestrian-metric">{b.metricText}</span>
               </div>
-              <img src={getSpriteImage(b.model)} alt={b.name} className="pedestrian-sprite" />
+
+              <div className="walker-sprite-container" style={{ transform: b.dir === -1 ? 'scaleX(-1)' : 'scaleX(1)' }}>
+                <img
+                  src={getSpriteImage(b.model)}
+                  alt={b.name}
+                  className="browser-sprite-img"
+                  onError={(e) => {
+                    e.currentTarget.src = manYellowImg;
+                  }}
+                />
+              </div>
             </div>
           ))}
 
-          {/* Người đi bộ chiều sâu 3D (Đi ra đi vô đường phố) */}
+          {/* B. Người đi bộ "DI CHUYỂN QUA LẠI LIÊN TỤC" (Trái qua phải, Phải qua trái, Chiều sâu 3D) */}
           {depthWalkers.map((w) => (
             <div
               key={`${w.id}_${w.cycle || 0}`}
               className={`depth-walker ${w.route}`}
               style={{
-                '--walk-dir': w.dir,
-                '--walk-dur': `${w.duration}s`
+                animationDuration: `${w.duration}s`,
+                animationDelay: w.delay ? `${w.delay}s` : '0s'
               }}
               onAnimationEnd={() => handleWalkerEnd(w)}
             >
-              <div className="depth-walker-content">
+              <div className="walker-head-badge">
                 {w.chat && (
-                  <div className="pedestrian-chat-bubble" style={{ transform: `scaleX(${w.dir})` }}>
+                  <div className="walker-chat-bubble">
                     <span>{w.chat}</span>
+                    <div className="chat-bubble-tail" />
                   </div>
                 )}
-                <div className="pedestrian-name-tag" style={{ transform: `scaleX(${w.dir})` }}>
-                  <span className="pedestrian-name">{w.name}</span>
-                  <span className="pedestrian-metric">{w.metricText}</span>
+                <div className="walker-capsule-badge">
+                  <div className="capsule-avatar-ring">
+                    {w.avatar ? (
+                      <img src={w.avatar} alt="" className="capsule-avatar-img" />
+                    ) : (
+                      <div className="capsule-avatar-fallback" style={{ background: w.avatarBg || getAvatarColor(w.name) }}>
+                        {w.name ? w.name.slice(0, 1).toUpperCase() : '✨'}
+                      </div>
+                    )}
+                    <span className="capsule-live-dot" />
+                  </div>
+                  <span className="capsule-username">@{w.name}</span>
+                  <div className="capsule-metric-pill pill-ambient">
+                    <span>🌸</span><strong>{w.metricText || 'DU XUÂN'}</strong>
+                  </div>
                 </div>
-                <img src={getSpriteImage(w.model)} alt={w.name} className="pedestrian-sprite" />
+              </div>
+
+              <div className="walker-bob-box" style={{ transform: w.dir === -1 ? 'scaleX(-1)' : 'scaleX(1)' }}>
+                <img
+                  src={getSpriteImage(w.model)}
+                  alt={w.name}
+                  className="depth-sprite-img"
+                  onError={(e) => {
+                    e.currentTarget.src = manYellowImg;
+                  }}
+                />
               </div>
             </div>
           ))}
