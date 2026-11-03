@@ -683,36 +683,45 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
           </div>
         </div>
 
-        {/* 3. BẢNG XẾP HẠNG TOP PHÓNG SINH (HẠ THẤP KHỎI GIAO DIỆN TIKTOK NATIVE) */}
-        <div className="phongsinh-leaderboard-box">
-          <div className="lb-header">
-            <span>🏆 TOP PHÓNG SINH</span>
-            <span className="lb-total-badge">🕊️ {totalBirds.toLocaleString('vi-VN')}</span>
+        {/* 3. CỘT GỢI Ý DỌC BÊN TRÁI: NHẤN VÀO MÀN HÌNH ĐỂ THẢ CHIM */}
+        <div
+          className="phongsinh-vertical-cta"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleStageClick(e);
+          }}
+          title="Nhấn vào màn hình để thả chim tạo phước lành"
+        >
+          <div className="v-cta-tap">
+            <span className="v-tap-hand">👆</span>
           </div>
-          <div className="lb-list">
-            {topDevotees.length > 0 ? (
-              topDevotees.map((dev, idx) => (
-                <div key={dev.uniqueId || idx} className="lb-item">
-                  <span className={`lb-rank rank-${idx + 1}`}>#{idx + 1}</span>
-                  <span className="lb-name">{dev.name}</span>
-                  <span className="lb-val">
-                    🕊️ {(dev.birdsReleased || (idx === 0 ? 120 : 50)).toLocaleString('vi-VN')}
-                  </span>
-                </div>
-              ))
-            ) : (
-              <>
-                <div className="lb-item"><span className="lb-rank rank-1">#1</span><span className="lb-name">Nguyễn Nhân</span><span className="lb-val">🕊️ 150</span></div>
-                <div className="lb-item"><span className="lb-rank rank-2">#2</span><span className="lb-name">Mai Lan</span><span className="lb-val">🕊️ 100</span></div>
-                <div className="lb-item"><span className="lb-rank rank-3">#3</span><span className="lb-name">Anh Tuấn</span><span className="lb-val">🕊️ 80</span></div>
-                <div className="lb-item"><span className="lb-rank rank-4">#4</span><span className="lb-name">Bảo Châu</span><span className="lb-val">🕊️ 50</span></div>
-                <div className="lb-item"><span className="lb-rank rank-5">#5</span><span className="lb-name">Thanh Bình</span><span className="lb-val">🕊️ 50</span></div>
-              </>
-            )}
+
+          <div className="v-cta-column">
+            <span className="v-word">NHẤN</span>
+            <span className="v-word">VÀO</span>
+            <span className="v-word">MÀN</span>
+            <span className="v-word">HÌNH</span>
+            <span className="v-dot">•</span>
+            <span className="v-word gold">ĐỂ</span>
+            <span className="v-word gold">THẢ</span>
+            <span className="v-word gold">CHIM</span>
+            <span className="v-dot">•</span>
+            <span className="v-word amber">TẠO</span>
+            <span className="v-word amber">PHƯỚC</span>
+            <span className="v-word amber">LÀNH</span>
+          </div>
+
+          <div className="v-cta-dove">
+            <span className="v-dove-icon">🕊️</span>
+          </div>
+
+          <div className="v-cta-total-badge">
+            <span className="v-counter-num">{(totalBirds || 0).toLocaleString('vi-VN')}</span>
+            <span className="v-counter-txt">chim</span>
           </div>
         </div>
 
-        {/* 3B. NHẠC PHẬT GIÁO KHÔNG LỜI (GỌN GÀNG DƯỚI BẢNG XẾP HẠNG, BẤM ĐỂ CHUYỂN BÀI) */}
+        {/* 3B. NHẠC PHẬT GIÁO KHÔNG LỜI (GỌN GÀNG GÓC TRÊN, BẤM ĐỂ CHUYỂN BÀI) */}
         {currentTrack && (
           <div
             className="phongsinh-music-pill compact"
@@ -1017,20 +1026,6 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
               ❤️
             </div>
           ))}
-        </div>
-
-        {/* 8. GỢI Ý CHẠM MÀN HÌNH ĐỂ PHÓNG SINH */}
-        <div
-          className="phongsinh-interactive-hint"
-          onClick={(e) => {
-            e.stopPropagation();
-            handleStageClick(e);
-          }}
-          title="Bấm vào đây để phóng sinh chim"
-        >
-          <span className="hint-sparkle">✨</span>
-          <span className="hint-text">Hãy nhấn vào màn hình để thả chim để tạo phước lành</span>
-          <span className="hint-icon">🕊️🙏</span>
         </div>
       </div>
     </div>
