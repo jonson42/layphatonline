@@ -16,10 +16,24 @@ export default function App() {
     return window.location.pathname === '/admin' || window.location.hash === '#admin';
   });
 
-  const obsMode = useMemo(() => {
+  const obsParam = useMemo(() => {
     const params = new URLSearchParams(window.location.search);
-    return params.get('obs') === '1';
+    return params.get('obs');
   }, []);
+
+  const obsMode = Boolean(obsParam);
+
+  // Phân chia chế độ OBS:
+  // - obs = 1: Theo cấu hình của trang main (state?.settings?.mode || 'temple')
+  // - obs = 2: Cố định chế độ Bố thí ('bothi')
+  // - obs = 3: Cố định chế độ Phóng sinh chim ('phongsinh')
+  // - obs = 4: Cố định chế độ Xem quẻ / Thầy bói ('xinchu')
+  const effectiveMode = useMemo(() => {
+    if (obsParam === '2') return 'bothi';
+    if (obsParam === '3') return 'phongsinh';
+    if (obsParam === '4') return 'xinchu';
+    return state?.settings?.mode || 'temple';
+  }, [obsParam, state?.settings?.mode]);
 
   useEffect(() => {
     if (obsMode) {
@@ -39,13 +53,12 @@ export default function App() {
     return () => window.removeEventListener('pointerdown', unlock);
   }, [audio]);
 
-  // Sync background music with mode ('bothi' vs 'temple' vs 'phongsinh') & YouTube
+  // Sync background music with effectiveMode ('bothi' vs 'temple' vs 'phongsinh' vs 'xinchu') & YouTube
   useEffect(() => {
-    const currentMode = state?.settings?.mode || 'temple';
-    audio.setMode(currentMode);
+    audio.setMode(effectiveMode);
 
     // In bothi, phongsinh, and xinchu mode, dedicated background tracks/playlist play
-    if (currentMode === 'bothi' || currentMode === 'phongsinh' || currentMode === 'xinchu') {
+    if (effectiveMode === 'bothi' || effectiveMode === 'phongsinh' || effectiveMode === 'xinchu') {
       audio.stopYouTube();
     } else {
       const ytUrl = state?.settings?.youtubeUrl;
@@ -55,7 +68,7 @@ export default function App() {
         audio.stopYouTube();
       }
     }
-  }, [state?.settings?.mode, state?.settings?.youtubeUrl, audio]);
+  }, [effectiveMode, state?.settings?.youtubeUrl, audio]);
 
   if (isAdminView) {
     return (
@@ -67,11 +80,9 @@ export default function App() {
     );
   }
 
-  const currentMode = state?.settings?.mode || 'temple';
-
   return (
     <div className="app-workspace">
-      {currentMode === 'phongsinh' ? (
+      {effectiveMode === 'phongsinh' ? (
         <PhongSinhStage
           state={state}
           activeEvent={activeEvent}
@@ -79,7 +90,7 @@ export default function App() {
           callRpc={callRpc}
           obsMode={obsMode}
         />
-      ) : currentMode === 'bothi' ? (
+      ) : effectiveMode === 'bothi' ? (
         <BothiStage
           state={state}
           activeEvent={activeEvent}
@@ -87,7 +98,7 @@ export default function App() {
           callRpc={callRpc}
           obsMode={obsMode}
         />
-      ) : currentMode === 'xinchu' ? (
+      ) : effectiveMode === 'xinchu' ? (
         <XinChuStage
           state={state}
           activeEvent={activeEvent}

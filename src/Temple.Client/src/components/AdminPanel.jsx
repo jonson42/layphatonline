@@ -136,22 +136,78 @@ export default function AdminPanel({ state, callRpc, onCloseAdmin }) {
               Trạng thái Live: {state?.tiktok?.connected ? `✅ Đã kết nối @${state.tiktok.username}` : 'Chưa kết nối'} • Giọng đọc: ZeroTTS Mai Chi
             </p>
           </div>
-          <div style={{ display: 'flex', gap: '12px' }}>
+          <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center' }}>
             <a
               href="/?obs=1"
               target="_blank"
               rel="noreferrer"
+              title="OBS Mode 1: Theo cấu hình trang Main tự động"
               style={{
                 background: 'linear-gradient(180deg, #6b140e 0%, #3d0906 100%)',
                 color: '#ffe694',
-                padding: '10px 16px',
-                borderRadius: '10px',
+                padding: '8px 12px',
+                borderRadius: '8px',
                 border: '1px solid rgba(244,193,80,0.38)',
                 fontWeight: 700,
+                fontSize: '13px',
                 textDecoration: 'none'
               }}
             >
-              📺 Màn hình OBS (?obs=1)
+              📺 OBS 1 (Theo Main)
+            </a>
+            <a
+              href="/?obs=2"
+              target="_blank"
+              rel="noreferrer"
+              title="OBS Mode 2: Cố định chế độ Bố Thí"
+              style={{
+                background: 'linear-gradient(180deg, #1b382b 0%, #0c1d15 100%)',
+                color: '#86efac',
+                padding: '8px 12px',
+                borderRadius: '8px',
+                border: '1px solid rgba(134,239,172,0.38)',
+                fontWeight: 700,
+                fontSize: '13px',
+                textDecoration: 'none'
+              }}
+            >
+              🙏 OBS 2 (Bố Thí)
+            </a>
+            <a
+              href="/?obs=3"
+              target="_blank"
+              rel="noreferrer"
+              title="OBS Mode 3: Cố định chế độ Phóng Sinh Chim"
+              style={{
+                background: 'linear-gradient(180deg, #1e3a5f 0%, #0d1e33 100%)',
+                color: '#93c5fd',
+                padding: '8px 12px',
+                borderRadius: '8px',
+                border: '1px solid rgba(147,197,253,0.38)',
+                fontWeight: 700,
+                fontSize: '13px',
+                textDecoration: 'none'
+              }}
+            >
+              🕊️ OBS 3 (Phóng Sinh)
+            </a>
+            <a
+              href="/?obs=4"
+              target="_blank"
+              rel="noreferrer"
+              title="OBS Mode 4: Cố định chế độ Xem Quẻ / Thầy Bói"
+              style={{
+                background: 'linear-gradient(180deg, #581c87 0%, #3b0764 100%)',
+                color: '#f0abfc',
+                padding: '8px 12px',
+                borderRadius: '8px',
+                border: '1px solid rgba(240,171,252,0.38)',
+                fontWeight: 700,
+                fontSize: '13px',
+                textDecoration: 'none'
+              }}
+            >
+              🔮 OBS 4 (Xem Quẻ)
             </a>
             <button
               onClick={onCloseAdmin}
