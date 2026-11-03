@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import marketBgImg from '../assets/market_street_clean.jpg';
-import ongDoImg from '../assets/ong_do_calligrapher.png';
+import thayBoiImg from '../assets/ong_do_calligrapher.png';
 
 // 6 Nhân vật 3D Pixar đa dạng màu áo và quần riêng biệt
 import manYellowImg from '../assets/pedestrian_man_yellow.png';
@@ -39,12 +39,12 @@ function getAvatarColor(name) {
 }
 
 const AMBIENT_NAMES = [
-  'Bác Ba Xin Chữ',
+  'Bác Ba Bói Quẻ',
   'Chị Tư Đi Hội',
-  'Anh Bảy Du Xuân',
+  'Anh Bảy Xem Tướng',
   'Bé Mai Cầu May',
   'Cô Năm Cầu Tài',
-  'Chú Tư Ghé Thăm',
+  'Chú Tư Ghé Bói',
   'Lan Anh',
   'Hoàng Long',
   'Thu Trang',
@@ -52,13 +52,13 @@ const AMBIENT_NAMES = [
 ];
 
 const AMBIENT_CHATS = [
-  'Thầy đồ viết chữ đẹp quá! 📜',
-  'Cho em xin một chữ Phúc ạ! 🌸',
+  'Thầy bói phán chuẩn quá! 🔮',
+  'Cho em xin một chữ Tài buôn bán! 💰',
   'Năm mới chúc mọi người an khang! ✨',
-  'Xin chữ cầu may đầu xuân! 🧧',
-  'Thầy cho chữ rất có tâm! 🙏',
+  'Bói quẻ giải hạn cầu may! 🧧',
+  'Thầy giải quẻ rất có tâm! 🙏',
   'Phố hội xuân đông vui quá! 🏮',
-  'Chúc thầy đồ vạn sự hanh thông! 🕊️'
+  'Chúc thầy bói vạn sự hanh thông! 🕊️'
 ];
 
 const INITIAL_BROWSERS = [
@@ -72,7 +72,7 @@ const INITIAL_BROWSERS = [
     scale: 0.88,
     zIndex: 36,
     dir: 1,
-    chat: 'Phố hội xuân đông vui quá! 🏮',
+    chat: 'Thầy bói phán chuẩn quá! 🔮',
     metricText: '📜 CHỮ AN'
   },
   {
@@ -85,7 +85,7 @@ const INITIAL_BROWSERS = [
     scale: 0.65,
     zIndex: 22,
     dir: 1,
-    chat: 'Thầy cho chữ rất có tâm! 🙏',
+    chat: 'Thầy giải quẻ rất có tâm! 🙏',
     metricText: '📜 CHỮ LỘC'
   },
   {
@@ -98,7 +98,7 @@ const INITIAL_BROWSERS = [
     scale: 0.65,
     zIndex: 22,
     dir: -1,
-    chat: 'Xin chữ cầu may đầu xuân! 🧧',
+    chat: 'Bói quẻ giải hạn cầu may! 🧧',
     metricText: '📜 CHỮ TÀI'
   },
   {
@@ -111,7 +111,7 @@ const INITIAL_BROWSERS = [
     scale: 0.88,
     zIndex: 36,
     dir: -1,
-    chat: 'Thầy đồ viết chữ đẹp quá! 📜',
+    chat: 'Thầy bói hạ bút như rồng múa! 🐉',
     metricText: '👑 TOP 1'
   }
 ];
@@ -133,8 +133,8 @@ const INITIAL_WALKERS = [
     route: 'route-depth-out-left',
     duration: 11.5,
     dir: 1,
-    chat: 'Cho em xin một chữ Phúc! 🌸',
-    metricText: 'XIN CHỮ'
+    chat: 'Nhờ thầy bói đoán quẻ làm ăn! 🔮',
+    metricText: 'BÓI QUẺ'
   },
   {
     id: 'dw_2',
@@ -149,13 +149,13 @@ const INITIAL_WALKERS = [
   },
   {
     id: 'dw_3',
-    name: 'Bác Ba Xin Chữ',
+    name: 'Bác Ba Bói Quẻ',
     avatar: '',
     model: 'man_yellow',
     route: 'route-depth-out-right',
     duration: 11.0,
     dir: -1,
-    chat: 'Thầy đồ hạ bút như rồng múa! 🐉',
+    chat: 'Thầy bói đoán trọn quẻ linh nghiệm! 🔮',
     metricText: 'DU XUÂN'
   },
   {
@@ -171,17 +171,6 @@ const INITIAL_WALKERS = [
   }
 ];
 
-const DEFAULT_CALLIGRAPHY = [
-  { word: 'PHÚC', meaning: 'Phúc như Đông Hải, vạn sự hanh thông, gia đạo bình an 🌸' },
-  { word: 'LỘC', meaning: 'Tài lộc dồi dào, tiền vào như nước, buôn may bán đắt 💰' },
-  { word: 'THỌ', meaning: 'Thọ tỷ Nam Sơn, bách niên giai lão, thân tâm an lạc 🐢' },
-  { word: 'AN', meaning: 'Tâm an vạn sự an, bình an vô sự, thuận buồm xuôi gió 🕊️' },
-  { word: 'TÂM', meaning: 'Tâm sáng chí bền, giữ trọn chữ tâm giữa cuộc đời 🪷' },
-  { word: 'TÀI', meaning: 'Tấn tài tấn lộc, đại phú đại quý, may mắn ngập tràn 🪙' },
-  { word: 'CÁT TƯỜNG', meaning: 'Vạn sự như ý, cát tường như nguyện, bốn mùa thịnh vượng 🎋' },
-  { word: 'PHÁT TÀI', meaning: 'Khai xuân phát tài, mã đáo thành công, tiền tài rộng mở 🧧' }
-];
-
 export default function XinChuStage({ state, activeEvent, audio, callRpc, obsMode }) {
   const stageWrapperRef = useRef(null);
   const stage9x16Ref = useRef(null);
@@ -195,15 +184,25 @@ export default function XinChuStage({ state, activeEvent, audio, callRpc, obsMod
     isHighlight: false
   });
 
-  // Current active calligraphy scroll
+  // Current active divination scroll
   const [activeScroll, setActiveScroll] = useState({
     visible: true,
-    user: 'Đồng Hương Du Xuân',
+    user: 'Thí Chủ Hảo Tâm',
     avatar: '',
     word: 'CÁT TƯỜNG',
-    meaning: 'Vạn sự như ý, tỷ sự như mơ, bốn mùa bình an thịnh vượng 🌸✨',
+    hexTitle: 'Quẻ Thượng Cát • Thuận Buồm Xuôi Gió',
+    intent: 'Cầu kinh doanh hồng phát & gia đạo bình an',
+    meaning: 'Chữ CÁT TƯỜNG tụ khí sinh tài, bốn mùa bình an thịnh vượng. Mưu sự khởi đầu thuận lợi, ắt gặp quý nhân phù trợ.',
+    advice: 'Nên chọn ngày giờ hoàng đạo, giữ tâm thành ý thiện; tránh nóng vội trong việc lớn.',
     giftInfo: ''
   });
+
+  // Interactive Form on Stage for viewer/streamer to submit deed + word
+  const [showForm, setShowForm] = useState(false);
+  const [formUser, setFormUser] = useState('Thí Chủ Hảo Tâm');
+  const [formIntent, setFormIntent] = useState('Chuẩn bị mở quán buôn bán');
+  const [formWord, setFormWord] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Floating effects
   const [fallingPetals, setFallingPetals] = useState([]);
@@ -321,7 +320,7 @@ export default function XinChuStage({ state, activeEvent, audio, callRpc, obsMod
     }, 2200);
   }, [audio]);
 
-  // Kích hoạt người xem vào live / xin chữ: sải bước từ ngõ chợ xuống bàn Ông Đồ
+  // Kích hoạt người xem vào live / bói quẻ sải bước lại gần bàn Thầy Bói
   const triggerViewerInteraction = useCallback((user, avatar, actionText, actionType = 'greet', amount = 0, word = '') => {
     if (viewerTimerRef.current) clearTimeout(viewerTimerRef.current);
 
@@ -330,17 +329,17 @@ export default function XinChuStage({ state, activeEvent, audio, callRpc, obsMod
 
     let chatBubble = '';
     if (actionType === 'greet') {
-      chatBubble = 'Kính chào thầy đồ, cho em xin chữ cầu may ạ! 🙏';
+      chatBubble = 'Kính chào Thầy Bói, nhờ thầy đoán giúp em một quẻ ạ! 🔮🙏';
     } else if (actionType === 'donate') {
-      chatBubble = `Gieo duyên ${amount || 10} đồng! Thầy viết chữ giải hạn ạ! 🔮🌸`;
+      chatBubble = `Gieo duyên ${amount || 10} đồng! Thầy bói quẻ & viết chữ giải hạn ạ! 🔮🌸`;
     } else if (actionType === 'heart') {
-      chatBubble = `Thả tim trợ duyên thầy đồ! Cho em chữ ${word || 'Phúc'} nhé! ❤️`;
+      chatBubble = `Thả tim trợ duyên thầy bói! Cho em xin quẻ giải hạn nhé! ❤️`;
     } else if (actionType === 'follow') {
-      chatBubble = 'Đã follow kênh! Thầy tặng em một chữ may mắn nhé! ➕✨';
+      chatBubble = 'Đã follow kênh! Thầy bói quẻ cho em một chữ may mắn nhé! ➕✨';
     } else if (actionType === 'share') {
-      chatBubble = 'Đã chia sẻ live xin chữ đầu xuân đến bạn bè! 🔄📜';
+      chatBubble = 'Đã chia sẻ live xem bói đầu xuân đến bạn bè! 🔄📜';
     } else {
-      chatBubble = `Em xin thầy đồ chữ ${word || 'An'} ạ! 📜✨`;
+      chatBubble = `Em nhờ Thầy Bói đoán quẻ chữ ${word || 'TÀI'} ạ! 🔮✨`;
     }
 
     const walker = {
@@ -359,7 +358,6 @@ export default function XinChuStage({ state, activeEvent, audio, callRpc, obsMod
 
     setActiveViewerWalker(walker);
 
-    // Sau khi nhận chữ tại bàn Thầy Đồ (8s), di chuyển vào làm khách quen tại một sạp bên đường
     viewerTimerRef.current = setTimeout(() => {
       setStallBrowsers((prev) => {
         const targetIdx = Math.floor(Math.random() * prev.length);
@@ -370,7 +368,7 @@ export default function XinChuStage({ state, activeEvent, audio, callRpc, obsMod
           avatar: avatar || '',
           avatarBg: getAvatarColor(user),
           chat: chatBubble,
-          metricText: word ? `📜 CHỮ ${word}` : actionType === 'donate' ? `🪙 +${amount}đ` : '🌸 XIN CHỮ'
+          metricText: word ? `🔮 CHỮ ${word}` : actionType === 'donate' ? `🪙 +${amount}đ` : '🌸 BÓI QUẺ'
         };
         return updated;
       });
@@ -422,7 +420,7 @@ export default function XinChuStage({ state, activeEvent, audio, callRpc, obsMod
     return () => clearInterval(interval);
   }, []);
 
-  // Xử lý sự kiện từ Server
+  // Xử lý sự kiện từ Server & Gemini AI
   useEffect(() => {
     if (!activeEvent || activeEvent.id === processedEventIdRef.current) return;
     processedEventIdRef.current = activeEvent.id;
@@ -430,28 +428,25 @@ export default function XinChuStage({ state, activeEvent, audio, callRpc, obsMod
     const user = activeEvent.user || 'Thí Chủ';
     const avatar = activeEvent.avatar || '';
 
-    // Enqueue TTS
+    // Enqueue TTS phát đọc trên phiên live
     if (activeEvent.ttsText && audio) {
       audio.enqueueTts(activeEvent.ttsText, {
         voice: activeEvent.ttsVoice || 'maichi'
       });
     }
 
-    // Pick calligraphy word & meaning
-    let word = activeEvent.calligraphyWord;
-    let meaning = activeEvent.calligraphyMeaning;
-    if (!word) {
-      const fallback = DEFAULT_CALLIGRAPHY[Math.floor(Math.random() * DEFAULT_CALLIGRAPHY.length)];
-      word = fallback.word;
-      meaning = fallback.meaning;
-    }
+    const word = activeEvent.calligraphyWord || 'CÁT TƯỜNG';
+    const meaning = activeEvent.calligraphyMeaning || 'Vạn sự hanh thông, phúc lộc song toàn.';
+    const hexTitle = activeEvent.hexagramTitle || 'Quẻ Thượng Cát • Vạn Sự Hanh Thông';
+    const intent = activeEvent.actionIntent || activeEvent.wish || 'Cầu bình an may mắn';
+    const advice = activeEvent.actionAdvice || 'Giữ tâm sáng trí bền, chu toàn ắt gặp quý nhân.';
 
-    if (activeEvent.type === 'xinchuGift' || activeEvent.type === 'bothiDonate' || activeEvent.type === 'offerGift') {
-      const coins = activeEvent.coins || 10;
+    if (activeEvent.type === 'xinchuDivination' || activeEvent.type === 'xinchuCalligraphy') {
+      setIsSubmitting(false);
       setSpeech({
         user,
         avatar,
-        text: `Đa tạ thí chủ ${user} đã gieo duyên ${coins} đồng! Thầy khai bút tặng bức đại tự chữ ${word} nghênh tài lộc! 🧧✨`,
+        text: `🔮 Thầy bói phán cho ${user}: Với việc "${intent}", thầy khai bút cho chữ "${word}"! ${hexTitle} - ${meaning}`,
         isHighlight: true
       });
       setActiveScroll({
@@ -459,7 +454,38 @@ export default function XinChuStage({ state, activeEvent, audio, callRpc, obsMod
         user,
         avatar,
         word,
+        hexTitle,
+        intent,
         meaning,
+        advice,
+        giftInfo: `🔮 Bói Việc: ${intent}`
+      });
+      triggerViewerInteraction(user, avatar, `🔮 Bói chữ ${word}`, 'divination', 0, word);
+
+      setTimeout(() => {
+        setSpeech((prev) => ({
+          ...prev,
+          text: 'Nhờ anh/chị vừa vào live cho em xin vài đồng, thả tim hoặc follow để thầy đoán trọn quẻ, viết chữ giải hạn ạ! 🔮🌸🙏',
+          isHighlight: false
+        }));
+      }, 14000);
+    } else if (activeEvent.type === 'xinchuGift' || activeEvent.type === 'bothiDonate' || activeEvent.type === 'offerGift') {
+      const coins = activeEvent.coins || 10;
+      setSpeech({
+        user,
+        avatar,
+        text: `Đa tạ thí chủ ${user} đã gieo duyên ${coins} đồng! Thầy bói quẻ & khai bút tặng chữ ${word} nghênh tài lộc! 🧧✨`,
+        isHighlight: true
+      });
+      setActiveScroll({
+        visible: true,
+        user,
+        avatar,
+        word,
+        hexTitle,
+        intent: 'Gieo duyên công đức',
+        meaning,
+        advice,
         giftInfo: `🪙 Gieo duyên ${coins} đồng`
       });
       spawnCoins(Math.min(24, Math.max(8, Math.round(coins / 2))));
@@ -485,7 +511,10 @@ export default function XinChuStage({ state, activeEvent, audio, callRpc, obsMod
         user,
         avatar,
         word,
+        hexTitle,
+        intent: 'Thả tim trợ duyên',
         meaning,
+        advice,
         giftInfo: `❤️ Thả ${count} tim`
       });
       spawnHearts(Math.min(15, count));
@@ -502,7 +531,7 @@ export default function XinChuStage({ state, activeEvent, audio, callRpc, obsMod
       setSpeech({
         user,
         avatar,
-        text: `Cảm ơn thí chủ ${user} đã bấm follow kết duyên lành! Thầy kính tặng chữ ${word} vạn sự như ý! ➕📜`,
+        text: `Cảm ơn thí chủ ${user} đã bấm follow kết duyên lành! Thầy bói quẻ & tặng chữ ${word} vạn sự như ý! ➕📜`,
         isHighlight: true
       });
       setActiveScroll({
@@ -510,7 +539,10 @@ export default function XinChuStage({ state, activeEvent, audio, callRpc, obsMod
         user,
         avatar,
         word,
+        hexTitle,
+        intent: 'Kết duyên lành',
         meaning,
+        advice,
         giftInfo: '➕ Đã Follow'
       });
       triggerViewerInteraction(user, avatar, '➕ Đã Follow', 'follow', 0, word);
@@ -534,7 +566,10 @@ export default function XinChuStage({ state, activeEvent, audio, callRpc, obsMod
         user,
         avatar,
         word,
+        hexTitle,
+        intent: 'Chia sẻ lan tỏa phước duyên',
         meaning,
+        advice,
         giftInfo: '🔄 Đã Chia Sẻ'
       });
       triggerViewerInteraction(user, avatar, '🔄 Đã Chia Sẻ', 'share', 0, word);
@@ -546,53 +581,52 @@ export default function XinChuStage({ state, activeEvent, audio, callRpc, obsMod
           isHighlight: false
         }));
       }, 7500);
-    } else if (activeEvent.type === 'xinchuCalligraphy') {
-      setSpeech({
-        user,
-        avatar,
-        text: `Thầy Đồ xin khai bút đề tặng chữ ${word} cho thí chủ ${user}! Cầu chúc ${meaning}! 📜🖋️`,
-        isHighlight: true
-      });
-      setActiveScroll({
-        visible: true,
-        user,
-        avatar,
-        word,
-        meaning,
-        giftInfo: '📜 Xin Chữ Thầy Đồ'
-      });
-      triggerViewerInteraction(user, avatar, `📜 Xin chữ ${word}`, 'calligraphy', 0, word);
-
-      setTimeout(() => {
-        setSpeech((prev) => ({
-          ...prev,
-          text: 'Nhờ anh/chị vừa vào live cho em xin vài đồng, thả tim hoặc follow để thầy đoán trọn quẻ, viết chữ giải hạn ạ! 🔮🌸🙏',
-          isHighlight: false
-        }));
-      }, 9000);
     } else if (activeEvent.type === 'xinchuGreet' || activeEvent.type === 'bothiGreet' || activeEvent.type === 'templeGreet') {
       setSpeech({
         user,
         avatar,
-        text: `Thầy Đồ kính chào ${user} đã ghé gian hàng xin chữ đầu xuân! Chúc thí chủ vạn sự an khang! 🔮🌸`,
+        text: `Thầy Bói kính chào ${user} đã ghé gian hàng xem bói & xin chữ! Chúc thí chủ vạn sự an khang! 🔮🌸`,
         isHighlight: false
       });
       triggerViewerInteraction(user, avatar, '🌸 Ghé Thăm', 'greet', 0);
     }
   }, [activeEvent, audio, spawnCoins, spawnHearts, triggerViewerInteraction]);
 
-  // Click vào màn hình hoặc banner để xin chữ thử nghiệm
-  const handleStageClick = useCallback(() => {
-    if (callRpc) {
-      const words = ['PHÚC', 'LỘC', 'THỌ', 'AN', 'TÂM', 'TÀI', 'CÁT TƯỜNG', 'PHÁT TÀI'];
-      const pickedWord = words[Math.floor(Math.random() * words.length)];
-      callRpc('temple.requestCalligraphy', {
-        user: 'Thí Chủ Hoan Hỷ',
-        word: pickedWord,
-        readTts: true
-      });
-    }
-  }, [callRpc]);
+  // Gửi việc muốn làm & chữ muốn xin lên Gemini AI
+  const handleDivineSubmit = useCallback((e) => {
+    if (e) e.stopPropagation();
+    if (!callRpc) return;
+
+    const user = formUser.trim() || 'Thí Chủ Hảo Tâm';
+    const intent = formIntent.trim() || 'Cầu bình an, tài lộc hanh thông';
+    const word = formWord.trim().toUpperCase();
+
+    setIsSubmitting(true);
+    setSpeech({
+      user,
+      avatar: '',
+      text: `🔮 Thầy Bói đang bấm quẻ, gửi tâm nguyện "${intent}" lên đấng huyền học Gemini để khai chữ linh ứng...`,
+      isHighlight: true
+    });
+
+    callRpc('temple.requestCalligraphy', {
+      user,
+      intent,
+      word,
+      readTts: true
+    }).then(() => {
+      setShowForm(false);
+    }).catch((err) => {
+      console.error('[Divine Error]', err);
+      setIsSubmitting(false);
+    });
+  }, [callRpc, formUser, formIntent, formWord]);
+
+  // Bấm vào gợi ý đáy màn hình để mở form bói quẻ
+  const handleOpenForm = useCallback((e) => {
+    e.stopPropagation();
+    setShowForm((prev) => !prev);
+  }, []);
 
   const handleNextMusic = useCallback((e) => {
     e.stopPropagation();
@@ -602,7 +636,7 @@ export default function XinChuStage({ state, activeEvent, audio, callRpc, obsMod
   }, [audio]);
 
   return (
-    <div className={`xinchu-stage-wrapper ${obsMode ? 'is-obs' : ''}`} ref={stageWrapperRef} onClick={handleStageClick}>
+    <div className={`xinchu-stage-wrapper ${obsMode ? 'is-obs' : ''}`} ref={stageWrapperRef}>
       <div className="xinchu-stage-container" ref={stage9x16Ref}>
         {/* 1. Lớp ảnh nền phố chợ cổ kính */}
         <div className="xinchu-background-layer">
@@ -610,18 +644,18 @@ export default function XinChuStage({ state, activeEvent, audio, callRpc, obsMod
           <div className="xinchu-ambient-glow" />
         </div>
 
-        {/* 2. Top Bar: Badge chế độ, Thống kê số chữ đã tặng & Trình phát nhạc Phật giáo 22 bài */}
+        {/* 2. Top Bar: Badge chế độ, Thống kê số quẻ đã giải & Trình phát nhạc Phật giáo 22 bài */}
         <div className="top-status-bar xinchu-top-bar">
           <div className="top-left-badges">
             <div className="stat-pill mode-badge xinchu-stat-pill">
-              <span className="pill-icon">📜</span>
-              <span className="pill-text">XIN CHỮ ĐẦU NĂM</span>
+              <span className="pill-icon">🔮</span>
+              <span className="pill-text">THẦY BÓI ĐOÁN QUẺ & CHO CHỮ</span>
             </div>
 
             <div className="stat-pill xinchu-stat-pill">
               <span className="pill-icon">🧧</span>
               <span className="pill-val">{(state?.totalCalligraphyWords || 388).toLocaleString()}</span>
-              <span className="pill-unit">Bức Chữ</span>
+              <span className="pill-unit">Quẻ Đã Giải</span>
             </div>
           </div>
 
@@ -695,7 +729,7 @@ export default function XinChuStage({ state, activeEvent, audio, callRpc, obsMod
             </div>
           ))}
 
-          {/* Người xem vừa vào live / xin chữ sải bước lại gần bàn Thầy Đồ */}
+          {/* Người xem vừa vào live / xin chữ sải bước lại gần bàn Thầy Bói */}
           {activeViewerWalker && (
             <div
               className={`active-viewer-walker walk-to-bowl ${activeViewerWalker.dir === -1 ? 'from-right' : 'from-left'}`}
@@ -727,8 +761,8 @@ export default function XinChuStage({ state, activeEvent, audio, callRpc, obsMod
           )}
         </div>
 
-        {/* 4. Hộp thoại lời Thầy Đồ (Dialogue Banner) chuẩn theo hình ảnh mẫu */}
-        <div className={`xinchu-dialogue-banner ${speech.isHighlight ? 'highlight' : ''}`}>
+        {/* 4. Hộp thoại lời Thầy Bói (Dialogue Banner) chuẩn theo hình ảnh mẫu */}
+        <div className={`xinchu-dialogue-banner ${speech.isHighlight ? 'highlight' : ''}`} onClick={handleOpenForm}>
           <div className="banner-card">
             <div className="banner-user-row">
               <span className="banner-user-tag">
@@ -744,9 +778,9 @@ export default function XinChuStage({ state, activeEvent, audio, callRpc, obsMod
           </div>
         </div>
 
-        {/* 5. Trục Liễn Thư Pháp (Grand Calligraphy Scroll) hiển thị chữ được tặng */}
+        {/* 5. Trục Liễn Thư Pháp & Quẻ Luận Giải từ Thầy Bói (Gemini AI) */}
         {activeScroll.visible && (
-          <div className="xinchu-scroll-container" key={`${activeScroll.user}_${activeScroll.word}`}>
+          <div className="xinchu-scroll-container" key={`${activeScroll.user}_${activeScroll.word}_${activeScroll.intent}`}>
             <div className="xinchu-scroll-roller-top" />
             <div className="xinchu-scroll-body">
               <div className="scroll-recipient-header">
@@ -758,30 +792,54 @@ export default function XinChuStage({ state, activeEvent, audio, callRpc, obsMod
                   </div>
                 )}
                 <div className="scroll-recipient-text">
-                  Thầy Đồ kính tặng thí chủ <strong>{activeScroll.user}</strong>
+                  Thầy Bói đoán quẻ cho <strong>{activeScroll.user}</strong>
                 </div>
               </div>
 
+              {/* Tâm nguyện / Việc muốn làm */}
+              {activeScroll.intent && (
+                <div className="scroll-intent-box">
+                  Tâm nguyện: <strong>"{activeScroll.intent}"</strong>
+                </div>
+              )}
+
+              {/* Tên Quẻ Đại Cát */}
+              {activeScroll.hexTitle && (
+                <div className="scroll-hexagram-pill">
+                  <span>🔮 {activeScroll.hexTitle}</span>
+                </div>
+              )}
+
+              {/* Chữ Thư Pháp Đại Tự */}
               <div className="scroll-calligraphy-char">
                 {activeScroll.word}
               </div>
 
+              {/* Lời Luận Giải của Thầy Bói (Gemini AI) */}
               <div className="scroll-meaning-text">
                 {activeScroll.meaning}
               </div>
 
+              {/* Kế sách hành động / Lời khuyên */}
+              {activeScroll.advice && (
+                <div className="scroll-advice-box">
+                  <span className="advice-label">💡 LỜI KHUYÊN HÓA GIẢI & ĐÓN LỘC:</span>
+                  <span>{activeScroll.advice}</span>
+                </div>
+              )}
+
               <div className="scroll-seal-stamp">
-                <span>ẤN THẦY ĐỒ • CÁT TƯỜNG</span>
+                <span>ẤN THẦY BÓI • CÁT TƯỜNG</span>
               </div>
             </div>
             <div className="xinchu-scroll-roller-bottom" />
           </div>
         )}
 
-        {/* 6. Gian hàng Ông Đồ: Sprite Thầy Đồ ngồi chõng tre cho chữ */}
-        <div className="xinchu-master-station">
+        {/* 6. Gian hàng Thầy Bói: Sprite Thầy Bói ngồi chõng tre đoán quẻ */}
+        <div className="xinchu-master-station" onClick={handleOpenForm}>
           <div className="xinchu-station-aura" />
-          <img src={ongDoImg} alt="Thầy Đồ Cho Chữ" className="xinchu-master-sprite" />
+          <img src={thayBoiImg} alt="Thầy Bói Đoán Quẻ & Cho Chữ" className="xinchu-master-sprite" />
         </div>
 
         {/* 7. Hiệu ứng cánh hoa đào / hoa mai rơi (Falling Petals) */}
@@ -844,12 +902,72 @@ export default function XinChuStage({ state, activeEvent, audio, callRpc, obsMod
           </div>
         )}
 
-        {/* 10. Gợi ý tương tác bấm màn hình */}
-        <div className="xinchu-click-hint" onClick={handleStageClick}>
+        {/* 10. Hộp Nhập Việc Muốn Làm & Chữ Muốn Xin (Popup Card) */}
+        {showForm && (
+          <div className="thay-boi-input-card" onClick={(e) => e.stopPropagation()}>
+            <div className="thay-boi-input-header">
+              <span className="thay-boi-input-title">
+                <span>🔮</span>
+                <span>NHỜ THẦY BÓI ĐOÁN QUẺ & CHO CHỮ (AI GEMINI)</span>
+              </span>
+              <button className="thay-boi-close-btn" onClick={() => setShowForm(false)}>✕</button>
+            </div>
+
+            <div className="thay-boi-input-row">
+              <div className="thay-boi-field" style={{ flex: '1.2' }}>
+                <label>Họ tên thí chủ:</label>
+                <input
+                  type="text"
+                  className="thay-boi-input"
+                  value={formUser}
+                  onChange={(e) => setFormUser(e.target.value)}
+                  placeholder="Ví dụ: Diệu Thảo, Hoàng Long..."
+                />
+              </div>
+
+              <div className="thay-boi-field" style={{ flex: '0.8' }}>
+                <label>Chữ muốn xin (tùy chọn):</label>
+                <input
+                  type="text"
+                  className="thay-boi-input"
+                  value={formWord}
+                  onChange={(e) => setFormWord(e.target.value)}
+                  placeholder="TÀI, ĐỖ, DUYÊN... (hoặc để trống)"
+                />
+              </div>
+            </div>
+
+            <div className="thay-boi-field">
+              <label>Việc muốn làm / Dự định / Tâm sự cần giải:</label>
+              <input
+                type="text"
+                className="thay-boi-input"
+                value={formIntent}
+                onChange={(e) => setFormIntent(e.target.value)}
+                placeholder="Ví dụ: Chuẩn bị mở quán trà sữa, thi đại học, tỏ tình crush, xuất ngoại..."
+              />
+            </div>
+
+            <button
+              className="thay-boi-submit-btn"
+              disabled={isSubmitting}
+              onClick={handleDivineSubmit}
+            >
+              {isSubmitting ? (
+                <>⏳ THẦY ĐANG BẤM QUẺ VÀ THỈNH Ý GEMINI...</>
+              ) : (
+                <>✨ THẦY BÓI BẤM QUẺ & ĐỌC LỜI PHÁN (GEMINI AI) ✨</>
+              )}
+            </button>
+          </div>
+        )}
+
+        {/* 11. Gợi ý tương tác bấm màn hình */}
+        <div className="xinchu-click-hint" onClick={handleOpenForm}>
           <span className="hint-sparkle">✨</span>
+          <span className="hint-icon">🔮</span>
+          <span className="hint-text">CHẠM ĐỂ NHẬP VIỆC & NHỜ THẦY BÓI CHO CHỮ</span>
           <span className="hint-icon">📜</span>
-          <span className="hint-text">CHẠM ĐỂ XIN CHỮ THẦY ĐỒ</span>
-          <span className="hint-icon">🌸</span>
           <span className="hint-sparkle">✨</span>
         </div>
       </div>

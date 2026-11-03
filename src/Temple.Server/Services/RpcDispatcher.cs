@@ -74,8 +74,9 @@ public class RpcDispatcher
                 return _templeService.ReleaseBirds(pBirds ?? new ReleaseBirdsParams());
 
             case "temple.requestCalligraphy":
+            case "temple.divineCalligraphy":
                 var pCalligraphy = DeserializeParams<RequestCalligraphyParams>(parameters);
-                return _templeService.RequestCalligraphy(pCalligraphy ?? new RequestCalligraphyParams());
+                return await _templeService.RequestCalligraphyAsync(pCalligraphy ?? new RequestCalligraphyParams());
 
             case "temple.updateSettings":
                 if (parameters.HasValue)

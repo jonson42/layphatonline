@@ -4455,3 +4455,174 @@ body.obs-mode .phongsinh-stage-wrapper,
   white-space: nowrap;
   animation: pulseGoldHint 1.8s ease-in-out infinite alternate;
 }
+
+
+/* ==========================================================================
+   THẦY BÓI LUẬN QUẺ & CHO CHỮ (GEMINI AI ENHANCEMENTS)
+   ========================================================================== */
+.scroll-hexagram-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(90deg, #b45309 0%, #d97706 50%, #b45309 100%);
+  border: 1.5px solid #fef08a;
+  border-radius: 20px;
+  padding: 5px 18px;
+  font-size: 19px;
+  font-weight: 800;
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  margin-bottom: 8px;
+}
+
+.scroll-intent-box {
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px dashed #fcd34d;
+  border-radius: 12px;
+  padding: 8px 16px;
+  margin: 6px auto 12px auto;
+  max-width: 680px;
+  font-size: 19px;
+  font-weight: 600;
+  color: #fef9c3;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+.scroll-intent-box strong {
+  color: #ffd54f;
+}
+
+.scroll-advice-box {
+  background: rgba(60, 10, 5, 0.75);
+  border: 1.5px solid #f59e0b;
+  border-radius: 10px;
+  padding: 8px 16px;
+  margin: 10px auto 14px auto;
+  max-width: 680px;
+  font-size: 18px;
+  line-height: 1.35;
+  color: #fff8e7;
+  text-align: left;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.4);
+}
+
+.scroll-advice-box .advice-label {
+  font-weight: 800;
+  color: #fef08a;
+  display: block;
+  margin-bottom: 2px;
+}
+
+/* Floating Divination Input Modal on Stage */
+.thay-boi-input-card {
+  position: absolute;
+  bottom: 120px;
+  left: 540px;
+  transform: translateX(-50%);
+  width: 900px;
+  background: linear-gradient(135deg, rgba(30, 8, 4, 0.96) 0%, rgba(55, 15, 6, 0.98) 100%);
+  border: 3.5px solid #f59e0b;
+  border-radius: 28px;
+  padding: 20px 28px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 35px rgba(245, 158, 11, 0.5);
+  z-index: 68;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: cardPopup 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes cardPopup {
+  0% { opacity: 0; transform: translateX(-50%) translateY(30px) scale(0.95); }
+  100% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+}
+
+.thay-boi-input-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(245, 158, 11, 0.35);
+  padding-bottom: 8px;
+}
+
+.thay-boi-input-title {
+  font-size: 20px;
+  font-weight: 800;
+  color: #fef08a;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: 0.5px;
+}
+
+.thay-boi-close-btn {
+  background: transparent;
+  border: none;
+  color: #f87171;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 2px 8px;
+  line-height: 1;
+}
+
+.thay-boi-input-row {
+  display: flex;
+  gap: 12px;
+}
+
+.thay-boi-field {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.thay-boi-field label {
+  font-size: 14px;
+  font-weight: 700;
+  color: #ffd54f;
+}
+
+.thay-boi-input {
+  background: rgba(15, 4, 2, 0.85);
+  border: 1.5px solid rgba(245, 158, 11, 0.5);
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 16px;
+  color: #fff;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.thay-boi-input:focus {
+  border-color: #f59e0b;
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.5);
+}
+
+.thay-boi-submit-btn {
+  background: linear-gradient(180deg, #dc2626 0%, #991b1b 100%);
+  border: 2px solid #ffd54f;
+  border-radius: 14px;
+  padding: 12px 20px;
+  font-size: 18px;
+  font-weight: 800;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 6px 20px rgba(220, 38, 38, 0.5);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.thay-boi-submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(220, 38, 38, 0.7);
+}
+
+.thay-boi-submit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}

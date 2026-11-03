@@ -365,7 +365,7 @@ export default function AdminPanel({ state, callRpc, onCloseAdmin }) {
                     cursor: 'pointer'
                   }}
                 >
-                  📜 Xin Chữ
+                  🔮 Thầy Bói
                 </button>
                 
               </div>

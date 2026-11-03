@@ -28,6 +28,8 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.Services.AddHttpClient();
+builder.Services.AddSingleton<IGeminiService, GeminiService>();
 builder.Services.AddSingleton<ITtsService, TtsService>();
 builder.Services.AddSingleton<ITempleService, TempleService>();
 builder.Services.AddSingleton<ITikTokService, TikTokService>();

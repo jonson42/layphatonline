@@ -208,6 +208,15 @@ public class TempleEvent
     [JsonPropertyName("calligraphyMeaning")]
     public string? CalligraphyMeaning { get; set; }
 
+    [JsonPropertyName("actionIntent")]
+    public string? ActionIntent { get; set; }
+
+    [JsonPropertyName("hexagramTitle")]
+    public string? HexagramTitle { get; set; }
+
+    [JsonPropertyName("actionAdvice")]
+    public string? ActionAdvice { get; set; }
+
     [JsonPropertyName("fortune")]
     public FortuneStick? Fortune { get; set; }
 }

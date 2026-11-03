@@ -216,13 +216,23 @@ public class SimulationService : BackgroundService
             }
             else if (roll < 0.70)
             {
-                // 3. Giả lập xin chữ thư pháp cụ thể
+                // 3. Giả lập Thầy Bói đoán quẻ & cho chữ (Gemini AI)
+                string[] sampleIntents = {
+                    "Khai trương mở quán buôn bán",
+                    "Thi đỗ đại học điểm cao",
+                    "Tỏ tình người yêu mến",
+                    "Xuất ngoại đi làm xa",
+                    "Cầu bình an mạnh khỏe cho gia đình",
+                    "Đổi công việc mới thăng tiến"
+                };
+                string pickedIntent = sampleIntents[_rnd.Next(sampleIntents.Length)];
                 string[] words = { "PHÚC", "LỘC", "THỌ", "AN", "TÂM", "TÀI", "NHẪN", "ĐỨC", "CÁT TƯỜNG", "DUYÊN", "ĐỖ ĐẠT", "PHÁT TÀI" };
                 string pickedWord = words[_rnd.Next(words.Length)];
                 _templeService.RequestCalligraphy(new RequestCalligraphyParams
                 {
                     User = pick.User,
                     UniqueId = pick.UniqueId,
+                    Intent = pickedIntent,
                     Word = pickedWord,
                     ReadTts = true
                 });

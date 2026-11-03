@@ -20,6 +20,8 @@ cloudflared.exe
 
 # Temporary and Cache files
 cloudflare_url.txt
+data/gemini_key.txt
+.env
 data/tts-cache/*.mp3
 !data/tts-cache/.gitkeep
 test_*.mp3

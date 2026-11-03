@@ -294,6 +294,9 @@ public class RequestCalligraphyParams
     [JsonPropertyName("word")]
     public string? Word { get; set; }
 
+    [JsonPropertyName("intent")]
+    public string? Intent { get; set; }
+
     [JsonPropertyName("wish")]
     public string? Wish { get; set; }
 
