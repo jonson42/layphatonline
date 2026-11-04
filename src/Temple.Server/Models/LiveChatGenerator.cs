@@ -72,12 +72,12 @@ public static class LiveChatGenerator
     // Mẫu câu chào đón thành viên mới vào phòng live
     private static readonly string[] MemberGreetingTemplates = new[]
     {
-        "Chào mừng @{0} đã vào phòng live, nhờ bạn và cả nhà bấm vào màn hình để thả tim ủng hộ nhé! Chúc bạn {1} vạn sự như ý ✨",
-        "Chào @{0}, nhờ mọi người bấm vào màn hình để thả tim trợ duyên cho buổi phóng sinh chim nhé! Chúc bạn {1} an lành 🕊️",
-        "Chào mừng @{0} ghé thăm phòng live, chúc bạn {1} ấm áp, an lành nha",
-        "Chào @{0}, chúc bạn và gia đình {1} vui vẻ, vạn sự cát tường",
-        "Rất vui được đón tiếp @{0}, bấm vào màn hình thả tim ủng hộ phòng live nhé bạn ơi ❤️",
-        "Hoan nghênh @{0} đã tới phòng live, cả nhà cùng bấm vào màn hình thả tim trợ duyên nào 🔥"
+        "Chào mừng @{0} đã vào phòng live! Nhờ @{0} cho xin 1 follow và tim để thả chim nhé! Chúc bạn {1} vạn sự như ý ✨",
+        "Chào @{0}! Nhờ @{0} cho xin 1 follow và tim để cùng thả chim tích đức tạo phước lành nhé! Chúc bạn {1} an lành 🕊️",
+        "Chào mừng @{0} ghé thăm phòng live! Nhờ @{0} xin 1 follow và tim để thả chim, chúc bạn {1} bình an may mắn ❤️",
+        "Chào @{0}! Nhờ @{0} cho xin 1 follow và tim để thả chim tạo phước lành, chúc bạn và gia đình {1} vạn sự cát tường 🙏",
+        "Rất vui được đón tiếp @{0}! Nhờ @{0} cho xin 1 follow và tim để thả chim phóng sinh nhé bạn ơi 🕊️❤️",
+        "Hoan nghênh @{0} đã tới phòng live! Nhờ @{0} xin 1 follow và tim để cùng thả chim tích đức nào 🔥"
     };
 
     private static readonly string[] Icons = new[]

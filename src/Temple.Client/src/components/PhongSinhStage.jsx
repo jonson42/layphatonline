@@ -530,7 +530,7 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
       }
       recentGreetedRef.current.set(userKey, now);
       speechTag = 'Vừa vào phòng Live ✨';
-      defaultSpeech = `Chào mừng ${cleanUser} đã đến với buổi phóng sinh chim tích đức! Nhờ mọi người bấm vào màn hình để thả tim và cùng thả chim tạo phước lành! Cầu chúc bạn vạn sự cát tường, bình an và may mắn!`;
+      defaultSpeech = `Chào mừng ${cleanUser} đã đến với buổi phóng sinh chim tích đức! Nhờ ${cleanUser} cho xin 1 follow và tim để thả chim! Cầu chúc bạn vạn sự cát tường, bình an và may mắn!`;
     } else if (type === 'phongsinhRelease' || type === 'bothiDonate' || type === 'offerGift' || type === 'grandCeremony') {
       const birdsCount = count > 1 ? count : (coins ? coins * 5 : 50);
       speechTag = `Đã phóng sinh ${birdsCount} chú chim 🕊️`;

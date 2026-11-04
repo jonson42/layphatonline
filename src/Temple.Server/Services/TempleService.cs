@@ -459,8 +459,8 @@ public class TempleService : ITempleService
 
             if (mode == "phongsinh")
             {
-                ttsText = $"Chào mừng {dev.Name} đã đến với buổi phóng sinh chim tích đức! Nhờ mọi người bấm vào màn hình để thả tim và cùng thả chim tạo phước lành! {wish}.";
-                wishText = "Nhờ mọi người bấm vào màn hình thả tim và cùng phóng sinh chim tích đức! 🕊️❤️";
+                ttsText = $"Chào mừng {dev.Name} đã đến với buổi phóng sinh chim tích đức! Nhờ {dev.Name} cho xin 1 follow và tim để thả chim! {wish}.";
+                wishText = $"Nhờ {dev.Name} cho xin 1 follow và tim để thả chim! 🕊️❤️";
                 evtType = "phongsinhGreet";
             }
             else if (mode == "bothi")
