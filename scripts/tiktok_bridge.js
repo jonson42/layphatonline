@@ -138,18 +138,24 @@ async function connect(rawUser) {
     if (!u.user || u.user === 'Thí Chủ') {
       u.user = data?.uniqueId || data?.nickname || data?.displayId || data?.user?.uniqueId || 'Thí Chủ Hữu Duyên';
     }
-    const key = (u.uniqueId || u.user || '').toLowerCase().trim();
+    const key1 = (u.uniqueId || '').toLowerCase().trim();
+    const key2 = (u.user || '').toLowerCase().trim();
     const now = Date.now();
-    if (key) {
-      const last = recentMembers.get(key);
-      if (last && (now - last < 30000)) {
-        return; // Bỏ qua nếu đã phát event vào phòng cho người này trong 30s qua
-      }
-      recentMembers.set(key, now);
-      if (recentMembers.size > 500) {
-        for (const [k, ts] of recentMembers) {
-          if (now - ts > 60000) recentMembers.delete(k);
-        }
+
+    // Chống lặp (dup) câu chào thành viên: Chặn nếu người này đã được chào trong 45 giây qua
+    if (key1 && recentMembers.has(key1) && (now - recentMembers.get(key1) < 45000)) {
+      return;
+    }
+    if (key2 && recentMembers.has(key2) && (now - recentMembers.get(key2) < 45000)) {
+      return;
+    }
+
+    if (key1) recentMembers.set(key1, now);
+    if (key2) recentMembers.set(key2, now);
+
+    if (recentMembers.size > 500) {
+      for (const [k, ts] of recentMembers) {
+        if (now - ts > 90000) recentMembers.delete(k);
       }
     }
     emit({ type: 'member', ...u });

@@ -147,6 +147,7 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
   const stageWrapperRef = useRef(null);
   const stage9x16Ref = useRef(null);
   const processedEventIdRef = useRef(null);
+  const recentGreetedRef = useRef(new Map());
 
   // Người đi bộ chiều sâu 3D trên sân đá
   const [walkers, setWalkers] = useState(INITIAL_PS_WALKERS);
@@ -242,7 +243,7 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
   const [speech, setSpeech] = useState({
     user: '',
     tag: '',
-    text: 'Chào mừng quý Phật tử & Thí chủ hữu duyên!\nHãy cùng nhau phóng sinh chim để tích đức tu tâm.\n(Cầu chúc vạn sự cát tường, bình an và may mắn 🙏)',
+    text: 'Chào mừng quý Phật tử & Thí chủ hữu duyên!\nHãy bấm vào màn hình để thả tim và phóng sinh chim tích đức tu tâm.\n(Cầu chúc vạn sự cát tường, bình an và may mắn 🙏)',
     time: Date.now()
   });
 
@@ -521,8 +522,15 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
     let speechTag = '';
     const isGreet = (typeof type === 'string' && type.endsWith('Greet')) || type === 'burnIncense';
     if (isGreet) {
+      const now = Date.now();
+      const userKey = (cleanUser || '').trim().toLowerCase();
+      const lastGreet = recentGreetedRef.current.get(userKey);
+      if (lastGreet && (now - lastGreet < 40000)) {
+        return; // Chống lặp (dup) câu chào mừng: người này đã được chào trong 40s qua
+      }
+      recentGreetedRef.current.set(userKey, now);
       speechTag = 'Vừa vào phòng Live ✨';
-      defaultSpeech = `Chào mừng ${cleanUser} đã đến với buổi phóng sinh chim tích đức! Cầu chúc bạn vạn sự cát tường, bình an và may mắn!`;
+      defaultSpeech = `Chào mừng ${cleanUser} đã đến với buổi phóng sinh chim tích đức! Nhờ mọi người bấm vào màn hình để thả tim và cùng thả chim tạo phước lành! Cầu chúc bạn vạn sự cát tường, bình an và may mắn!`;
     } else if (type === 'phongsinhRelease' || type === 'bothiDonate' || type === 'offerGift' || type === 'grandCeremony') {
       const birdsCount = count > 1 ? count : (coins ? coins * 5 : 50);
       speechTag = `Đã phóng sinh ${birdsCount} chú chim 🕊️`;
@@ -607,21 +615,6 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
     const clickY = (e.clientY - rect.top) / scale;
 
     if (clickY > 850 && clickY < 1650) {
-      const demoMsg = 'Chào mừng bạn đã đến với buổi phóng sinh chim tích đức! Cầu chúc bạn vạn sự cát tường, bình an và may mắn!';
-      setSpeech({
-        user: 'Phật Tử Hữu Duyên',
-        tag: 'Vừa vào phòng Live ✨',
-        text: demoMsg,
-        time: Date.now()
-      });
-      triggerFocusViewer('Phật Tử Hữu Duyên', '', 'greet', demoMsg);
-      if (audio) {
-        if (typeof audio.enqueueTts === 'function') {
-          audio.enqueueTts(demoMsg, { voice: 'maichi' });
-        } else if (typeof audio.queueTts === 'function') {
-          audio.queueTts(demoMsg, { voice: 'maichi' });
-        }
-      }
       spawnFlock(clickX, clickY, 16, true);
       spawnHearts(clickX, clickY, 6);
       callRpc('temple.releaseBirds', {
@@ -682,35 +675,37 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
           </div>
         </div>
 
-        {/* 3. CỘT GỢI Ý DỌC BÊN TRÁI: NHẤN VÀO MÀN HÌNH ĐỂ THẢ CHIM */}
+        {/* 3. CỘT GỢI Ý DỌC BÊN TRÁI: BẤM VÀO MÀN HÌNH ĐỂ THẢ TIM & THẢ CHIM */}
         <div
           className="phongsinh-vertical-cta"
           onClick={(e) => {
             e.stopPropagation();
             handleStageClick(e);
           }}
-          title="Nhấn vào màn hình để thả chim tạo phước lành"
+          title="Bấm vào màn hình để thả tim và thả chim tạo phước lành"
         >
           <div className="v-cta-tap">
             <span className="v-tap-hand">👆</span>
           </div>
 
           <div className="v-cta-column">
-            <span className="v-word">NHẤN</span>
+            <span className="v-word">BẤM</span>
             <span className="v-word">VÀO</span>
             <span className="v-word">MÀN</span>
             <span className="v-word">HÌNH</span>
             <span className="v-dot">•</span>
-            <span className="v-word gold">ĐỂ</span>
+            <span className="v-word" style={{ color: '#ff4081', textShadow: '0 0 10px rgba(255, 64, 129, 0.8)' }}>THẢ</span>
+            <span className="v-word" style={{ color: '#ff4081', textShadow: '0 0 10px rgba(255, 64, 129, 0.8)' }}>TIM</span>
+            <span className="v-dot">•</span>
             <span className="v-word gold">THẢ</span>
             <span className="v-word gold">CHIM</span>
             <span className="v-dot">•</span>
-            <span className="v-word amber">TẠO</span>
-            <span className="v-word amber">PHƯỚC</span>
-            <span className="v-word amber">LÀNH</span>
+            <span className="v-word amber">TÍCH</span>
+            <span className="v-word amber">ĐỨC</span>
           </div>
 
-          <div className="v-cta-dove">
+          <div className="v-cta-dove" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
+            <span style={{ fontSize: '18px' }}>❤️</span>
             <span className="v-dove-icon">🕊️</span>
           </div>
 

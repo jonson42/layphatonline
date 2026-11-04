@@ -791,11 +791,34 @@ class TempleAudioEngine {
     }
 
     const now = Date.now();
-    if (this.lastTtsText === clean && (now - (this.lastTtsTime || 0) < 4000)) {
+    // 1. Chống lặp chính xác cùng một câu văn bản trong vòng 18 giây
+    if (this.lastTtsText === clean && (now - (this.lastTtsTime || 0) < 18000)) {
       if (onStart) onStart();
       if (onEnd) setTimeout(onEnd, 2500);
       return;
     }
+
+    // 2. Chống lặp câu chào mừng cho cùng một người trong vòng 40 giây (ngăn dup khi server chọn ngẫu nhiên lời chúc khác nhau)
+    if (!this.recentGreetedUsers) {
+      this.recentGreetedUsers = new Map();
+    }
+    const greetMatch = clean.match(/(?:Chào mừng|Chào)\s+([^!?,.]{2,30}?)(?:\s+đã|\s+ghé|[,.!?]|$)/i);
+    if (greetMatch && greetMatch[1]) {
+      const greetedName = greetMatch[1].trim().toLowerCase();
+      const lastGreetTime = this.recentGreetedUsers.get(greetedName);
+      if (lastGreetTime && (now - lastGreetTime < 40000)) {
+        if (onStart) onStart();
+        if (onEnd) setTimeout(onEnd, 2000);
+        return; // Bỏ qua trùng lặp câu chào mừng cho người này
+      }
+      this.recentGreetedUsers.set(greetedName, now);
+      if (this.recentGreetedUsers.size > 200) {
+        for (const [k, ts] of this.recentGreetedUsers) {
+          if (now - ts > 60000) this.recentGreetedUsers.delete(k);
+        }
+      }
+    }
+
     this.lastTtsText = clean;
     this.lastTtsTime = now;
 

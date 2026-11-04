@@ -202,8 +202,15 @@ public class TikTokService : ITikTokService, IDisposable
                         mUser = !string.IsNullOrWhiteSpace(mUnique) ? mUnique : "Thí Chủ Hữu Duyên";
                     }
 
-                    string memberKey = (!string.IsNullOrEmpty(mUnique) ? mUnique : mUser).ToLowerInvariant();
-                    if (!TextSanitizer.CheckAndRecordCooldown("member_greet_" + memberKey, 15000))
+                    string cleanUnique = (mUnique ?? "").Trim().ToLowerInvariant();
+                    string cleanUser = (mUser ?? "").Trim().ToLowerInvariant();
+
+                    // Chống trùng lặp (dup) câu chào thành viên: Chặn nếu người này đã được chào trong 60 giây qua
+                    if (!string.IsNullOrEmpty(cleanUnique) && !TextSanitizer.CheckAndRecordCooldown("member_greet_id_" + cleanUnique, 60000))
+                    {
+                        break;
+                    }
+                    if (!string.IsNullOrEmpty(cleanUser) && !TextSanitizer.CheckAndRecordCooldown("member_greet_name_" + cleanUser, 60000))
                     {
                         break;
                     }

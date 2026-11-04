@@ -55,6 +55,9 @@ public static class LiveChatGenerator
         "Chúc mọi người buổi tối an lành nha",
         "Tối nay phòng live đông vui quá",
         "Mới vào thả tim ủng hộ chủ phòng nào anh em",
+        "Nhờ cả nhà bấm vào màn hình để thả tim trợ duyên cho buổi phóng sinh nhé ❤️",
+        "Cả nhà ơi, cùng bấm liên tục vào màn hình để thả tim giúp phòng live lên xu hướng nha ✨",
+        "Mỗi lượt bấm vào màn hình thả tim là một phước lành trợ duyên, cả nhà cùng thả tim nhé 🙏",
         "Chúc cả nhà xem live vui vẻ nhé",
         "Live tối nay cuốn quá, ngồi xem mãi không chán",
         "Cả nhà thả tim nhiệt tình cho xôm tụ nha",
@@ -69,11 +72,12 @@ public static class LiveChatGenerator
     // Mẫu câu chào đón thành viên mới vào phòng live
     private static readonly string[] MemberGreetingTemplates = new[]
     {
-        "Chào mừng @{0} đã vào phòng live, chúc bạn {1} thật nhiều niềm vui và may mắn nhé",
+        "Chào mừng @{0} đã vào phòng live, nhờ bạn và cả nhà bấm vào màn hình để thả tim ủng hộ nhé! Chúc bạn {1} vạn sự như ý ✨",
+        "Chào @{0}, nhờ mọi người bấm vào màn hình để thả tim trợ duyên cho buổi phóng sinh chim nhé! Chúc bạn {1} an lành 🕊️",
         "Chào mừng @{0} ghé thăm phòng live, chúc bạn {1} ấm áp, an lành nha",
         "Chào @{0}, chúc bạn và gia đình {1} vui vẻ, vạn sự cát tường",
-        "Rất vui được đón tiếp @{0}, thả tim ủng hộ phòng live nhé bạn ơi",
-        "Hoan nghênh @{0} đã tới phòng live, chúc bạn {1} hanh thông tấn tới"
+        "Rất vui được đón tiếp @{0}, bấm vào màn hình thả tim ủng hộ phòng live nhé bạn ơi ❤️",
+        "Hoan nghênh @{0} đã tới phòng live, cả nhà cùng bấm vào màn hình thả tim trợ duyên nào 🔥"
     };
 
     private static readonly string[] Icons = new[]
