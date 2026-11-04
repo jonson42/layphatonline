@@ -14,6 +14,38 @@ export default function AdminPanel({ state, callRpc, onCloseAdmin }) {
   const [adminYtInput, setAdminYtInput] = useState(() => state?.settings?.youtubeUrl || '');
 
   const [connecting, setConnecting] = useState(false);
+  const [tunnelUrl, setTunnelUrl] = useState('');
+  const [copiedKey, setCopiedKey] = useState('');
+
+  React.useEffect(() => {
+    let timer;
+    const fetchTunnel = async () => {
+      try {
+        const res = await fetch('/api/tunnel-url');
+        const data = await res.json();
+        if (data.ok && data.url) {
+          setTunnelUrl(data.url);
+        }
+      } catch (_) {}
+    };
+    fetchTunnel();
+    timer = setInterval(fetchTunnel, 4000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const baseTunnelUrl = React.useMemo(() => {
+    if (!tunnelUrl) return '';
+    return tunnelUrl.split('?')[0].replace(/\/$/, '');
+  }, [tunnelUrl]);
+
+  const handleCopyUrl = (urlToCopy, key) => {
+    if (!urlToCopy) return;
+    try {
+      navigator.clipboard.writeText(urlToCopy);
+    } catch (_) {}
+    setCopiedKey(key);
+    setTimeout(() => setCopiedKey(''), 2500);
+  };
   const [customComment, setCustomComment] = useState('');
   const [commentInterval, setCommentInterval] = useState(() => state?.settings?.autoCommentIntervalSeconds || 20);
   const [chatSample, setChatSample] = useState(null);
@@ -353,6 +385,156 @@ export default function AdminPanel({ state, callRpc, onCloseAdmin }) {
             </button>
           </div>
         </header>
+
+        {/* LINK CLOUDFLARE TUNNEL (DÀNH CHO OBS & TIKTOK LIVE STUDIO) */}
+        <div style={{
+          background: 'linear-gradient(135deg, rgba(255, 152, 0, 0.16) 0%, rgba(88, 28, 135, 0.22) 100%)',
+          border: '1.5px solid rgba(255, 183, 77, 0.45)',
+          borderRadius: '16px',
+          padding: '16px 20px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '10px',
+          boxShadow: '0 4px 18px rgba(0, 0, 0, 0.35)'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <span style={{ fontSize: '20px' }}>🌐</span>
+              <strong style={{ fontSize: '16px', color: '#ffe082' }}>
+                Link Cloudflare Tunnel (Dành cho OBS & TikTok LIVE Studio)
+              </strong>
+              {tunnelUrl ? (
+                <span style={{
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  padding: '3px 8px',
+                  borderRadius: '6px',
+                  background: 'rgba(50, 200, 80, 0.2)',
+                  color: '#69f0ae',
+                  border: '1px solid #69f0ae'
+                }}>
+                  ● HOẠT ĐỘNG
+                </span>
+              ) : (
+                <span style={{
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  padding: '3px 8px',
+                  borderRadius: '6px',
+                  background: 'rgba(255, 180, 0, 0.2)',
+                  color: '#ffd54f',
+                  border: '1px solid #ffd54f'
+                }}>
+                  ⏳ Đang tìm tunnel...
+                </span>
+              )}
+            </div>
+
+            {tunnelUrl && (
+              <button
+                onClick={() => handleCopyUrl(baseTunnelUrl || tunnelUrl, 'main')}
+                style={{
+                  background: copiedKey === 'main' ? '#2e7d32' : 'linear-gradient(180deg, #ffa726 0%, #fb8c00 100%)',
+                  color: '#1a0500',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '7px 16px',
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+              >
+                {copiedKey === 'main' ? '✅ Đã Copy Link Gốc' : '📋 Copy Link Gốc'}
+              </button>
+            )}
+          </div>
+
+          <div style={{
+            fontSize: '13px',
+            color: tunnelUrl ? '#fffde7' : '#ffcc80',
+            fontFamily: 'monospace',
+            wordBreak: 'break-all',
+            background: 'rgba(0, 0, 0, 0.55)',
+            padding: '10px 14px',
+            borderRadius: '8px',
+            border: '1px solid rgba(255, 255, 255, 0.1)'
+          }}>
+            {tunnelUrl ? (baseTunnelUrl || tunnelUrl) : 'Chưa tìm thấy link trong file cloudflare_url.txt. Vui lòng chạy file bat cloudflared tunnel nếu cần phát ra Internet.'}
+          </div>
+
+          {/* 4 Nút Copy nhanh Link OBS Cloudflare cho từng chế độ */}
+          {tunnelUrl && (
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', alignItems: 'center', marginTop: '4px' }}>
+              <span style={{ fontSize: '13px', color: '#d6ba8a', fontWeight: 600 }}>
+                Copy nhanh link dán vào OBS Browser Source:
+              </span>
+              <button
+                onClick={() => handleCopyUrl(`${baseTunnelUrl}/?obs=1`, 'obs1')}
+                style={{
+                  background: copiedKey === 'obs1' ? '#2e7d32' : 'linear-gradient(180deg, #6b140e 0%, #3d0906 100%)',
+                  color: '#ffe694',
+                  padding: '7px 14px',
+                  borderRadius: '8px',
+                  border: '1px solid rgba(244,193,80,0.4)',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  cursor: 'pointer'
+                }}
+              >
+                {copiedKey === 'obs1' ? '✅ Đã Copy' : '📋 Copy OBS 1 (Theo Main)'}
+              </button>
+              <button
+                onClick={() => handleCopyUrl(`${baseTunnelUrl}/?obs=2`, 'obs2')}
+                style={{
+                  background: copiedKey === 'obs2' ? '#2e7d32' : 'linear-gradient(180deg, #1b382b 0%, #0c1d15 100%)',
+                  color: '#86efac',
+                  padding: '7px 14px',
+                  borderRadius: '8px',
+                  border: '1px solid rgba(134,239,172,0.4)',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  cursor: 'pointer'
+                }}
+              >
+                {copiedKey === 'obs2' ? '✅ Đã Copy' : '📋 Copy OBS 2 (Bố Thí)'}
+              </button>
+              <button
+                onClick={() => handleCopyUrl(`${baseTunnelUrl}/?obs=3`, 'obs3')}
+                style={{
+                  background: copiedKey === 'obs3' ? '#2e7d32' : 'linear-gradient(180deg, #1e3a5f 0%, #0d1e33 100%)',
+                  color: '#93c5fd',
+                  padding: '7px 14px',
+                  borderRadius: '8px',
+                  border: '1px solid rgba(147,197,253,0.4)',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  cursor: 'pointer'
+                }}
+              >
+                {copiedKey === 'obs3' ? '✅ Đã Copy' : '📋 Copy OBS 3 (Phóng Sinh)'}
+              </button>
+              <button
+                onClick={() => handleCopyUrl(`${baseTunnelUrl}/?obs=4`, 'obs4')}
+                style={{
+                  background: copiedKey === 'obs4' ? '#2e7d32' : 'linear-gradient(180deg, #581c87 0%, #3b0764 100%)',
+                  color: '#f0abfc',
+                  padding: '7px 14px',
+                  borderRadius: '8px',
+                  border: '1px solid rgba(240,171,252,0.4)',
+                  fontSize: '12px',
+                  fontWeight: 700,
+                  cursor: 'pointer'
+                }}
+              >
+                {copiedKey === 'obs4' ? '✅ Đã Copy' : '📋 Copy OBS 4 (Xem Quẻ)'}
+              </button>
+            </div>
+          )}
+        </div>
 
         {/* Grid Panels */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(480px, 1fr))', gap: '20px' }}>
