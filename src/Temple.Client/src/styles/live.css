@@ -2525,8 +2525,8 @@ body.obs-mode .phongsinh-stage-wrapper,
   border-radius: 14px;
   padding: 5px 14px;
   font-size: 13.5px;
-  font-weight: 800;
-  color: #1a0802;
+  font-weight: 900;
+  color: #000000;
   white-space: nowrap;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
   margin-bottom: 6px;
@@ -3728,8 +3728,8 @@ body.obs-mode .phongsinh-stage-wrapper,
   border-radius: 20px;
   padding: 8px 20px;
   font-size: 20px;
-  font-weight: 800;
-  color: #bf360c;
+  font-weight: 900;
+  color: #000000;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5), 0 0 14px rgba(255, 152, 0, 0.35);
   white-space: nowrap;
   position: relative;
@@ -3752,8 +3752,8 @@ body.obs-mode .phongsinh-stage-wrapper,
   display: flex;
   align-items: center;
   gap: 10px;
-  background: linear-gradient(135deg, rgba(35, 20, 8, 0.96) 0%, rgba(70, 40, 15, 0.98) 100%);
-  border: 2.5px solid #ffd700;
+  background: linear-gradient(135deg, #ffffff 0%, #fef3c7 50%, #fde68a 100%);
+  border: 2.5px solid #78350f;
   box-shadow: 0 0 24px rgba(255, 215, 0, 0.9), 0 8px 20px rgba(0, 0, 0, 0.65);
   border-radius: 999px;
   padding: 5px 16px 5px 6px;
@@ -3797,9 +3797,9 @@ body.obs-mode .phongsinh-stage-wrapper,
 
 .focus-username {
   font-size: 22px;
-  font-weight: 900;
-  color: #fff9c4;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+  font-weight: 950;
+  color: #000000;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.7);
   white-space: nowrap;
   max-width: 290px;
   overflow: hidden;
@@ -3925,34 +3925,35 @@ body.obs-mode .phongsinh-stage-wrapper,
   100% { transform: translateX(-50%) scale(2.4); opacity: 0; }
 }
 
-/* Bảng tên nâu gỗ bo tròn trên đầu nhân vật */
+/* Bảng tên vàng sáng bo tròn trên đầu nhân vật - Chữ Đen Rõ Nét */
 .devotee-badge {
-  background: linear-gradient(180deg, #7c481e 0%, #4e290b 100%);
-  border: 2.5px solid #fde047;
+  background: linear-gradient(180deg, #ffffff 0%, #fef3c7 45%, #fde68a 100%);
+  border: 3px solid #78350f;
   border-radius: 20px;
   padding: 6px 20px;
   text-align: center;
-  color: #ffffff;
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.8), inset 0 1px 2px rgba(255, 255, 255, 0.4);
+  color: #000000;
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.8), inset 0 2px 2px rgba(255, 255, 255, 0.9);
   margin-bottom: 8px;
   pointer-events: none;
   backdrop-filter: blur(6px);
 }
 
 .badge-name {
-  font-size: 29px;
-  font-weight: 900;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.95);
+  font-size: 30px;
+  font-weight: 950;
+  color: #000000;
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.8);
   white-space: nowrap;
   letter-spacing: 0.6px;
 }
 
 .badge-count {
-  font-size: 22px;
-  font-weight: 800;
-  color: #fef08a;
+  font-size: 23px;
+  font-weight: 900;
+  color: #712b00;
   white-space: nowrap;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95);
+  text-shadow: none;
 }
 
 .devotee-character-container {
