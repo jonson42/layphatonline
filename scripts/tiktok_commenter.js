@@ -278,16 +278,29 @@ async function sendComment(text) {
 
     // 2. Tìm phần tử nhập bình luận trong khung chat TikTok Live
     const candidateSelectors = [
+      'input[placeholder*="Type" i]',
+      'textarea[placeholder*="Type" i]',
+      '[placeholder*="Type" i]',
+      '[placeholder*="Type..."]',
       'div[data-e2e="comment-input"]',
       'div[data-e2e="chat-room-input"]',
       'div[data-e2e="live-comment-input"]',
       'div[contenteditable="true"]',
       'div[role="textbox"]',
+      '[data-e2e*="chat"] input',
+      '[data-e2e*="chat"] textarea',
+      '[class*="Chat"] input',
+      '[class*="Chat"] textarea',
+      '[class*="chat"] input',
+      '[class*="chat"] textarea',
+      '[class*="Chat"] [contenteditable="true"]',
+      '[class*="chat"] [contenteditable="true"]',
       'textarea[placeholder*="bình luận" i]',
       'textarea[placeholder*="comment" i]',
       'textarea[placeholder*="chat" i]',
       'input[placeholder*="bình luận" i]',
       'input[placeholder*="comment" i]',
+      'input[placeholder*="chat" i]',
       'div[class*="ChatInputContainer"] [contenteditable="true"]',
       'div[class*="DivChatRoom"] [contenteditable="true"]',
       'div[class*="CommentInput"] [contenteditable="true"]',
@@ -324,6 +337,36 @@ async function sendComment(text) {
       if (!inputElement) {
         await activePage.waitForTimeout(500);
       }
+    }
+
+    // Fallback thông minh: Quét trực tiếp DOM tìm phần tử chat theo placeholder hoặc tọa độ
+    if (!inputElement) {
+      try {
+        const found = await activePage.evaluate(() => {
+          const all = Array.from(document.querySelectorAll('input, textarea, div[contenteditable="true"], [role="textbox"]'));
+          // 1. Theo placeholder/aria
+          for (const el of all) {
+            const ph = (el.getAttribute('placeholder') || '').toLowerCase();
+            const aria = (el.getAttribute('aria-label') || '').toLowerCase();
+            if (ph.includes('type') || ph.includes('comment') || ph.includes('bình luận') || ph.includes('chat') || aria.includes('comment') || aria.includes('chat')) {
+              el.setAttribute('data-agy-chat', 'true');
+              return true;
+            }
+          }
+          // 2. Theo tọa độ góc dưới bên phải (vùng khung chat)
+          for (const el of all) {
+            const rect = el.getBoundingClientRect();
+            if (rect.width > 30 && rect.height > 15 && rect.bottom > window.innerHeight * 0.65 && rect.left > window.innerWidth * 0.45) {
+              el.setAttribute('data-agy-chat', 'true');
+              return true;
+            }
+          }
+          return false;
+        });
+        if (found) {
+          inputElement = await activePage.$('[data-agy-chat="true"]');
+        }
+      } catch (_) {}
     }
 
     if (!inputElement) {
@@ -384,8 +427,7 @@ async function sendComment(text) {
     await activePage.keyboard.type(commentText, { delay: 35 });
     await activePage.waitForTimeout(250);
 
-    // 4. Tìm nút gửi (post/send button) hoặc nhấn Enter
-    let clickedPost = false;
+    // 4. Tìm nút gửi (post/send button) và nhấn Enter
     try {
       const postBtnSelectors = [
         'button[data-e2e="comment-post"]',
@@ -393,7 +435,9 @@ async function sendComment(text) {
         'button[class*="ButtonPost"]',
         'button[class*="SendButton"]',
         'button[type="submit"]',
-        'button:has(svg[data-e2e*="send"])'
+        'button:has(svg[data-e2e*="send"])',
+        '[aria-label*="Send" i]',
+        '[aria-label*="Gửi" i]'
       ];
       for (const bSel of postBtnSelectors) {
         const btn = await activePage.$(bSel);
@@ -401,17 +445,14 @@ async function sendComment(text) {
           const isDisabled = await btn.isDisabled();
           if (!isDisabled) {
             await btn.click();
-            clickedPost = true;
             break;
           }
         }
       }
     } catch (_) {}
 
-    // Nếu chưa bấm nút thì nhấn phím Enter
-    if (!clickedPost) {
-      await activePage.keyboard.press('Enter');
-    }
+    // Luôn luôn nhấn Enter để đảm bảo gửi tin nhắn
+    await activePage.keyboard.press('Enter');
 
     await activePage.waitForTimeout(600);
 
