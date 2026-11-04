@@ -482,8 +482,10 @@ export default function BothiStage({ state, activeEvent, audio, callRpc, obsMode
     const user = activeEvent.user || 'Thí Chủ';
     const avatar = activeEvent.avatar || '';
 
-    // Enqueue TTS
-    if (activeEvent.ttsText && audio) {
+    const isGreetEvent = (typeof activeEvent.type === 'string' && activeEvent.type.endsWith('Greet')) || activeEvent.type === 'burnIncense';
+
+    // Enqueue TTS phát đọc trên phiên live (ngoại trừ greet event xử lý riêng theo ngữ cảnh Bố Thí)
+    if (!isGreetEvent && activeEvent.ttsText && audio) {
       audio.enqueueTts(activeEvent.ttsText, {
         voice: activeEvent.ttsVoice || 'maichi'
       });
@@ -576,7 +578,7 @@ export default function BothiStage({ state, activeEvent, audio, callRpc, obsMode
           isHappy: false
         }));
       }, 7500);
-    } else if (activeEvent.type === 'bothiGreet' || activeEvent.type === 'burnIncense') {
+    } else if (isGreetEvent) {
       // User entered live
       setSpeech({
         user,
@@ -587,6 +589,16 @@ export default function BothiStage({ state, activeEvent, audio, callRpc, obsMode
       setKidMood('greeting');
       spawnHearts(3);
       triggerViewerInteraction(user, avatar, '👋 Vừa vào Live!', 'greet', 0);
+
+      // Kích hoạt âm thanh TTS giọng đọc chào mừng Bố Thí
+      if (audio) {
+        const speechTts = (activeEvent.ttsText && activeEvent.ttsText.includes('uống bia'))
+          ? activeEvent.ttsText
+          : `Chào ${user}, nhờ anh chị cho em xin vài đồng, tim hoặc bấm follow để em có tiền đi uống bia! Cảm ơn anh chị rất nhiều!`;
+        audio.enqueueTts(speechTts, {
+          voice: activeEvent.ttsVoice || 'maichi'
+        });
+      }
 
       setTimeout(() => {
         setKidMood('crying');

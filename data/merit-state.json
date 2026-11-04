@@ -1,6 +1,6 @@
 {
-  "totalIncense": 3748,
-  "totalMerit": 413782,
+  "totalIncense": 3751,
+  "totalMerit": 413807,
   "woodenFishHits": 10670,
   "bellRings": 234,
   "lanternCount": 635,
@@ -12,7 +12,7 @@
   "totalBirdsReleased": 11377,
   "totalCalligraphyWords": 388,
   "activeIncenseSticks": 36,
-  "haloIntensity": 0.9085714285714286,
+  "haloIntensity": 0.9264285714285714,
   "offerings": {
     "lotus": 183,
     "fruit": 2,
@@ -20849,9 +20849,75 @@
       "gifts": 0,
       "birdsReleased": 0,
       "lastWish": "C\u1EA7u t\u00E0i l\u1ED9c hanh th\u00F4ng, tai qua n\u1EA1n kh\u1ECFi, s\u1EDF nguy\u1EC7n t\u00F2ng t\u00E2m"
+    },
+    "\u0110\u1EA1i Th\u00ED Ch\u1EE7 Minh T\u00E2m": {
+      "name": "\u0110\u1EA1i Th\u00ED Ch\u1EE7 Minh T\u00E2m",
+      "uniqueId": "\u0111\u1EA1ith\u00EDch\u1EE7minht\u00E2m",
+      "avatar": "",
+      "merit": 15,
+      "incense": 3,
+      "gifts": 0,
+      "birdsReleased": 0,
+      "lastWish": "C\u1EA7u cho gia quy\u1EBFn b\u00ECnh an, v\u1EA1n s\u1EF1 c\u00E1t t\u01B0\u1EDDng"
+    },
+    "Test User": {
+      "name": "Test User",
+      "uniqueId": "testuser",
+      "avatar": "",
+      "merit": 10,
+      "incense": 0,
+      "gifts": 0,
+      "birdsReleased": 0,
+      "lastWish": "C\u1EA7u b\u00E1ch b\u1EC7nh ti\u00EAu tr\u1EEB, ph\u01B0\u1EDBc \u0111\u1EE9c v\u00F4 bi\u00EAn, v\u1EA1n s\u1EF1 nh\u01B0 \u00FD"
     }
   },
   "recentEvents": [
+    {
+      "id": "b81d89de0927461c8c49aef5cdc8ceb5",
+      "timestamp": "2026-11-04T06:11:05.6321575Z",
+      "type": "phongsinhGreet",
+      "user": "Test User",
+      "uniqueId": "testuser",
+      "avatar": "",
+      "count": 1,
+      "merit": 10,
+      "wish": "Ch\u00E0o m\u1EEBng tham gia ph\u00F3ng sinh chim t\u00EDch \u0111\u1EE9c! \uD83D\uDD4A\uFE0F",
+      "ttsText": "Ch\u00E0o m\u1EEBng Test User \u0111\u00E3 \u0111\u1EBFn v\u1EDBi bu\u1ED5i ph\u00F3ng sinh chim t\u00EDch \u0111\u1EE9c! C\u1EA7u b\u00E1ch b\u1EC7nh ti\u00EAu tr\u1EEB, ph\u01B0\u1EDBc \u0111\u1EE9c v\u00F4 bi\u00EAn, v\u1EA1n s\u1EF1 nh\u01B0 \u00FD. H\u00E3y c\u00F9ng nhau th\u1EA3 chim \u0111\u1EC3 t\u1EA1o ph\u01B0\u1EDBc l\u00E0nh!",
+      "ttsVoice": "maichi",
+      "giftType": null,
+      "giftName": null,
+      "coins": null,
+      "topic": null,
+      "calligraphyWord": null,
+      "calligraphyMeaning": null,
+      "actionIntent": null,
+      "hexagramTitle": null,
+      "actionAdvice": null,
+      "fortune": null
+    },
+    {
+      "id": "0b8246918ee5413ba10fcdce03eff1f9",
+      "timestamp": "2026-11-04T04:59:39.6833124Z",
+      "type": "burnIncense",
+      "user": "\u0110\u1EA1i Th\u00ED Ch\u1EE7 Minh T\u00E2m",
+      "uniqueId": "\u0111\u1EA1ith\u00EDch\u1EE7minht\u00E2m",
+      "avatar": "",
+      "count": 3,
+      "merit": 15,
+      "wish": "C\u1EA7u cho gia quy\u1EBFn b\u00ECnh an, v\u1EA1n s\u1EF1 c\u00E1t t\u01B0\u1EDDng",
+      "ttsText": "Nam m\u00F4 A Di \u0110\u00E0 Ph\u1EADt. C\u1EA3m t\u1EA1 th\u00ED ch\u1EE7 \u0110\u1EA1i Th\u00ED Ch\u1EE7 Minh T\u00E2m \u0111\u00E3 th\u00E0nh t\u00E2m th\u1EAFp 3 n\u00E9n h\u01B0\u01A1ng th\u01A1m. C\u1EA7u cho gia quy\u1EBFn b\u00ECnh an, v\u1EA1n s\u1EF1 c\u00E1t t\u01B0\u1EDDng.",
+      "ttsVoice": "maichi",
+      "giftType": null,
+      "giftName": null,
+      "coins": null,
+      "topic": null,
+      "calligraphyWord": null,
+      "calligraphyMeaning": null,
+      "actionIntent": null,
+      "hexagramTitle": null,
+      "actionAdvice": null,
+      "fortune": null
+    },
     {
       "id": "bb440bb3ac4a4ecb96b79d2279a81d29",
       "timestamp": "2026-11-03T15:21:09.2546012Z",
@@ -21610,52 +21676,6 @@
       "hexagramTitle": null,
       "actionAdvice": null,
       "fortune": null
-    },
-    {
-      "id": "f9a6da8207184bd18a4bb80548ae014d",
-      "timestamp": "2026-11-03T15:12:24.9082128Z",
-      "type": "phongsinhHeart",
-      "user": "Amakoong",
-      "uniqueId": "inamakoong",
-      "avatar": "https://p16-common-sign.tiktokcdn.com/tos-alisg-avt-0068/7311691286744924167~tplv-tiktok-shrink:72:72.webp?dr=14561\u0026refresh_token=bc0d56ee\u0026x-expires=1793890800\u0026x-signature=SN78PgrLyfLBXbvqY9TaVluomkk%3D\u0026t=4d5b0474\u0026ps=13740610\u0026shp=a5d48078\u0026shcp=fdd36af4\u0026idc=my2",
-      "count": 1,
-      "merit": 1,
-      "wish": "\u0110\u00E3 th\u1EA3 1 tim tr\u1EE3 duy\u00EAn ph\u00F3ng sinh chim! \u2764\uFE0F\uD83D\uDD4A\uFE0F",
-      "ttsText": "C\u1EA3m \u01A1n anh ch\u1ECB Amakoong \u0111\u00E3 th\u1EA3 1 tim tr\u1EE3 duy\u00EAn ph\u00F3ng sinh \u0111\u00E0n chim v\u1EC1 v\u1EDBi t\u1EF1 do! Ch\u00FAc anh ch\u1ECB lu\u00F4n vui v\u1EBB v\u00E0 nhi\u1EC1u may m\u1EAFn!",
-      "ttsVoice": "maichi",
-      "giftType": null,
-      "giftName": null,
-      "coins": null,
-      "topic": null,
-      "calligraphyWord": null,
-      "calligraphyMeaning": null,
-      "actionIntent": null,
-      "hexagramTitle": null,
-      "actionAdvice": null,
-      "fortune": null
-    },
-    {
-      "id": "7c6594f6f30a4ba49b6ceaf9843cd371",
-      "timestamp": "2026-11-03T15:12:13.2608860Z",
-      "type": "phongsinhGreet",
-      "user": "Amakoong",
-      "uniqueId": "inamakoong",
-      "avatar": "https://p19-common-sign.tiktokcdn.com/tos-alisg-avt-0068/7311691286744924167~tplv-tiktok-shrink:72:72.webp?dr=14561\u0026refresh_token=3ffb1e9e\u0026x-expires=1793890800\u0026x-signature=roFZ%2FKLO50aBPolaULkq5x7iVJk%3D\u0026t=4d5b0474\u0026ps=13740610\u0026shp=a5d48078\u0026shcp=fdd36af4\u0026idc=my2",
-      "count": 1,
-      "merit": 10,
-      "wish": "Ch\u00E0o m\u1EEBng tham gia ph\u00F3ng sinh chim t\u00EDch \u0111\u1EE9c! \uD83D\uDD4A\uFE0F",
-      "ttsText": "Ch\u00E0o m\u1EEBng Amakoong \u0111\u00E3 \u0111\u1EBFn v\u1EDBi bu\u1ED5i ph\u00F3ng sinh chim t\u00EDch \u0111\u1EE9c! C\u1EA7u s\u1EE9c kh\u1ECFe d\u1ED3i d\u00E0o, t\u00E2m an tr\u00ED s\u00E1ng, gia \u0111\u00ECnh \u00EAm \u1EA5m. H\u00E3y c\u00F9ng nhau th\u1EA3 chim \u0111\u1EC3 t\u1EA1o ph\u01B0\u1EDBc l\u00E0nh!",
-      "ttsVoice": "maichi",
-      "giftType": null,
-      "giftName": null,
-      "coins": null,
-      "topic": null,
-      "calligraphyWord": null,
-      "calligraphyMeaning": null,
-      "actionIntent": null,
-      "hexagramTitle": null,
-      "actionAdvice": null,
-      "fortune": null
     }
   ],
   "settings": {
@@ -21667,14 +21687,16 @@
     "autoSim": false,
     "autoSimIntervalMs": 9500,
     "youtubeUrl": "https://www.youtube.com/watch?v=MRv1QAT9_o8",
-    "mode": "phongsinh"
+    "mode": "phongsinh",
+    "autoCommentEnabled": false,
+    "autoCommentIntervalSeconds": 20
   },
   "tiktok": {
-    "connected": true,
+    "connected": false,
     "connecting": false,
     "username": "tranyennhi0987",
     "roomId": "7703950471296568084",
     "viewerCount": 1,
-    "lastError": null
+    "lastError": "T\u00E0i kho\u1EA3n @tranyennhi0987 hi\u1EC7n KH\u00D4NG PH\u00C1T TR\u1EF0C TI\u1EBEP (Offline) tr\u00EAn TikTok. Vui l\u00F2ng \u0111\u1EA3m b\u1EA3o t\u00E0i kho\u1EA3n \u0111ang m\u1EDF Live tr\u00EAn TikTok tr\u01B0\u1EDBc khi b\u1EA5m K\u1EBFt n\u1ED1i, ho\u1EB7c b\u1EADt \u0027T\u1EF1 \u0111\u1ED9ng gi\u1EA3 l\u1EADp \u0111\u00F4ng ng\u01B0\u1EDDi\u0027 \u0111\u1EC3 tr\u1EA3i nghi\u1EC7m th\u1EED."
   }
 }

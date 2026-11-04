@@ -522,7 +522,8 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
     // Xác định nội dung văn bản nói (TTS) và phụ đề chào mừng/cảm ơn
     let defaultSpeech = '';
     let speechTag = '';
-    if (type === 'phongsinhGreet' || type === 'bothiGreet' || type === 'templeGreet') {
+    const isGreet = (typeof type === 'string' && type.endsWith('Greet')) || type === 'burnIncense';
+    if (isGreet) {
       speechTag = 'Vừa vào phòng Live ✨';
       defaultSpeech = `Chào mừng ${cleanUser} đã đến với buổi phóng sinh chim tích đức! Cầu chúc bạn vạn sự cát tường, bình an và may mắn!`;
     } else if (type === 'phongsinhRelease' || type === 'bothiDonate' || type === 'offerGift' || type === 'grandCeremony') {
@@ -552,7 +553,7 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
     }
 
     // 2. Kích hoạt FOCUS NGƯỜI MỚI VÀO LIVE / ĐÓNG GÓP TƯƠNG TÁC + Cập nhật Banner đối thoại
-    if (type === 'phongsinhGreet' || type === 'bothiGreet' || type === 'templeGreet') {
+    if (isGreet) {
       setSpeech({
         user: cleanUser,
         tag: speechTag || 'Vừa vào phòng Live ✨',

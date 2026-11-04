@@ -471,7 +471,7 @@ public class TempleService : ITempleService
             }
             else if (mode == "xinchu")
             {
-                ttsText = $"Thầy Đồ kính chào {dev.Name} đã ghé gian hàng xin chữ! Nhờ thí chủ cho em xin vài đồng, thả tim hoặc follow để thầy đoán trọn quẻ, viết chữ giải hạn nghênh tài lộc ạ! {wish}.";
+                ttsText = $"Thầy Bói kính chào {dev.Name} đã ghé gian hàng xem bói và xin chữ! Nhờ thí chủ cho em xin vài đồng, thả tim hoặc follow để thầy đoán trọn quẻ, viết chữ giải hạn nghênh tài lộc ạ! {wish}.";
                 wishText = "Nhờ anh/chị vừa vào live cho em xin vài đồng, thả tim hoặc follow để thầy đoán trọn quẻ, viết chữ giải hạn ạ! 🔮🌸🙏";
                 evtType = "xinchuGreet";
             }

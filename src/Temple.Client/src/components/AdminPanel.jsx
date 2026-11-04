@@ -690,6 +690,35 @@ export default function AdminPanel({ state, callRpc, onCloseAdmin }) {
                 {loadingTts ? 'Đang đọc...' : '🎙️ Đọc Thử'}
               </button>
             </div>
+            <div style={{ display: 'flex', gap: '8px', marginTop: '6px' }}>
+              <button
+                type="button"
+                onClick={() => {
+                  if (!callRpc) return;
+                  callRpc('temple.greetMember', {
+                    user: 'Thí Chủ Hảo Tâm',
+                    readTts: true
+                  });
+                }}
+                style={{
+                  flex: 1,
+                  background: 'linear-gradient(180deg, #10b981 0%, #059669 100%)',
+                  color: '#fff',
+                  padding: '10px 14px',
+                  borderRadius: '10px',
+                  border: '1px solid #34d399',
+                  fontWeight: 700,
+                  fontSize: '13px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px'
+                }}
+              >
+                👋 Thử Giọng Chào Người Mới Vào (Simulate Member Join)
+              </button>
+            </div>
             {ttsAudioUrl && (
               <audio src={ttsAudioUrl} controls autoPlay style={{ width: '100%', height: '38px', marginTop: '6px' }} />
             )}
@@ -873,7 +902,9 @@ export default function AdminPanel({ state, callRpc, onCloseAdmin }) {
                   color: '#fff8eb'
                 }}
               >
-                <option value="temple.burnIncense">temple.burnIncense (Thắp hương / Chào người vào)</option>
+                <option value="temple.greetMember">temple.greetMember (Chào người xem mới vào phòng live)</option>
+                <option value="temple.requestCalligraphy">temple.requestCalligraphy (Thầy bói đoán quẻ & xin chữ)</option>
+                <option value="temple.burnIncense">temple.burnIncense (Thắp hương / Cúng dường)</option>
                 <option value="temple.follow">temple.follow (Follow kênh)</option>
                 <option value="temple.share">temple.share (Chia sẻ live)</option>
                 <option value="temple.sendPrayer">temple.sendPrayer (Cầu nguyện / Hoa đăng)</option>

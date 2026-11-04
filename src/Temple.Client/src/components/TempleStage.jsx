@@ -226,6 +226,10 @@ export default function TempleStage({ state, activeEvent, audio, callRpc, obsMod
 
     switch (ev.type) {
       case 'burnIncense':
+      case 'templeGreet':
+      case 'phongsinhGreet':
+      case 'bothiGreet':
+      case 'xinchuGreet':
         audio.playIncenseChime();
         if (pe) {
           pe.spawnIncenseBurst(540, 895);

@@ -189,7 +189,7 @@ class TempleAudioEngine {
   }
 
   playPhongsinhTrack(index = 0) {
-    if (this.currentMode !== 'phongsinh' && this.currentMode !== 'bothi') return;
+    if (this.currentMode !== 'phongsinh' && this.currentMode !== 'bothi' && this.currentMode !== 'xinchu') return;
     if (!this.phongsinhPlaylist || this.phongsinhPlaylist.length === 0) return;
     if (index < 0) index = this.phongsinhPlaylist.length - 1;
     if (index >= this.phongsinhPlaylist.length) index = 0;
@@ -200,26 +200,26 @@ class TempleAudioEngine {
 
     // Dọn dẹp bgAudio cũ trước khi tạo bài mới
     this.stopAndUnloadBgAudio();
-    if (this.currentMode !== 'phongsinh' && this.currentMode !== 'bothi') return;
+    if (this.currentMode !== 'phongsinh' && this.currentMode !== 'bothi' && this.currentMode !== 'xinchu') return;
 
     const audioEl = new Audio(track.src);
     audioEl.loop = false; // Tự động chuyển bài kế tiếp khi hết bài
     audioEl.preload = 'auto';
     audioEl.volume = this.ttsPlaying ? this.getDuckedVolume() : this.bgBaseVolume;
 
-    // Hết bài -> Tự động phát bài kế tiếp trong playlist NhacCuaTui (CHỈ KHI VẪN Ở MODE PHONGSINH HOẶC BOTHI)
+    // Hết bài -> Tự động phát bài kế tiếp trong playlist NhacCuaTui (CHỈ KHI VẪN Ở MODE PHONGSINH, BOTHI HOẶC XINCHU)
     audioEl.onended = () => {
-      if (this.currentMode === 'phongsinh' || this.currentMode === 'bothi') {
+      if (this.currentMode === 'phongsinh' || this.currentMode === 'bothi' || this.currentMode === 'xinchu') {
         this.nextPhongsinhTrack();
       }
     };
 
     // Nếu lỗi file local -> Fallback sang stream online của NCT hoặc sang bài tiếp
     audioEl.onerror = () => {
-      if (this.currentMode !== 'phongsinh' && this.currentMode !== 'bothi') return;
+      if (this.currentMode !== 'phongsinh' && this.currentMode !== 'bothi' && this.currentMode !== 'xinchu') return;
       if (track.streamFallback && audioEl.src !== track.streamFallback) {
         audioEl.src = track.streamFallback;
-        if (this.bgMusicEnabled && this.unlocked && !this.activeYoutubeId && (this.currentMode === 'phongsinh' || this.currentMode === 'bothi')) {
+        if (this.bgMusicEnabled && this.unlocked && !this.activeYoutubeId && (this.currentMode === 'phongsinh' || this.currentMode === 'bothi' || this.currentMode === 'xinchu')) {
           audioEl.play().catch(() => {});
         }
       } else {
@@ -908,7 +908,35 @@ class TempleAudioEngine {
     }
   }
 
-  playWavUrl(url) {
+  async playWavUrl(url) {
+    // 1. Uu tien phat bang Web Audio API (decodeAudioData) de vuot qua Autoplay Policy cua OBS CEF & Browser
+    try {
+      const ctx = this.ensureContext();
+      if (ctx && ctx.state === 'suspended') {
+        await ctx.resume().catch(() => {});
+      }
+      if (ctx && ctx.state === 'running') {
+        const res = await fetch(url);
+        if (res.ok) {
+          const arrayBuf = await res.arrayBuffer();
+          const audioBuf = await ctx.decodeAudioData(arrayBuf);
+          return await new Promise((resolve) => {
+            const srcNode = ctx.createBufferSource();
+            srcNode.buffer = audioBuf;
+            const gain = ctx.createGain();
+            gain.gain.value = Math.max(0, Math.min(1, this.ttsVolume));
+            srcNode.connect(gain);
+            gain.connect(ctx.destination);
+            srcNode.onended = () => resolve();
+            srcNode.start(0);
+          });
+        }
+      }
+    } catch (err) {
+      console.warn('[AudioEngine WebAudio TTS Fallback]', err);
+    }
+
+    // 2. Du phong bang HTML5 Audio Element neu Web Audio gap su co
     return new Promise((resolve) => {
       try {
         const audio = new Audio(url);
@@ -918,18 +946,21 @@ class TempleAudioEngine {
           this.currentAudio = null;
           resolve();
         };
-        audio.onerror = () => {
+        audio.onerror = (e) => {
+          console.warn('[AudioEngine HTML5 Audio Error]', e);
           this.currentAudio = null;
           resolve();
         };
         const playPromise = audio.play();
         if (playPromise && typeof playPromise.catch === 'function') {
-          playPromise.catch(() => {
+          playPromise.catch((e) => {
+            console.warn('[AudioEngine HTML5 Audio Blocked]', e);
             this.currentAudio = null;
             resolve();
           });
         }
-      } catch (_) {
+      } catch (e) {
+        console.warn('[AudioEngine playWavUrl Error]', e);
         resolve();
       }
     });

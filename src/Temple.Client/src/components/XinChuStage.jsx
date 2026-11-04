@@ -461,8 +461,10 @@ export default function XinChuStage({ state, activeEvent, audio, callRpc, obsMod
     const user = activeEvent.user || 'Thí Chủ';
     const avatar = activeEvent.avatar || '';
 
-    // Enqueue TTS phát đọc trên phiên live
-    if (activeEvent.ttsText && audio) {
+    const isGreetEvent = (typeof activeEvent.type === 'string' && activeEvent.type.endsWith('Greet')) || activeEvent.type === 'burnIncense';
+
+    // Enqueue TTS phát đọc trên phiên live (ngoại trừ greet event xử lý riêng theo ngữ cảnh Thầy Bói)
+    if (!isGreetEvent && activeEvent.ttsText && audio) {
       audio.enqueueTts(activeEvent.ttsText, {
         voice: activeEvent.ttsVoice || 'maichi'
       });
@@ -614,14 +616,33 @@ export default function XinChuStage({ state, activeEvent, audio, callRpc, obsMod
           isHighlight: false
         }));
       }, 7500);
-    } else if (activeEvent.type === 'xinchuGreet' || activeEvent.type === 'bothiGreet' || activeEvent.type === 'templeGreet') {
+    } else if (isGreetEvent) {
+      const greetText = `Thầy Bói kính chào ${user} đã ghé gian hàng xem bói & xin chữ! Chúc thí chủ vạn sự an khang! 🔮🌸`;
       setSpeech({
         user,
         avatar,
-        text: `Thầy Bói kính chào ${user} đã ghé gian hàng xem bói & xin chữ! Chúc thí chủ vạn sự an khang! 🔮🌸`,
+        text: greetText,
         isHighlight: false
       });
       triggerViewerInteraction(user, avatar, '🌸 Ghé Thăm', 'greet', 0);
+
+      // Kích hoạt âm thanh TTS giọng đọc chào mừng thí chủ
+      if (audio) {
+        const speechTts = (activeEvent.ttsText && (activeEvent.ttsText.includes('Thầy') || activeEvent.ttsText.includes('xin chữ') || activeEvent.ttsText.includes('bói')))
+          ? activeEvent.ttsText
+          : `Thầy Bói kính chào ${user} đã ghé gian hàng xem bói và xin chữ! Nhờ thí chủ cho em xin vài đồng, thả tim hoặc follow để thầy đoán trọn quẻ, viết chữ giải hạn nghênh tài lộc ạ!`;
+        audio.enqueueTts(speechTts, {
+          voice: activeEvent.ttsVoice || 'maichi'
+        });
+      }
+
+      setTimeout(() => {
+        setSpeech((prev) => ({
+          ...prev,
+          text: 'Nhờ anh/chị vừa vào live cho em xin vài đồng, thả tim hoặc follow để thầy đoán trọn quẻ, viết chữ giải hạn ạ! 🔮🌸🙏',
+          isHighlight: false
+        }));
+      }, 8500);
     }
   }, [activeEvent, audio, spawnCoins, spawnHearts, triggerViewerInteraction]);
 
