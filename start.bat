@@ -11,6 +11,12 @@ echo   Tunnel   : Cloudflare Tunnel (Cho TikTok LIVE Studio)
 echo ============================================================
 echo.
 
+REM 0. Kiem tra thu vien Playwright & TikTok Connector
+if not exist "%~dp0scripts\node_modules\playwright" (
+    echo [*] Dang cai dat thu vien Playwright va TikTok connector...
+    call npm install --prefix "%~dp0scripts"
+)
+
 REM 1. Khoi chay C# ASP.NET Core Backend
 echo [*] Dang khoi chay C# ASP.NET Core Backend (Port 5000)...
 start "Temple C# Backend" /D "%~dp0src\Temple.Server" cmd /k dotnet run
