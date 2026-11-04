@@ -30,6 +30,26 @@ public class TikTokCommenterService : ITikTokCommenterService, IDisposable
         _scriptPath = File.Exists(scriptCandidate)
             ? scriptCandidate
             : Path.GetFullPath(Path.Combine(env.ContentRootPath, "..", "..", "scripts", "tiktok_commenter.js"));
+
+        string dataDir = Directory.Exists(Path.Combine(env.ContentRootPath, "data"))
+            ? Path.Combine(env.ContentRootPath, "data")
+            : Path.GetFullPath(Path.Combine(env.ContentRootPath, "..", "..", "data"));
+        string cookiePath = Path.Combine(dataDir, "tiktok_browser_profile", "Default", "Network", "Cookies");
+        if (File.Exists(cookiePath) && new FileInfo(cookiePath).Length > 1000)
+        {
+            _state.LoggedIn = true;
+            _state.StatusMessage = "Đã nhận diện phiên đăng nhập TikTok từ profile lưu trữ";
+            _state.LastError = null;
+        }
+
+        try
+        {
+            EnsureProcessStarted();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogDebug(ex, "[PlaywrightCommenter] Chưa thể khởi chạy nền");
+        }
     }
 
     public TikTokCommenterState GetState()
@@ -258,13 +278,32 @@ public class TikTokCommenterService : ITikTokCommenterService, IDisposable
             {
                 case "ready":
                     _logger.LogInformation("[PlaywrightCommenter] Script Node sẵn sàng");
+                    if (root.TryGetProperty("loggedIn", out var rLoggedIn))
+                    {
+                        lock (_lock)
+                        {
+                            _state.LoggedIn = rLoggedIn.GetBoolean();
+                            if (_state.LoggedIn)
+                            {
+                                _state.LastError = null;
+                            }
+                        }
+                        BroadcastState();
+                    }
                     break;
 
                 case "status":
                     lock (_lock)
                     {
                         if (root.TryGetProperty("running", out var rp)) _state.Running = rp.GetBoolean();
-                        if (root.TryGetProperty("loggedIn", out var lp)) _state.LoggedIn = lp.GetBoolean();
+                        if (root.TryGetProperty("loggedIn", out var lp))
+                        {
+                            _state.LoggedIn = lp.GetBoolean();
+                            if (_state.LoggedIn)
+                            {
+                                _state.LastError = null;
+                            }
+                        }
                         if (root.TryGetProperty("url", out var up)) _state.Url = up.GetString();
                         if (root.TryGetProperty("message", out var mp)) _state.StatusMessage = mp.GetString() ?? _state.StatusMessage;
                     }

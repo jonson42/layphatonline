@@ -27,11 +27,27 @@ let context = null;
 let activePage = null;
 let currentLiveUrl = '';
 let isClosing = false;
+let lastKnownLoggedIn = false;
 
 // Đường dẫn profile lưu session đăng nhập vĩnh viễn
 const profileDir = path.resolve(__dirname, '..', 'data', 'tiktok_browser_profile');
 if (!fs.existsSync(profileDir)) {
   fs.mkdirSync(profileDir, { recursive: true });
+}
+
+/**
+ * Kiểm tra nhanh file Cookies SQLite trên đĩa để xem đã có sessionid của TikTok chưa
+ */
+function checkSavedCookies() {
+  try {
+    const cookiesPath = path.join(profileDir, 'Default', 'Network', 'Cookies');
+    if (!fs.existsSync(cookiesPath)) return false;
+    const buf = fs.readFileSync(cookiesPath);
+    const content = buf.toString('latin1');
+    return content.includes('sessionid') && content.includes('.tiktok.com');
+  } catch (_) {
+    return false;
+  }
 }
 
 async function getBrowserContext(headless = false) {
@@ -71,43 +87,71 @@ async function getBrowserContext(headless = false) {
     context = null;
     activePage = null;
     if (!isClosing) {
-      emit({ type: 'status', running: false, loggedIn: false, message: 'Trình duyệt đã đóng' });
+      emit({ type: 'status', running: false, loggedIn: lastKnownLoggedIn, message: 'Trình duyệt đã đóng' });
     }
   });
 
   return context;
 }
 
-async function checkLoggedIn(page) {
-  if (!page) return false;
+/**
+ * Kiểm tra trạng thái đăng nhập TikTok qua cả Cookies trong Context lẫn DOM trang
+ */
+async function checkLoggedIn(page, ctx) {
+  // 1. Kiểm tra qua Context Cookies trong bộ nhớ
   try {
-    const hasUserAvatar = await page.evaluate(() => {
-      // Tìm avatar người dùng đăng nhập ở góc trên cùng TikTok
-      const avatar = document.querySelector('header img[class*="Avatar"], [data-e2e="profile-icon"], img[src*="avatar"]');
-      const loginBtn = document.querySelector('[data-e2e="top-login-button"], [id*="login-button"]');
-      if (loginBtn) return false;
-      return !!avatar;
-    });
-    return !!hasUserAvatar;
-  } catch (_) {
-    return false;
+    const c = ctx || context || (page ? page.context() : null);
+    if (c) {
+      const cookies = await c.cookies('https://www.tiktok.com');
+      const hasSession = cookies.some(ck => 
+        (ck.name === 'sessionid' || ck.name === 'sessionid_ss' || ck.name === 'sid_tt' || ck.name === 'passport_auth_status') && ck.value
+      );
+      if (hasSession) {
+        lastKnownLoggedIn = true;
+        return true;
+      }
+    }
+  } catch (_) {}
+
+  // 2. Kiểm tra qua file cookie database của profile Chrome
+  if (checkSavedCookies()) {
+    lastKnownLoggedIn = true;
+    return true;
   }
+
+  // 3. Fallback kiểm tra DOM trên trang nếu đang mở
+  if (page && !page.isClosed()) {
+    try {
+      const domResult = await page.evaluate(() => {
+        const loginBtn = document.querySelector('[data-e2e="top-login-button"], [id*="login-button"], [data-e2e="login-to-chat"]');
+        if (loginBtn) return false;
+        const avatarOrInput = document.querySelector('img[class*="Avatar"], [data-e2e="profile-icon"], img[src*="avatar"], div[data-e2e="comment-input"], div[contenteditable="true"]');
+        return !!avatarOrInput;
+      });
+      if (domResult) {
+        lastKnownLoggedIn = true;
+        return true;
+      }
+    } catch (_) {}
+  }
+
+  return lastKnownLoggedIn;
 }
 
 async function openLive(url, headless = false) {
   try {
     isClosing = false;
     currentLiveUrl = url;
-    emit({ type: 'status', running: true, message: `Đang mở trình duyệt kết nối ${url}...` });
+    emit({ type: 'status', running: true, loggedIn: lastKnownLoggedIn, message: `Đang mở trình duyệt kết nối ${url}...` });
 
     const ctx = await getBrowserContext(headless);
     const pages = ctx.pages();
     activePage = pages.length > 0 ? pages[0] : await ctx.newPage();
 
     await activePage.goto(url, { timeout: 35000, waitUntil: 'domcontentloaded' });
-    await activePage.waitForTimeout(3000);
+    await activePage.waitForTimeout(2500);
 
-    const loggedIn = await checkLoggedIn(activePage);
+    const loggedIn = await checkLoggedIn(activePage, ctx);
     emit({
       type: 'status',
       running: true,
@@ -126,7 +170,7 @@ async function openLive(url, headless = false) {
 async function openLogin() {
   try {
     isClosing = false;
-    emit({ type: 'status', running: true, message: 'Đang mở cửa sổ đăng nhập TikTok...' });
+    emit({ type: 'status', running: true, loggedIn: lastKnownLoggedIn, message: 'Đang mở cửa sổ đăng nhập TikTok...' });
     // Mở headful để người dùng thấy và quét mã QR hoặc đăng nhập
     const ctx = await getBrowserContext(false);
     const pages = ctx.pages();
@@ -136,8 +180,27 @@ async function openLogin() {
     emit({
       type: 'status',
       running: true,
+      loggedIn: lastKnownLoggedIn,
       message: 'Vui lòng quét mã QR hoặc đăng nhập tài khoản TikTok trên cửa sổ trình duyệt vừa mở.'
     });
+
+    // Lắng nghe tự động phát hiện khi người dùng đăng nhập thành công
+    const pollTimer = setInterval(async () => {
+      if (!context || isClosing) {
+        clearInterval(pollTimer);
+        return;
+      }
+      const ok = await checkLoggedIn(activePage, ctx);
+      if (ok) {
+        clearInterval(pollTimer);
+        emit({
+          type: 'status',
+          running: true,
+          loggedIn: true,
+          message: '✅ Đã đăng nhập TikTok thành công! Đã lưu session vĩnh viễn.'
+        });
+      }
+    }, 2500);
   } catch (err) {
     emit({ type: 'error', message: `Lỗi mở trang đăng nhập: ${err.message}` });
   }
@@ -160,38 +223,46 @@ async function sendComment(text) {
     const candidateSelectors = [
       'div[data-e2e="comment-input"]',
       'div[contenteditable="true"]',
+      '[data-e2e="chat-room-input"]',
+      '[data-e2e="live-comment-input"]',
+      'div[class*="ChatInputContainer"] [contenteditable="true"]',
+      'div[class*="DivChatRoom"] [contenteditable="true"]',
+      'div[class*="CommentInput"] [contenteditable="true"]',
+      'div[class*="DivBottomArea"] [contenteditable="true"]',
       'textarea[placeholder*="bình luận" i]',
       'textarea[placeholder*="comment" i]',
       '[placeholder*="Gửi bình luận" i]',
       '[placeholder*="Add comment" i]',
       '[placeholder*="Send a comment" i]',
-      '[placeholder*="Say something" i]',
-      'div[class*="ChatInputContainer"] [contenteditable="true"]',
-      'div[class*="DivChatRoom"] [contenteditable="true"]'
+      '[placeholder*="Say something" i]'
     ];
 
+    // Chờ ô nhập bình luận xuất hiện (tối đa 5s phòng khi live đang tải chat)
     let inputElement = null;
-    for (const sel of candidateSelectors) {
-      try {
-        const el = await activePage.$(sel);
-        if (el) {
-          const isVisible = await el.isVisible();
-          if (isVisible) {
+    const startTime = Date.now();
+    while (!inputElement && (Date.now() - startTime < 5000)) {
+      for (const sel of candidateSelectors) {
+        try {
+          const el = await activePage.$(sel);
+          if (el && await el.isVisible()) {
             inputElement = el;
             break;
           }
-        }
-      } catch (_) {}
+        } catch (_) {}
+      }
+      if (!inputElement) {
+        await activePage.waitForTimeout(500);
+      }
     }
 
     if (!inputElement) {
       // Kiểm tra xem có đang yêu cầu đăng nhập không
-      const loggedIn = await checkLoggedIn(activePage);
+      const loggedIn = await checkLoggedIn(activePage, context);
       emit({
         type: 'comment_result',
         success: false,
         error: loggedIn
-          ? 'Không tìm thấy ô nhập chat trên giao diện Live'
+          ? 'Không tìm thấy ô nhập chat trên giao diện Live (hãy kiểm tra xem phòng Live có đang mở chat không)'
           : 'Tài khoản chưa đăng nhập TikTok. Vui lòng bấm "Mở trình duyệt đăng nhập TikTok" trước!'
       });
       return;
@@ -264,7 +335,7 @@ async function closeBrowser() {
       context = null;
       activePage = null;
     }
-    emit({ type: 'status', running: false, loggedIn: false, message: 'Đã đóng trình duyệt Playwright' });
+    emit({ type: 'status', running: false, loggedIn: lastKnownLoggedIn, message: 'Đã đóng trình duyệt Playwright' });
   } catch (err) {
     emit({ type: 'error', message: `Lỗi đóng trình duyệt: ${err.message}` });
   }
@@ -297,7 +368,7 @@ process.stdin.on('data', async (chunk) => {
           emit({
             type: 'status',
             running: !!context && !context.isClosed?.(),
-            loggedIn: activePage ? await checkLoggedIn(activePage) : false,
+            loggedIn: await checkLoggedIn(activePage, context),
             url: activePage ? activePage.url() : ''
           });
           break;
@@ -312,6 +383,14 @@ process.stdin.on('data', async (chunk) => {
   }
 });
 
-// Báo hiệu script đã khởi động thành công
-emit({ type: 'ready', message: 'TikTok Playwright Commenter Bridge đã sẵn sàng' });
-
+// Báo hiệu script đã khởi động thành công và nạp trạng thái phiên đăng nhập lưu sẵn
+(async () => {
+  lastKnownLoggedIn = checkSavedCookies();
+  emit({
+    type: 'ready',
+    loggedIn: lastKnownLoggedIn,
+    message: lastKnownLoggedIn
+      ? 'TikTok Playwright Commenter Bridge đã sẵn sàng (Đã nhận diện đăng nhập)'
+      : 'TikTok Playwright Commenter Bridge đã sẵn sàng'
+  });
+})();

@@ -1021,7 +1021,7 @@ export default function AdminPanel({ state, callRpc, onCloseAdmin }) {
               {commenter?.lastComment && (
                 <div><strong>Bình luận vừa gửi gần nhất:</strong> <span style={{ color: '#a7f3d0' }}>"{commenter.lastComment}"</span> lúc <span style={{ color: '#ffd54f' }}>{commenter.lastCommentTime}</span></div>
               )}
-              {commenter?.lastError && (
+              {commenter?.lastError && !(commenter?.loggedIn && commenter.lastError.includes('đăng nhập')) && (
                 <div style={{ color: '#ff8a80' }}><strong>Lỗi:</strong> {commenter.lastError}</div>
               )}
             </div>
