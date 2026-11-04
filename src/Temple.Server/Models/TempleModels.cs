@@ -132,6 +132,12 @@ public class TempleSettings
 
     [JsonPropertyName("mode")]
     public string Mode { get; set; } = "temple";
+
+    [JsonPropertyName("autoCommentEnabled")]
+    public bool AutoCommentEnabled { get; set; } = false;
+
+    [JsonPropertyName("autoCommentIntervalSeconds")]
+    public int AutoCommentIntervalSeconds { get; set; } = 20;
 }
 
 public class TikTokState
@@ -330,6 +336,9 @@ public class PublicTempleState
 
     [JsonPropertyName("tts")]
     public TtsStatus Tts { get; set; } = new();
+
+    [JsonPropertyName("commenter")]
+    public TikTokCommenterState Commenter { get; set; } = new();
 }
 
 public class TtsStatus

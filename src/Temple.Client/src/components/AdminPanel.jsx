@@ -14,6 +14,104 @@ export default function AdminPanel({ state, callRpc, onCloseAdmin }) {
   const [adminYtInput, setAdminYtInput] = useState(() => state?.settings?.youtubeUrl || '');
 
   const [connecting, setConnecting] = useState(false);
+  const [customComment, setCustomComment] = useState('');
+  const [commentInterval, setCommentInterval] = useState(() => state?.settings?.autoCommentIntervalSeconds || 20);
+  const [chatSample, setChatSample] = useState(null);
+  const [loadingComment, setLoadingComment] = useState(false);
+
+  const commenter = state?.commenter;
+
+  // Tải câu mẫu LiveChatGenerator và trạng thái commenter
+  const loadChatSample = async () => {
+    try {
+      const res = await callRpc('live.getChatSample');
+      if (res) setChatSample(res);
+    } catch (_) {}
+  };
+
+  React.useEffect(() => {
+    loadChatSample();
+  }, []);
+
+  const handleStartCommenter = async () => {
+    setLoadingComment(true);
+    try {
+      const res = await callRpc('live.startCommenter', { username: ttUser, headless: false });
+      setRpcOutput(JSON.stringify(res, null, 2));
+    } catch (e) {
+      setRpcOutput(`Commenter Error: ${e.message}`);
+    } finally {
+      setLoadingComment(false);
+    }
+  };
+
+  const handleStopCommenter = async () => {
+    try {
+      const res = await callRpc('live.stopCommenter');
+      setRpcOutput(JSON.stringify(res, null, 2));
+    } catch (e) {
+      setRpcOutput(`Commenter Error: ${e.message}`);
+    }
+  };
+
+  const handleOpenLogin = async () => {
+    try {
+      const res = await callRpc('live.openLogin');
+      setRpcOutput(JSON.stringify(res, null, 2));
+      alert('Đã mở cửa sổ trình duyệt TikTok! Bạn vui lòng đăng nhập hoặc quét mã QR trên màn hình trình duyệt đó.');
+    } catch (e) {
+      setRpcOutput(`Login Error: ${e.message}`);
+    }
+  };
+
+  const handleSendCustomComment = async () => {
+    if (!customComment.trim()) return;
+    setLoadingComment(true);
+    try {
+      const res = await callRpc('live.sendComment', { text: customComment.trim() });
+      setRpcOutput(JSON.stringify(res, null, 2));
+      if (res?.success) setCustomComment('');
+      else if (res?.state?.lastError) alert(`Lỗi gửi: ${res.state.lastError}`);
+    } catch (e) {
+      setRpcOutput(`Send Error: ${e.message}`);
+    } finally {
+      setLoadingComment(false);
+    }
+  };
+
+  const handleSendCurrentGreeting = async () => {
+    setLoadingComment(true);
+    try {
+      const res = await callRpc('live.sendGreeting', { text: rpcUser || 'Thí Chủ' });
+      setRpcOutput(JSON.stringify(res, null, 2));
+      loadChatSample();
+    } catch (e) {
+      setRpcOutput(`Greeting Error: ${e.message}`);
+    } finally {
+      setLoadingComment(false);
+    }
+  };
+
+  const handleToggleAutoComment = async () => {
+    const cur = state?.settings?.autoCommentEnabled || false;
+    try {
+      const res = await callRpc('temple.updateSettings', { autoCommentEnabled: !cur });
+      setRpcOutput(JSON.stringify(res, null, 2));
+    } catch (e) {
+      setRpcOutput(`Settings Error: ${e.message}`);
+    }
+  };
+
+  const handleSaveInterval = async () => {
+    const val = parseInt(commentInterval, 10) || 20;
+    try {
+      const res = await callRpc('temple.updateSettings', { autoCommentIntervalSeconds: val });
+      setRpcOutput(JSON.stringify(res, null, 2));
+      alert(`Đã lưu thời gian giãn cách bình luận: ${val} giây`);
+    } catch (e) {
+      setRpcOutput(`Interval Error: ${e.message}`);
+    }
+  };
 
   const handleConnectLive = async () => {
     setConnecting(true);
@@ -580,6 +678,268 @@ export default function AdminPanel({ state, callRpc, onCloseAdmin }) {
                 }}
               >
                 Đặt Lại Công Đức
+              </button>
+            </div>
+          </section>
+
+          {/* Card 3: Playwright Auto TikTok Commenter & LiveChatGenerator */}
+          <section style={{
+            gridColumn: '1 / -1',
+            background: '#190604',
+            border: '1.5px solid rgba(244, 193, 80, 0.45)',
+            borderRadius: '18px',
+            padding: '20px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '14px'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(244,193,80,0.25)', paddingBottom: '10px' }}>
+              <h2 style={{ fontSize: '18px', color: '#ffe694', margin: 0 }}>
+                🤖 3. Tự Động Bình Luận TikTok Live (Playwright AI Chat Greeting)
+              </h2>
+              <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                <span style={{
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  padding: '4px 10px',
+                  borderRadius: '6px',
+                  background: commenter?.running ? 'rgba(50, 200, 80, 0.2)' : 'rgba(255, 255, 255, 0.08)',
+                  color: commenter?.running ? '#69f0ae' : '#aaa',
+                  border: commenter?.running ? '1px solid #69f0ae' : '1px solid #555'
+                }}>
+                  {commenter?.running ? '🟢 Trình Duyệt Đang Mở' : '⚪ Trình Duyệt Đang Tắt'}
+                </span>
+                <span style={{
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  padding: '4px 10px',
+                  borderRadius: '6px',
+                  background: commenter?.loggedIn ? 'rgba(50, 200, 80, 0.2)' : 'rgba(255, 180, 0, 0.2)',
+                  color: commenter?.loggedIn ? '#69f0ae' : '#ffd54f',
+                  border: commenter?.loggedIn ? '1px solid #69f0ae' : '1px solid #ffd54f'
+                }}>
+                  {commenter?.loggedIn ? '✅ Đã Đăng Nhập TikTok' : '⚠️ Chưa Đăng Nhập'}
+                </span>
+              </div>
+            </div>
+
+            {/* Trạng thái chi tiết */}
+            <div style={{
+              background: 'rgba(0, 0, 0, 0.4)',
+              borderRadius: '12px',
+              padding: '12px 16px',
+              fontSize: '13px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '6px',
+              border: '1px solid rgba(244, 193, 80, 0.2)'
+            }}>
+              <div><strong>Trạng thái:</strong> <span style={{ color: '#ffe694' }}>{commenter?.statusMessage || 'Chưa khởi chạy'}</span></div>
+              {commenter?.url && <div><strong>Phòng Live:</strong> <a href={commenter.url} target="_blank" rel="noreferrer" style={{ color: '#90caf9' }}>{commenter.url}</a></div>}
+              {commenter?.lastComment && (
+                <div><strong>Bình luận vừa gửi gần nhất:</strong> <span style={{ color: '#a7f3d0' }}>"{commenter.lastComment}"</span> lúc <span style={{ color: '#ffd54f' }}>{commenter.lastCommentTime}</span></div>
+              )}
+              {commenter?.lastError && (
+                <div style={{ color: '#ff8a80' }}><strong>Lỗi:</strong> {commenter.lastError}</div>
+              )}
+            </div>
+
+            {/* Xem trước câu chúc thời gian thực LiveChatGenerator */}
+            <div style={{
+              background: 'linear-gradient(180deg, rgba(88, 28, 135, 0.3) 0%, rgba(33, 9, 6, 0.6) 100%)',
+              border: '1px solid rgba(216, 180, 254, 0.3)',
+              borderRadius: '12px',
+              padding: '12px 16px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '8px'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '14px', fontWeight: 700, color: '#f0abfc' }}>
+                  🕒 Bộ Sinh Lời Chúc Tự Động Theo Thời Điểm: <span style={{ color: '#ffd54f', textTransform: 'capitalize' }}>{chatSample?.timeOfDay || 'Hiện Tại'}</span>
+                </span>
+                <button
+                  onClick={loadChatSample}
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.1)',
+                    color: '#ffe694',
+                    border: '1px solid rgba(244, 193, 80, 0.3)',
+                    borderRadius: '6px',
+                    padding: '4px 10px',
+                    fontSize: '12px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  🔄 Đổi Câu Mẫu
+                </button>
+              </div>
+              <div style={{ fontSize: '13px', color: '#e9d5ff' }}>
+                • <strong>Câu chung cho phòng:</strong> <em>"{chatSample?.randomMessage || 'Đang tải...'}"</em>
+              </div>
+              <div style={{ fontSize: '13px', color: '#fed7aa' }}>
+                • <strong>Chào mừng người mới vào:</strong> <em>"{chatSample?.memberGreeting || 'Đang tải...'}"</em>
+              </div>
+            </div>
+
+            {/* Các nút điều khiển chính */}
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+              {!commenter?.running ? (
+                <button
+                  onClick={handleStartCommenter}
+                  disabled={loadingComment}
+                  style={{
+                    background: 'linear-gradient(180deg, #10b981 0%, #047857 100%)',
+                    color: '#fff',
+                    padding: '10px 18px',
+                    borderRadius: '10px',
+                    border: '1px solid #6ee7b7',
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '6px'
+                  }}
+                >
+                  🚀 Khởi Động Trình Duyệt Comment
+                </button>
+              ) : (
+                <button
+                  onClick={handleStopCommenter}
+                  style={{
+                    background: 'linear-gradient(180deg, #ef4444 0%, #b91c1c 100%)',
+                    color: '#fff',
+                    padding: '10px 18px',
+                    borderRadius: '10px',
+                    border: '1px solid #fca5a5',
+                    fontWeight: 700,
+                    cursor: 'pointer'
+                  }}
+                >
+                  ⏹️ Tắt Trình Duyệt Comment
+                </button>
+              )}
+
+              <button
+                onClick={handleOpenLogin}
+                style={{
+                  background: 'linear-gradient(180deg, #f59e0b 0%, #b45309 100%)',
+                  color: '#fff',
+                  padding: '10px 18px',
+                  borderRadius: '10px',
+                  border: '1px solid #fde68a',
+                  fontWeight: 700,
+                  cursor: 'pointer'
+                }}
+              >
+                🔑 Mở Trình Duyệt Đăng Nhập TikTok
+              </button>
+
+              <button
+                onClick={handleSendCurrentGreeting}
+                disabled={loadingComment || !commenter?.running}
+                style={{
+                  background: commenter?.running ? 'linear-gradient(180deg, #8b5cf6 0%, #6d28d9 100%)' : '#444',
+                  color: commenter?.running ? '#fff' : '#888',
+                  padding: '10px 18px',
+                  borderRadius: '10px',
+                  border: commenter?.running ? '1px solid #c4b5fd' : '1px solid #555',
+                  fontWeight: 700,
+                  cursor: commenter?.running ? 'pointer' : 'not-allowed'
+                }}
+              >
+                💬 Gửi Thử Câu Chúc Thời Điểm Ngay
+              </button>
+            </div>
+
+            {/* Thiết lập Tự Động Bình Luận & Cooldown */}
+            <div style={{
+              display: 'flex',
+              gap: '16px',
+              flexWrap: 'wrap',
+              alignItems: 'center',
+              background: 'rgba(0, 0, 0, 0.25)',
+              borderRadius: '10px',
+              padding: '12px 14px',
+              border: '1px solid rgba(244, 193, 80, 0.2)'
+            }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '14px', fontWeight: 600, color: '#ffe694' }}>
+                <input
+                  type="checkbox"
+                  checked={state?.settings?.autoCommentEnabled || false}
+                  onChange={handleToggleAutoComment}
+                  style={{ width: '18px', height: '18px', accentColor: '#10b981' }}
+                />
+                <span>Tự động gửi lời chúc khi có người mới vào phòng Live (Member Join)</span>
+              </label>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto' }}>
+                <span style={{ fontSize: '13px', color: '#d6ba8a' }}>Giãn cách tối thiểu giữa 2 comment:</span>
+                <input
+                  type="number"
+                  min={8}
+                  max={300}
+                  value={commentInterval}
+                  onChange={(e) => setCommentInterval(e.target.value)}
+                  style={{
+                    width: '70px',
+                    background: '#120403',
+                    border: '1px solid rgba(244,193,80,0.38)',
+                    borderRadius: '8px',
+                    padding: '6px 8px',
+                    color: '#fff',
+                    textAlign: 'center'
+                  }}
+                />
+                <span style={{ fontSize: '13px', color: '#d6ba8a' }}>giây</span>
+                <button
+                  onClick={handleSaveInterval}
+                  style={{
+                    background: '#3d0906',
+                    color: '#ffe694',
+                    padding: '6px 12px',
+                    borderRadius: '8px',
+                    border: '1px solid rgba(244,193,80,0.38)',
+                    cursor: 'pointer',
+                    fontSize: '12px',
+                    fontWeight: 700
+                  }}
+                >
+                  Lưu
+                </button>
+              </div>
+            </div>
+
+            {/* Gửi bình luận tùy chỉnh thủ công */}
+            <div style={{ display: 'flex', gap: '10px', marginTop: '4px' }}>
+              <input
+                type="text"
+                value={customComment}
+                onChange={(e) => setCustomComment(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSendCustomComment()}
+                placeholder="Nhập nội dung bình luận muốn gửi trực tiếp vào TikTok Live chat..."
+                style={{
+                  flex: 1,
+                  background: '#120403',
+                  border: '1px solid rgba(244,193,80,0.38)',
+                  borderRadius: '10px',
+                  padding: '10px 14px',
+                  color: '#fff8eb'
+                }}
+              />
+              <button
+                onClick={handleSendCustomComment}
+                disabled={loadingComment || !commenter?.running || !customComment.trim()}
+                style={{
+                  background: commenter?.running && customComment.trim() ? 'linear-gradient(180deg, #f4c150 0%, #c48312 100%)' : '#444',
+                  color: commenter?.running && customComment.trim() ? '#1f0604' : '#888',
+                  padding: '10px 20px',
+                  borderRadius: '10px',
+                  border: commenter?.running && customComment.trim() ? '1px solid #fff3b0' : '1px solid #555',
+                  fontWeight: 700,
+                  cursor: commenter?.running && customComment.trim() ? 'pointer' : 'not-allowed'
+                }}
+              >
+                Gửi Chat
               </button>
             </div>
           </section>

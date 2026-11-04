@@ -5016,3 +5016,88 @@ body.obs-mode .phongsinh-stage-wrapper,
   text-transform: uppercase;
   letter-spacing: 0.6px;
 }
+
+/* 4. NGƯỜI XEM LIVE VÀO PHÒNG SẢI BƯỚC ĐẾN BÀN THẦY BÓI (XINCHU VISITOR) */
+.xinchu-viewer-walker {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+  transform-origin: bottom center;
+  z-index: 44;
+}
+
+.xinchu-viewer-walker.from-left {
+  animation: animXinChuVisitorLeft 8s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+}
+
+.xinchu-viewer-walker.from-right {
+  animation: animXinChuVisitorRight 8s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+}
+
+@keyframes animXinChuVisitorLeft {
+  0% {
+    left: -120px;
+    top: 1400px;
+    transform: scale(0.72);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  42% {
+    left: 280px;
+    top: 1400px;
+    transform: scale(0.76);
+  }
+  80% {
+    left: 280px;
+    top: 1400px;
+    transform: scale(0.76);
+    opacity: 1;
+  }
+  100% {
+    left: 100px;
+    top: 1420px;
+    transform: scale(0.74);
+    opacity: 0;
+  }
+}
+
+@keyframes animXinChuVisitorRight {
+  0% {
+    left: 1080px;
+    top: 1400px;
+    transform: scale(0.72);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  42% {
+    left: 740px;
+    top: 1400px;
+    transform: scale(0.76);
+  }
+  80% {
+    left: 740px;
+    top: 1400px;
+    transform: scale(0.76);
+    opacity: 1;
+  }
+  100% {
+    left: 920px;
+    top: 1420px;
+    transform: scale(0.74);
+    opacity: 0;
+  }
+}
+
+.xinchu-visitor-sprite {
+  height: 200px;
+  max-height: 200px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.5));
+}

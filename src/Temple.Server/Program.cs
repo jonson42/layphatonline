@@ -32,6 +32,7 @@ builder.Services.AddHttpClient();
 builder.Services.AddSingleton<IGeminiService, GeminiService>();
 builder.Services.AddSingleton<ITtsService, TtsService>();
 builder.Services.AddSingleton<ITempleService, TempleService>();
+builder.Services.AddSingleton<ITikTokCommenterService, TikTokCommenterService>();
 builder.Services.AddSingleton<ITikTokService, TikTokService>();
 builder.Services.AddSingleton<RpcDispatcher>();
 builder.Services.AddSingleton<JsonRpcWebSocketHandler>();

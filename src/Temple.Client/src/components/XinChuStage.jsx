@@ -811,33 +811,47 @@ export default function XinChuStage({ state, activeEvent, audio, callRpc, obsMod
             </div>
           ))}
 
-          {/* Người xem vừa vào live / xin chữ sải bước lại gần bàn Thầy Bói */}
+          {/* Người xem vừa vào live / xin chữ sải bước lại gần bàn Thầy Bói trên mặt đất */}
           {activeViewerWalker && (
             <div
-              className={`active-viewer-walker walk-to-bowl ${activeViewerWalker.dir === -1 ? 'from-right' : 'from-left'}`}
+              className={`xinchu-viewer-walker ${activeViewerWalker.dir === -1 ? 'from-right' : 'from-left'}`}
               style={{
-                '--viewer-dir': activeViewerWalker.dir,
                 zIndex: 42
               }}
             >
-              <div className="active-viewer-content">
+              <div className="xinchu-viewer-content">
                 {activeViewerWalker.chatBubble && (
-                  <div className="pedestrian-chat-bubble active-donor-bubble" style={{ transform: `scaleX(${activeViewerWalker.dir})` }}>
+                  <div className="walker-chat-bubble">
                     <span>{activeViewerWalker.chatBubble}</span>
+                    <div className="chat-bubble-tail" />
                   </div>
                 )}
-                <div className="pedestrian-name-tag active-donor-tag" style={{ transform: `scaleX(${activeViewerWalker.dir})` }}>
-                  {activeViewerWalker.avatar ? (
-                    <img src={activeViewerWalker.avatar} alt="avatar" className="donor-avatar-mini" />
-                  ) : (
-                    <div className="donor-avatar-placeholder" style={{ background: activeViewerWalker.avatarBg }}>
-                      {activeViewerWalker.name.charAt(0).toUpperCase()}
-                    </div>
-                  )}
-                  <span className="pedestrian-name">{activeViewerWalker.name}</span>
-                  <span className="pedestrian-metric donor-highlight">{activeViewerWalker.actionText}</span>
+                <div className="walker-capsule-badge">
+                  <div className="capsule-avatar-ring">
+                    {activeViewerWalker.avatar ? (
+                      <img src={activeViewerWalker.avatar} alt="avatar" className="capsule-avatar-img" />
+                    ) : (
+                      <div className="capsule-avatar-fallback" style={{ background: activeViewerWalker.avatarBg || getAvatarColor(activeViewerWalker.name) }}>
+                        {activeViewerWalker.name ? activeViewerWalker.name.slice(0, 1).toUpperCase() : '✨'}
+                      </div>
+                    )}
+                    <span className="capsule-live-dot" />
+                  </div>
+                  <span className="capsule-username">@{activeViewerWalker.name}</span>
+                  <div className="capsule-metric-pill pill-ambient" style={{ background: 'linear-gradient(135deg, #b91c1c 0%, #7f1d1d 100%)', color: '#ffe694', borderColor: '#f59e0b' }}>
+                    <span>🔮</span><strong>{activeViewerWalker.actionText || 'XIN QUẺ'}</strong>
+                  </div>
                 </div>
-                <img src={getSpriteImage(activeViewerWalker.model)} alt={activeViewerWalker.name} className="pedestrian-sprite donor-sprite" />
+                <div className="walker-bob-box" style={{ transform: activeViewerWalker.dir === -1 ? 'scaleX(-1)' : 'scaleX(1)' }}>
+                  <img
+                    src={getSpriteImage(activeViewerWalker.model)}
+                    alt={activeViewerWalker.name}
+                    className="xinchu-visitor-sprite"
+                    onError={(e) => {
+                      e.currentTarget.src = manYellowImg;
+                    }}
+                  />
+                </div>
               </div>
             </div>
           )}

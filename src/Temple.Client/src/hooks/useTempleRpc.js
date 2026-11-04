@@ -42,6 +42,11 @@ export function useTempleRpc() {
             ...prev,
             tiktok: { ...prev.tiktok, viewerCount: msg.params.viewerCount }
           } : prev);
+        } else if (msg.method === 'tiktok.commenterState') {
+          setState((prev) => prev ? {
+            ...prev,
+            commenter: msg.params
+          } : prev);
         } else if (msg.id != null && pendingRequests.current.has(msg.id)) {
           const { resolve, reject } = pendingRequests.current.get(msg.id);
           pendingRequests.current.delete(msg.id);

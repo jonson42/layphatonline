@@ -9,6 +9,7 @@ public class TikTokService : ITikTokService, IDisposable
 {
     private readonly ILogger<TikTokService> _logger;
     private readonly ITempleService _templeService;
+    private readonly ITikTokCommenterService _commenterService;
     private readonly string _scriptPath;
     private Process? _process;
     private StreamWriter? _stdin;
@@ -25,10 +26,11 @@ public class TikTokService : ITikTokService, IDisposable
         "Cầu bách bệnh tiêu trừ, phước thọ tăng long, vạn sự như ý"
     };
 
-    public TikTokService(ILogger<TikTokService> logger, ITempleService templeService, IHostEnvironment env)
+    public TikTokService(ILogger<TikTokService> logger, ITempleService templeService, ITikTokCommenterService commenterService, IHostEnvironment env)
     {
         _logger = logger;
         _templeService = templeService;
+        _commenterService = commenterService;
         string scriptCandidate = Path.Combine(env.ContentRootPath, "scripts", "tiktok_bridge.js");
         _scriptPath = File.Exists(scriptCandidate)
             ? scriptCandidate
@@ -214,6 +216,21 @@ public class TikTokService : ITikTokService, IDisposable
                         Avatar = mAvatar,
                         ReadTts = true
                     });
+
+                    if (_templeService.GetPublicState().Settings.AutoCommentEnabled)
+                    {
+                        _ = Task.Run(async () =>
+                        {
+                            try
+                            {
+                                await _commenterService.SendRandomTimeGreetingAsync(mUser);
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger.LogDebug(ex, "[TikTokService] Không thể tự động gửi bình luận chào mừng");
+                            }
+                        });
+                    }
                     break;
 
                 case "chat":

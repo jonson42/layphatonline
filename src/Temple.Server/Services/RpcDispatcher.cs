@@ -8,17 +8,20 @@ public class RpcDispatcher
     private readonly ITempleService _templeService;
     private readonly ITtsService _ttsService;
     private readonly ITikTokService _tikTokService;
+    private readonly ITikTokCommenterService _commenterService;
     private readonly ILogger<RpcDispatcher> _logger;
 
     public RpcDispatcher(
         ITempleService templeService,
         ITtsService ttsService,
         ITikTokService tikTokService,
+        ITikTokCommenterService commenterService,
         ILogger<RpcDispatcher> logger)
     {
         _templeService = templeService;
         _ttsService = ttsService;
         _tikTokService = tikTokService;
+        _commenterService = commenterService;
         _logger = logger;
     }
 
@@ -133,6 +136,37 @@ public class RpcDispatcher
                 bool enabled = pSim?.Enabled ?? false;
                 var doc = JsonDocument.Parse($"{{\"autoSim\": {(enabled ? "true" : "false")}}}");
                 return _templeService.UpdateSettings(doc.RootElement);
+
+            case "live.startCommenter":
+                var pStartCom = DeserializeParams<StartCommenterParams>(parameters);
+                return await _commenterService.StartAsync(pStartCom?.Username, pStartCom?.Headless ?? false);
+
+            case "live.stopCommenter":
+                return await _commenterService.StopAsync();
+
+            case "live.openLogin":
+                return await _commenterService.OpenLoginAsync();
+
+            case "live.sendComment":
+                var pSendCom = DeserializeParams<SendCommentParams>(parameters);
+                bool okCom = await _commenterService.SendCommentAsync(pSendCom?.Text ?? "");
+                return new { success = okCom, text = pSendCom?.Text, state = _commenterService.GetState() };
+
+            case "live.sendGreeting":
+                var pGreetCom = DeserializeParams<SendCommentParams>(parameters);
+                bool okGreet = await _commenterService.SendRandomTimeGreetingAsync(pGreetCom?.Text);
+                return new { success = okGreet, state = _commenterService.GetState() };
+
+            case "live.getCommenterStatus":
+                return _commenterService.GetState();
+
+            case "live.getChatSample":
+                return new
+                {
+                    timeOfDay = LiveChatGenerator.GetTimeOfDayGreeting(),
+                    randomMessage = LiveChatGenerator.GetRandomChatMessage(),
+                    memberGreeting = LiveChatGenerator.GetMemberGreeting("Thí Chủ Hữu Duyên")
+                };
 
             default:
                 throw new InvalidOperationException($"Không tìm thấy phương thức JSON-RPC: {method}");
