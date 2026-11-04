@@ -49,6 +49,13 @@ export default function AdminPanel({ state, callRpc, onCloseAdmin }) {
   const [customComment, setCustomComment] = useState('');
   const [commentInterval, setCommentInterval] = useState(() => state?.settings?.autoCommentIntervalSeconds || 20);
   const [chatSample, setChatSample] = useState(null);
+  const [autoCommentActive, setAutoCommentActive] = React.useState(() => state?.settings?.autoCommentEnabled || false);
+
+  React.useEffect(() => {
+    if (state?.settings?.autoCommentEnabled !== undefined) {
+      setAutoCommentActive(state.settings.autoCommentEnabled);
+    }
+  }, [state?.settings?.autoCommentEnabled]);
   const [loadingComment, setLoadingComment] = useState(false);
 
   const [localCommenter, setLocalCommenter] = React.useState(null);
@@ -137,11 +144,16 @@ export default function AdminPanel({ state, callRpc, onCloseAdmin }) {
   };
 
   const handleToggleAutoComment = async () => {
-    const cur = state?.settings?.autoCommentEnabled || false;
+    const nextVal = !autoCommentActive;
+    setAutoCommentActive(nextVal);
     try {
-      const res = await callRpc('temple.updateSettings', { autoCommentEnabled: !cur });
+      const res = await callRpc('temple.updateSettings', { autoCommentEnabled: nextVal });
+      if (res?.settings?.autoCommentEnabled !== undefined) {
+        setAutoCommentActive(res.settings.autoCommentEnabled);
+      }
       setRpcOutput(JSON.stringify(res, null, 2));
     } catch (e) {
+      setAutoCommentActive(!nextVal);
       setRpcOutput(`Settings Error: ${e.message}`);
     }
   };
@@ -658,11 +670,11 @@ export default function AdminPanel({ state, callRpc, onCloseAdmin }) {
                   fontWeight: 700,
                   padding: '3px 8px',
                   borderRadius: '6px',
-                  background: state?.settings?.autoCommentEnabled ? 'rgba(50, 200, 80, 0.25)' : 'rgba(255, 255, 255, 0.1)',
-                  color: state?.settings?.autoCommentEnabled ? '#69f0ae' : '#aaa',
-                  border: state?.settings?.autoCommentEnabled ? '1px solid #69f0ae' : '1px solid #666'
+                  background: autoCommentActive ? 'rgba(50, 200, 80, 0.25)' : 'rgba(255, 255, 255, 0.1)',
+                  color: autoCommentActive ? '#69f0ae' : '#aaa',
+                  border: autoCommentActive ? '1px solid #69f0ae' : '1px solid #666'
                 }}>
-                  {state?.settings?.autoCommentEnabled ? 'ĐANG BẬT' : 'ĐANG TẮT'}
+                  {autoCommentActive ? 'ĐANG BẬT' : 'ĐANG TẮT'}
                 </span>
               </div>
               <div style={{ fontSize: '12px', color: '#fed7aa', display: 'flex', justifyContent: 'space-between' }}>
@@ -1159,9 +1171,9 @@ export default function AdminPanel({ state, callRpc, onCloseAdmin }) {
               <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '14px', fontWeight: 600, color: '#ffe694' }}>
                 <input
                   type="checkbox"
-                  checked={state?.settings?.autoCommentEnabled || false}
+                  checked={autoCommentActive}
                   onChange={handleToggleAutoComment}
-                  style={{ width: '18px', height: '18px', accentColor: '#10b981' }}
+                  style={{ width: '18px', height: '18px', accentColor: '#10b981', cursor: 'pointer' }}
                 />
                 <span>Tự động gửi lời chúc khi có người mới vào phòng Live (Member Join)</span>
               </label>

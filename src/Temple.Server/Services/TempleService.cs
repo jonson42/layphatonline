@@ -953,6 +953,14 @@ public class TempleService : ITempleService
             {
                 _state.Settings.Mode = md.GetString() ?? "temple";
             }
+            if (p.TryGetProperty("autoCommentEnabled", out var ace))
+            {
+                _state.Settings.AutoCommentEnabled = ace.GetBoolean();
+            }
+            if (p.TryGetProperty("autoCommentIntervalSeconds", out var aci))
+            {
+                _state.Settings.AutoCommentIntervalSeconds = aci.GetInt32();
+            }
 
             _ = SaveStateAsync();
             var state = GetPublicState();

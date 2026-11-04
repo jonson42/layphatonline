@@ -72,7 +72,22 @@ public class RpcDispatcher
 
             case "temple.greetMember":
                 var pGreet = DeserializeParams<GreetMemberParams>(parameters);
-                return _templeService.GreetMember(pGreet ?? new GreetMemberParams());
+                var greetRes = _templeService.GreetMember(pGreet ?? new GreetMemberParams());
+                if (_templeService.GetPublicState().Settings.AutoCommentEnabled)
+                {
+                    _ = Task.Run(async () =>
+                    {
+                        try
+                        {
+                            await _commenterService.SendRandomTimeGreetingAsync(pGreet?.User ?? "Thí Chủ Hảo Tâm");
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogDebug(ex, "[RpcDispatcher] Không thể tự động gửi bình luận chào mừng");
+                        }
+                    });
+                }
+                return greetRes;
 
             case "temple.releaseBirds":
                 var pBirds = DeserializeParams<ReleaseBirdsParams>(parameters);
