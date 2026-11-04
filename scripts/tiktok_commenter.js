@@ -193,12 +193,27 @@ async function openLogin() {
       const ok = await checkLoggedIn(activePage, ctx);
       if (ok) {
         clearInterval(pollTimer);
+        const targetLive = currentLiveUrl || 'https://www.tiktok.com/@tranyennhi0987/live';
         emit({
           type: 'status',
           running: true,
           loggedIn: true,
-          message: '✅ Đã đăng nhập TikTok thành công! Đã lưu session vĩnh viễn.'
+          message: `✅ Đã đăng nhập TikTok thành công! Đang tự động chuyển vào phòng Live: ${targetLive}...`
         });
+
+        // Tự động chuyển thẳng từ trang Login sang phòng Live
+        try {
+          await activePage.goto(targetLive, { timeout: 35000, waitUntil: 'domcontentloaded' });
+          await activePage.waitForTimeout(2000);
+          emit({
+            type: 'status',
+            running: true,
+            loggedIn: true,
+            url: activePage.url(),
+            title: await activePage.title(),
+            message: '✅ Đã kết nối phòng Live và sẵn sàng bình luận'
+          });
+        } catch (_) {}
       }
     }, 2500);
   } catch (err) {
@@ -215,6 +230,26 @@ async function sendComment(text) {
   if (!activePage || activePage.isClosed()) {
     emit({ type: 'comment_result', success: false, error: 'Chưa mở phòng Live trên Playwright' });
     return;
+  }
+
+  // Tự động chuyển hướng sang phòng Live nếu trình duyệt vẫn đang ở trang đăng nhập
+  const curUrl = activePage.url() || '';
+  if (curUrl.includes('/login') || (!curUrl.includes('/live') && !curUrl.includes('@'))) {
+    const targetLive = currentLiveUrl || 'https://www.tiktok.com/@tranyennhi0987/live';
+    emit({
+      type: 'status',
+      running: true,
+      loggedIn: true,
+      url: targetLive,
+      message: `Đang tự động chuyển từ trang đăng nhập sang phòng Live: ${targetLive}...`
+    });
+    try {
+      await activePage.goto(targetLive, { timeout: 35000, waitUntil: 'domcontentloaded' });
+      await activePage.waitForTimeout(2500);
+    } catch (errNav) {
+      emit({ type: 'comment_result', success: false, error: `Không thể chuyển sang phòng Live: ${errNav.message}` });
+      return;
+    }
   }
 
   const commentText = text.trim();
