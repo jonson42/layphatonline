@@ -314,3 +314,4 @@ process.stdin.on('data', async (chunk) => {
 
 // Báo hiệu script đã khởi động thành công
 emit({ type: 'ready', message: 'TikTok Playwright Commenter Bridge đã sẵn sàng' });
+

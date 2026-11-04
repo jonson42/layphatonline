@@ -11,3 +11,4 @@ public interface ITikTokCommenterService
     Task<bool> SendCommentAsync(string text);
     Task<bool> SendRandomTimeGreetingAsync(string? username = null);
 }
+

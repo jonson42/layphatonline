@@ -209,11 +209,20 @@ export default function AdminPanel({ state, callRpc, onCloseAdmin }) {
 
   return (
     <div style={{
-      minHeight: '100vh',
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      width: '100vw',
+      height: '100vh',
+      overflowY: 'auto',
+      WebkitOverflowScrolling: 'touch',
       background: 'radial-gradient(circle at 50% 0%, #330c08 0%, #100302 80%)',
       color: '#fff8eb',
       padding: '24px',
-      overflowY: 'auto'
+      boxSizing: 'border-box',
+      zIndex: 9999
     }}>
       <div style={{ maxWidth: '1280px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '22px' }}>
         {/* Top Header */}
@@ -307,6 +316,27 @@ export default function AdminPanel({ state, callRpc, onCloseAdmin }) {
             >
               🔮 OBS 4 (Xem Quẻ)
             </a>
+            <button
+              onClick={() => {
+                const el = document.getElementById('auto-comment-section');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }}
+              style={{
+                background: 'linear-gradient(180deg, #7c3aed 0%, #4c1d95 100%)',
+                color: '#f5d0fe',
+                padding: '8px 14px',
+                borderRadius: '8px',
+                border: '1px solid #c4b5fd',
+                fontWeight: 700,
+                fontSize: '13px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px'
+              }}
+            >
+              🤖 Auto Comment (Playwright)
+            </button>
             <button
               onClick={onCloseAdmin}
               style={{
@@ -407,6 +437,45 @@ export default function AdminPanel({ state, callRpc, onCloseAdmin }) {
                 ✅ <strong>Đã kết nối phòng Live:</strong> @{state.tiktok.username} ({state.tiktok.viewerCount || 0} mắt xem)
               </div>
             )}
+
+            {/* Hộp thông tin nhanh Auto Comment Playwright */}
+            <div
+              onClick={() => {
+                const el = document.getElementById('auto-comment-section');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }}
+              style={{
+                background: 'linear-gradient(135deg, rgba(88, 28, 135, 0.3) 0%, rgba(20, 5, 4, 0.7) 100%)',
+                border: '1.5px solid rgba(216, 180, 254, 0.45)',
+                borderRadius: '12px',
+                padding: '12px 14px',
+                cursor: 'pointer',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '8px'
+              }}
+            >
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '14px', fontWeight: 700, color: '#f0abfc' }}>
+                  🤖 Auto Comment TikTok Live (Playwright)
+                </span>
+                <span style={{
+                  fontSize: '11px',
+                  fontWeight: 700,
+                  padding: '3px 8px',
+                  borderRadius: '6px',
+                  background: state?.settings?.autoCommentEnabled ? 'rgba(50, 200, 80, 0.25)' : 'rgba(255, 255, 255, 0.1)',
+                  color: state?.settings?.autoCommentEnabled ? '#69f0ae' : '#aaa',
+                  border: state?.settings?.autoCommentEnabled ? '1px solid #69f0ae' : '1px solid #666'
+                }}>
+                  {state?.settings?.autoCommentEnabled ? 'ĐANG BẬT' : 'ĐANG TẮT'}
+                </span>
+              </div>
+              <div style={{ fontSize: '12px', color: '#fed7aa', display: 'flex', justifyContent: 'space-between' }}>
+                <span>Trình duyệt: <strong>{commenter?.running ? '🟢 Đang mở' : '⚪ Chưa mở'}</strong> • TikTok: <strong>{commenter?.loggedIn ? '✅ Đã login' : '⚠️ Chưa login'}</strong></span>
+                <span style={{ color: '#ffd54f', textDecoration: 'underline' }}>Cài đặt chi tiết ↓</span>
+              </div>
+            </div>
 
             <div style={{ display: 'flex', gap: '10px' }}>
               <input
@@ -683,7 +752,7 @@ export default function AdminPanel({ state, callRpc, onCloseAdmin }) {
           </section>
 
           {/* Card 3: Playwright Auto TikTok Commenter & LiveChatGenerator */}
-          <section style={{
+          <section id="auto-comment-section" style={{
             gridColumn: '1 / -1',
             background: '#190604',
             border: '1.5px solid rgba(244, 193, 80, 0.45)',
