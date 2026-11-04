@@ -33,7 +33,7 @@ class TempleAudioEngine {
     this.synthBgTimer = null;
     this.phongsinhTimer = null;
     this.currentMode = 'temple';
-    this.currentTrackSrc = '/assets/bg_chant.m4a';
+    this.currentTrackSrc = '/assets/phongsinh_music/20_Phật_Chú_A_Di_Đà.mp3';
     this.bgAudio = null;
     this.currentYoutubeId = null;
     this.activeYoutubeId = null;
@@ -139,7 +139,7 @@ class TempleAudioEngine {
     const isPlaylistMode = mode === 'phongsinh' || mode === 'bothi' || mode === 'xinchu';
     const targetSrc = isPlaylistMode
       ? (this.phongsinhPlaylist?.[this.phongsinhTrackIndex]?.src || '')
-      : '/assets/bg_chant.m4a';
+      : '/assets/phongsinh_music/20_Phật_Chú_A_Di_Đà.mp3';
 
     // Nếu chuyển đổi qua lại giữa Phóng Sinh, Bố Thí và Xin Chữ khi nhạc đang phát -> giữ nguyên mượt mà, không gián đoạn
     if (isPlaylistMode && (this.currentMode === 'phongsinh' || this.currentMode === 'bothi' || this.currentMode === 'xinchu') && this.bgAudio && !this.bgAudio.paused) {
@@ -156,6 +156,11 @@ class TempleAudioEngine {
     }
 
     this.currentMode = mode;
+
+    // Nếu đang phát YouTube độc quyền -> Không tự động bật nhạc nền local
+    if (this.activeYoutubeId) {
+      return;
+    }
 
     // 1. DỌN DẸP HOÀN TOÀN MỌI ÂM THANH NỀN, TIMER VÀ RESOURCE CỦA MODE CŨ
     this.stopAndUnloadBgAudio();
@@ -175,9 +180,12 @@ class TempleAudioEngine {
     audioEl.volume = this.ttsPlaying ? this.getDuckedVolume() : this.bgBaseVolume;
     audioEl.onerror = () => {
       if (this.currentMode !== mode) return;
-      this.useSynthMusicFallback = true;
-      if (this.bgMusicEnabled && this.unlocked && !this.activeYoutubeId && this.currentMode === mode) {
-        this.startDefaultZenSynthLoop();
+      // Dự phòng sang bài đầu tiên trong playlist phongsinh, tuyệt đối không dùng tiếng bip điện tử
+      if (this.phongsinhPlaylist && this.phongsinhPlaylist[0]) {
+        audioEl.src = this.phongsinhPlaylist[0].src;
+        if (this.bgMusicEnabled && this.unlocked && !this.activeYoutubeId) {
+          audioEl.play().catch(() => {});
+        }
       }
     };
 
@@ -262,11 +270,12 @@ class TempleAudioEngine {
   startZenAmbience() {
     if (!this.bgMusicEnabled) return;
     if (this.activeYoutubeId) return;
-    if (this.useSynthMusicFallback) {
-      this.startDefaultZenSynthLoop();
+    if (!this.bgAudio) {
+      if (this.currentMode) {
+        this.setMode(this.currentMode);
+      }
       return;
     }
-    if (!this.bgAudio) return;
 
     try {
       this.bgAudio.volume = this.ttsPlaying ? this.getDuckedVolume() : this.bgBaseVolume;
@@ -275,53 +284,18 @@ class TempleAudioEngine {
         if (p && typeof p.catch === 'function') {
           p.catch((err) => {
             if (err && err.name === 'AbortError') return;
-            if (this.bgAudio && this.bgAudio.error) {
-              this.useSynthMusicFallback = true;
-              this.startDefaultZenSynthLoop();
-            }
           });
         }
       }
-    } catch (_) {
-      this.useSynthMusicFallback = true;
-      this.startDefaultZenSynthLoop();
-    }
+    } catch (_) {}
   }
 
   startDefaultZenSynthLoop() {
-    if (!this.bgMusicEnabled || this.synthBgTimer) return;
-    const PENTATONIC = [261.63, 293.66, 329.63, 392.0, 440.0, 523.25];
-    let step = 0;
-    const playZenNote = () => {
-      if (!this.bgMusicEnabled || !this.ctx) return;
-      try {
-        const now = this.ctx.currentTime;
-        const freq = PENTATONIC[step % PENTATONIC.length];
-        step++;
-        const vol = (this.ttsPlaying ? this.getDuckedVolume() : this.bgBaseVolume) * 0.18;
-        if (vol <= 0.002) return;
-
-        const osc = this.ctx.createOscillator();
-        const gain = this.ctx.createGain();
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, now);
-
-        gain.gain.setValueAtTime(0.0001, now);
-        gain.gain.linearRampToValueAtTime(vol, now + 0.6);
-        gain.gain.exponentialRampToValueAtTime(0.0001, now + 4.2);
-
-        osc.connect(gain);
-        gain.connect(this.ctx.destination);
-        osc.onended = () => {
-          osc.disconnect();
-          gain.disconnect();
-        };
-        osc.start(now);
-        osc.stop(now + 4.25);
-      } catch (_) {}
-    };
-    playZenNote();
-    this.synthBgTimer = setInterval(playZenNote, 3600);
+    // Vô hiệu hóa hoàn toàn tiếng bip synth ngũ cung để tránh âm thanh lạ chồng chéo
+    if (this.synthBgTimer) {
+      clearInterval(this.synthBgTimer);
+      this.synthBgTimer = null;
+    }
   }
 
   stopZenAmbience() {
@@ -387,25 +361,49 @@ class TempleAudioEngine {
     return m ? m[1] : null;
   }
 
+  destroyYouTubePlayer() {
+    this.activeYoutubeId = null;
+    this.currentYoutubeId = null;
+    this.ytCreating = false;
+    this.ytPlayerReady = false;
+    if (this.ytPlayer) {
+      try {
+        if (typeof this.ytPlayer.stopVideo === 'function') {
+          this.ytPlayer.stopVideo();
+        }
+        if (typeof this.ytPlayer.destroy === 'function') {
+          this.ytPlayer.destroy();
+        }
+      } catch (_) {}
+      this.ytPlayer = null;
+    }
+    if (typeof document !== 'undefined') {
+      const holder = document.getElementById('temple-yt-audio-container');
+      if (holder) {
+        try {
+          holder.innerHTML = '';
+        } catch (_) {}
+      }
+    }
+  }
+
   loadYouTube(urlOrId) {
     const videoId = this.extractYouTubeId(urlOrId);
     if (!videoId) return false;
 
-    // Ngăn chặn gọi trùng lặp nếu đang phát hoặc đang tải đúng bài này
+    // Dừng và giải phóng toàn bộ âm thanh nền local ngay lập tức (Chỉ 1 nguồn phát duy nhất)
+    this.stopAndUnloadBgAudio();
+
+    // Ngăn chặn gọi trùng lặp nếu đang phát đúng bài này
     if (this.activeYoutubeId === videoId && (this.ytPlayer || this.ytCreating)) {
+      if (this.ytPlayer && this.ytPlayerReady && typeof this.ytPlayer.playVideo === 'function') {
+        try { this.ytPlayer.playVideo(); } catch (_) {}
+      }
       return true;
     }
 
     this.activeYoutubeId = videoId;
     this.currentYoutubeId = videoId;
-
-    if (this.bgAudio) {
-      try { this.bgAudio.pause(); } catch (_) {}
-    }
-    if (this.synthBgTimer) {
-      clearInterval(this.synthBgTimer);
-      this.synthBgTimer = null;
-    }
 
     if (this.ytPlayer && this.ytPlayerReady && typeof this.ytPlayer.loadVideoById === 'function') {
       try {
@@ -469,13 +467,15 @@ class TempleAudioEngine {
           onReady: (event) => {
             this.ytCreating = false;
             this.ytPlayerReady = true;
-            try {
-              event.target.setVolume(Math.round(this.bgBaseVolume * 100));
-              const pState = typeof event.target.getPlayerState === 'function' ? event.target.getPlayerState() : -1;
-              if (pState !== 1) {
+            // Chỉ phát video nếu bài này vẫn đang là bài được yêu cầu (tránh phát ngầm sau khi đã dừng)
+            if (this.activeYoutubeId === videoId) {
+              try {
+                event.target.setVolume(Math.round(this.bgBaseVolume * 100));
                 event.target.playVideo();
-              }
-            } catch (_) {}
+              } catch (_) {}
+            } else {
+              try { event.target.stopVideo(); } catch (_) {}
+            }
           },
           onStateChange: (event) => {
             if (window.YT && event.data === window.YT.PlayerState.ENDED) {
@@ -494,12 +494,7 @@ class TempleAudioEngine {
   }
 
   stopYouTube() {
-    this.activeYoutubeId = null;
-    this.currentYoutubeId = null;
-    this.ytCreating = false;
-    if (this.ytPlayer && typeof this.ytPlayer.stopVideo === 'function') {
-      try { this.ytPlayer.stopVideo(); } catch (_) {}
-    }
+    this.destroyYouTubePlayer();
     if (this.bgMusicEnabled) {
       this.startZenAmbience();
     }
@@ -633,22 +628,35 @@ class TempleAudioEngine {
       const ctx = this.ensureContext();
       if (!ctx) return;
       const t = ctx.currentTime;
-      for (let i = 0; i < 2; i++) {
-        const offset = i * 0.08;
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        osc.type = 'sine';
-        const startFreq = 2200 + (i * 300) + Math.random() * 200;
-        osc.frequency.setValueAtTime(startFreq, t + offset);
-        osc.frequency.exponentialRampToValueAtTime(startFreq * 1.5, t + offset + 0.04);
-        osc.frequency.exponentialRampToValueAtTime(startFreq * 0.8, t + offset + 0.09);
-        gain.gain.setValueAtTime(0.08, t + offset);
-        gain.gain.exponentialRampToValueAtTime(0.001, t + offset + 0.1);
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        osc.start(t + offset);
-        osc.stop(t + offset + 0.12);
-      }
+      // Âm thanh chim vỗ cánh / líu lo tự nhiên rất nhẹ (âm lượng 0.012), có lọc tần số cao để không chói tai
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const filter = ctx.createBiquadFilter();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(1400, t);
+      osc.frequency.exponentialRampToValueAtTime(1850, t + 0.04);
+      osc.frequency.exponentialRampToValueAtTime(1250, t + 0.11);
+
+      filter.type = 'lowpass';
+      filter.frequency.setValueAtTime(2200, t);
+
+      gain.gain.setValueAtTime(0.0001, t);
+      gain.gain.linearRampToValueAtTime(0.012, t + 0.02);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.12);
+
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(t);
+      osc.stop(t + 0.13);
+      osc.onended = () => {
+        try {
+          osc.disconnect();
+          filter.disconnect();
+          gain.disconnect();
+        } catch (_) {}
+      };
     } catch (_) {}
   }
 

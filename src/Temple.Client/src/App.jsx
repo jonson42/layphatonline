@@ -53,20 +53,14 @@ export default function App() {
     return () => window.removeEventListener('pointerdown', unlock);
   }, [audio]);
 
-  // Sync background music with effectiveMode ('bothi' vs 'temple' vs 'phongsinh' vs 'xinchu') & YouTube
+  // Sync background music with effectiveMode ('bothi' vs 'temple' vs 'phongsinh' vs 'xinchu') & YouTube (Độc quyền 1 nguồn âm thanh)
   useEffect(() => {
-    audio.setMode(effectiveMode);
-
-    // In bothi, phongsinh, and xinchu mode, dedicated background tracks/playlist play
-    if (effectiveMode === 'bothi' || effectiveMode === 'phongsinh' || effectiveMode === 'xinchu') {
-      audio.stopYouTube();
+    const ytUrl = state?.settings?.youtubeUrl;
+    if (ytUrl) {
+      audio.loadYouTube(ytUrl);
     } else {
-      const ytUrl = state?.settings?.youtubeUrl;
-      if (ytUrl) {
-        audio.loadYouTube(ytUrl);
-      } else {
-        audio.stopYouTube();
-      }
+      audio.stopYouTube();
+      audio.setMode(effectiveMode);
     }
   }, [effectiveMode, state?.settings?.youtubeUrl, audio]);
 

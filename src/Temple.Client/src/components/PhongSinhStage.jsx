@@ -271,7 +271,7 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
   }, [fitStage]);
 
   // Hàm tạo đàn chim bay vút lên bầu trời từ một vị trí (x, y)
-  const spawnFlock = useCallback((originX, originY, count = 12) => {
+  const spawnFlock = useCallback((originX, originY, count = 12, playSound = false) => {
     const flock = [];
     const now = Date.now();
     for (let i = 0; i < count; i++) {
@@ -296,14 +296,14 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
 
     setBirds(prev => [...prev.slice(-45), ...flock]);
 
-    // Âm thanh chim vỗ cánh / hót
-    if (audio?.playBirdChirp) {
+    // Âm thanh chim: Chỉ phát khi tương tác thật (playSound = true), tuyệt đối không phát lặp định kỳ 3.2s
+    if (playSound && audio?.playBirdChirp) {
       audio.playBirdChirp();
     }
   }, [audio]);
 
   // Kích hoạt Phật tử (Walker hoặc Vantage) cúi xuống đặt lồng chim mở nắp thả chim
-  const triggerCrouchAndRelease = useCallback((id, birdsCount = 14, originPos = null) => {
+  const triggerCrouchAndRelease = useCallback((id, birdsCount = 14, originPos = null, playSound = false) => {
     setCrouchStates(prev => ({
       ...prev,
       [id]: {
@@ -332,7 +332,7 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
           }
         }
       }
-      spawnFlock(x, y, birdsCount);
+      spawnFlock(x, y, birdsCount, playSound);
     }, 350);
   }, [vantageDevotees, walkers, spawnFlock]);
 
@@ -388,10 +388,7 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
       });
 
       // Bung đàn bồ câu lớn 25 con từ chính lồng chim của nhân vật được focus!
-      spawnFlock(530, 1450, 25);
-      if (audio?.playBirdChirp) {
-        audio.playBirdChirp();
-      }
+      spawnFlock(530, 1450, 25, true);
 
       // Sau 4s thả chim -> Đứng dậy vẫy tay và dạo bước ra
       focusExitTimerRef.current = setTimeout(() => {
@@ -426,7 +423,7 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
           triggerCrouchAndRelease(w.id, Math.floor(10 + Math.random() * 8), {
             x: chosenRoute.spawnX,
             y: chosenRoute.spawnY
-          });
+          }, false);
         }, 100);
       }
 
@@ -467,7 +464,7 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
       const standing = allDevotees.filter(d => !crouchStates[d.id]?.isCrouching);
       if (standing.length > 0 && !activeFocusDevotee) {
         const pick = standing[Math.floor(Math.random() * standing.length)];
-        triggerCrouchAndRelease(pick.id, Math.floor(12 + Math.random() * 8));
+        triggerCrouchAndRelease(pick.id, Math.floor(12 + Math.random() * 8), null, false);
       }
     }, 3200);
 
@@ -625,6 +622,7 @@ export default function PhongSinhStage({ state, activeEvent, audio, callRpc, obs
           audio.queueTts(demoMsg, { voice: 'maichi' });
         }
       }
+      spawnFlock(clickX, clickY, 16, true);
       spawnHearts(clickX, clickY, 6);
       callRpc('temple.releaseBirds', {
         user: 'Phật Tử Hữu Duyên',
