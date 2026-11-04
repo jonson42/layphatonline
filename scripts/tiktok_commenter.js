@@ -164,6 +164,8 @@ async function getBrowserContext(headless = false) {
       '--disable-infobars',
       '--no-first-run',
       '--no-default-browser-check',
+      '--mute-audio',
+      '--autoplay-policy=no-user-gesture-required',
       '--start-maximized',
       '--window-size=1280,820'
     ],
@@ -188,6 +190,27 @@ async function getBrowserContext(headless = false) {
       context = await playwrightChromium.launchPersistentContext(profileDir, launchOptions);
     }
   }
+
+  // Tắt tiếng vĩnh viễn toàn bộ video/audio trên trình duyệt Playwright để không bị dội âm nhạc livestream
+  try {
+    await context.addInitScript(() => {
+      const muteAll = () => {
+        try {
+          document.querySelectorAll('video, audio').forEach(el => {
+            el.muted = true;
+            el.volume = 0;
+          });
+        } catch (_) {}
+      };
+      muteAll();
+      window.addEventListener('DOMContentLoaded', muteAll);
+      window.addEventListener('load', muteAll);
+      try {
+        const obs = new MutationObserver(muteAll);
+        obs.observe(document.documentElement, { childList: true, subtree: true });
+      } catch (_) {}
+    });
+  } catch (_) {}
 
   // Tự động nạp cookies đã lưu
   await loadSavedCookies(context);
@@ -570,39 +593,53 @@ async function sendComment(text) {
       return;
     }
 
-    // 3. Focus và nhập nội dung như người thật (human typing)
+    // 3. Focus và nhập nội dung không qua phím ảo hệ điều hành (tránh hoàn toàn Unikey/EVKey gây lỗi font/nhân đôi chữ)
     await inputElement.scrollIntoViewIfNeeded();
     await inputElement.click();
     await activePage.waitForTimeout(150);
 
-    // Xóa văn bản cũ nếu có
-    await activePage.keyboard.press('Control+A');
-    await activePage.keyboard.press('Backspace');
-    await activePage.waitForTimeout(100);
-
-    // Chèn văn bản bằng insertText: Playwright gửi trực tiếp chuỗi Unicode qua CDP Input.insertText
-    // Tuyệt đối không dùng keyboard.type() vì sẽ sinh ra raw keydown khiến Unikey/EVKey trên Windows can thiệp gây nhân đôi ký tự và lỗi font
-    await activePage.keyboard.insertText(commentText);
-    await activePage.waitForTimeout(200);
-
-    // Fallback bảo đảm nội dung đã vào input / contenteditable (Draft.js / Lexical / React)
-    await activePage.evaluate((text) => {
+    // Xóa và chèn nội dung trực tiếp qua DOM & execCommand (Atomic Unicode insertion - hoàn toàn không gửi keystrokes tới OS)
+    const insertedDirectly = await activePage.evaluate((text) => {
       const active = document.activeElement;
-      if (!active) return;
-      const current = (active.innerText || active.value || '').trim();
-      if (!current) {
+      if (!active) return false;
+
+      try {
         if (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA') {
-          active.value = text;
+          active.select();
+          document.execCommand('delete', false, null);
+          document.execCommand('insertText', false, text);
+          if (!active.value) {
+            active.value = text;
+          }
           active.dispatchEvent(new Event('input', { bubbles: true }));
           active.dispatchEvent(new Event('change', { bubbles: true }));
+          return true;
         } else if (active.isContentEditable) {
-          document.execCommand('selectAll', false, null);
+          // Xóa toàn bộ nội dung trong contenteditable
+          const sel = window.getSelection();
+          const range = document.createRange();
+          range.selectNodeContents(active);
+          sel.removeAllRanges();
+          sel.addRange(range);
+          document.execCommand('delete', false, null);
+
+          // Chèn trực tiếp chuỗi text Unicode
           document.execCommand('insertText', false, text);
           active.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertText', data: text }));
+          return true;
         }
-      }
+      } catch (_) {}
+      return false;
     }, commentText);
-    await activePage.waitForTimeout(150);
+
+    // Fallback nếu trang web chặn execCommand: dùng CDP Input.insertText
+    if (!insertedDirectly) {
+      await activePage.keyboard.press('Control+A');
+      await activePage.keyboard.press('Backspace');
+      await activePage.waitForTimeout(100);
+      await activePage.keyboard.insertText(commentText);
+    }
+    await activePage.waitForTimeout(200);
 
     // 4. Tìm nút gửi (post/send button) và nhấn Enter
     try {

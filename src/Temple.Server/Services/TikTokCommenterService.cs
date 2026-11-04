@@ -275,6 +275,7 @@ public class TikTokCommenterService : ITikTokCommenterService, IDisposable
             WorkingDirectory = scriptDir
         };
         startInfo.EnvironmentVariables["NODE_SKIP_PLATFORM_CHECK"] = "1";
+        startInfo.EnvironmentVariables["NODE_PATH"] = Path.Combine(scriptDir, "node_modules");
 
         _process = new Process { StartInfo = startInfo, EnableRaisingEvents = true };
 
