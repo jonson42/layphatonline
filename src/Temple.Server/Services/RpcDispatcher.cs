@@ -166,12 +166,12 @@ public class RpcDispatcher
 
             case "live.sendComment":
                 var pSendCom = DeserializeParams<SendCommentParams>(parameters);
-                bool okCom = await _commenterService.SendCommentAsync(pSendCom?.Text ?? "");
+                bool okCom = await _commenterService.SendCommentAsync(pSendCom?.Text ?? "", ignoreCooldown: true);
                 return new { success = okCom, text = pSendCom?.Text, state = _commenterService.GetState() };
 
             case "live.sendGreeting":
                 var pGreetCom = DeserializeParams<SendCommentParams>(parameters);
-                bool okGreet = await _commenterService.SendRandomTimeGreetingAsync(pGreetCom?.Text);
+                bool okGreet = await _commenterService.SendRandomTimeGreetingAsync(pGreetCom?.Text, ignoreCooldown: true);
                 return new { success = okGreet, state = _commenterService.GetState() };
 
             case "live.getCommenterStatus":

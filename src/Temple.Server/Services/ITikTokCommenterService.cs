@@ -8,7 +8,7 @@ public interface ITikTokCommenterService
     Task<TikTokCommenterState> StartAsync(string? username = null, bool headless = false);
     Task<TikTokCommenterState> StopAsync();
     Task<TikTokCommenterState> OpenLoginAsync();
-    Task<bool> SendCommentAsync(string text);
-    Task<bool> SendRandomTimeGreetingAsync(string? username = null);
+    Task<bool> SendCommentAsync(string text, bool ignoreCooldown = false);
+    Task<bool> SendRandomTimeGreetingAsync(string? username = null, bool ignoreCooldown = false);
 }
 

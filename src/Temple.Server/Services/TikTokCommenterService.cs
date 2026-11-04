@@ -71,15 +71,28 @@ public class TikTokCommenterService : ITikTokCommenterService, IDisposable
 
     public async Task<TikTokCommenterState> StartAsync(string? username = null, bool headless = false)
     {
-        string targetUser = (username ?? _templeService.GetPublicState().TikTok.Username ?? "tranyennhi0987").Trim().TrimStart('@');
-        string liveUrl = $"https://www.tiktok.com/@{targetUser}/live";
+        string raw = (username ?? _templeService.GetPublicState().TikTok.Username ?? "tranyennhi0987").Trim();
+        string liveUrl;
+        string displayName;
+
+        if (raw.StartsWith("http://", StringComparison.OrdinalIgnoreCase) || raw.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+        {
+            liveUrl = raw;
+            displayName = raw;
+        }
+        else
+        {
+            string targetUser = raw.TrimStart('@');
+            liveUrl = $"https://www.tiktok.com/@{targetUser}/live";
+            displayName = $"@{targetUser}";
+        }
 
         lock (_lock)
         {
             EnsureProcessStarted();
             _state.Running = true;
             _state.Url = liveUrl;
-            _state.StatusMessage = $"Đang mở phòng Live @{targetUser}...";
+            _state.StatusMessage = $"Đang mở phòng Live {displayName}...";
             _state.LastError = null;
         }
 
@@ -126,7 +139,7 @@ public class TikTokCommenterService : ITikTokCommenterService, IDisposable
         return GetState();
     }
 
-    public async Task<bool> SendCommentAsync(string text)
+    public async Task<bool> SendCommentAsync(string text, bool ignoreCooldown = false)
     {
         string clean = (text ?? "").Trim();
         if (string.IsNullOrWhiteSpace(clean))
@@ -134,15 +147,18 @@ public class TikTokCommenterService : ITikTokCommenterService, IDisposable
             return false;
         }
 
-        // Kiểm tra giãn cách thời gian (cooldown) để tránh bị TikTok khóa/giới hạn comment
-        int minIntervalSec = _templeService.GetPublicState().Settings.AutoCommentIntervalSeconds;
-        if (minIntervalSec < 8) minIntervalSec = 8;
-
-        var elapsed = DateTime.UtcNow - _lastCommentSentUtc;
-        if (elapsed.TotalSeconds < minIntervalSec)
+        // Kiểm tra giãn cách thời gian (cooldown) nếu không phải gửi thủ công
+        if (!ignoreCooldown)
         {
-            _logger.LogWarning("[PlaywrightCommenter] Bỏ qua bình luận do chưa hết thời gian chờ ({Elapsed:F1}s / {Min}s)", elapsed.TotalSeconds, minIntervalSec);
-            return false;
+            int minIntervalSec = _templeService.GetPublicState().Settings.AutoCommentIntervalSeconds;
+            if (minIntervalSec < 8) minIntervalSec = 8;
+
+            var elapsed = DateTime.UtcNow - _lastCommentSentUtc;
+            if (elapsed.TotalSeconds < minIntervalSec)
+            {
+                _logger.LogWarning("[PlaywrightCommenter] Bỏ qua bình luận do chưa hết thời gian chờ ({Elapsed:F1}s / {Min}s)", elapsed.TotalSeconds, minIntervalSec);
+                return false;
+            }
         }
 
         TaskCompletionSource<bool> tcs;
@@ -174,13 +190,13 @@ public class TikTokCommenterService : ITikTokCommenterService, IDisposable
         }
     }
 
-    public async Task<bool> SendRandomTimeGreetingAsync(string? username = null)
+    public async Task<bool> SendRandomTimeGreetingAsync(string? username = null, bool ignoreCooldown = false)
     {
         string message = !string.IsNullOrWhiteSpace(username)
             ? LiveChatGenerator.GetMemberGreeting(username)
             : LiveChatGenerator.GetRandomChatMessage();
 
-        return await SendCommentAsync(message);
+        return await SendCommentAsync(message, ignoreCooldown);
     }
 
     private void EnsureProcessStarted()

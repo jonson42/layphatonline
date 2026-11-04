@@ -219,22 +219,58 @@ async function sendComment(text) {
 
   const commentText = text.trim();
   try {
-    // 1. Tìm phần tử nhập bình luận trong khung chat TikTok Live
+    // 1. Tự động dọn dẹp các popup cản trở trước khi tìm ô chat
+    try {
+      // Đóng cookie banner nếu có
+      const cookieBtn = await activePage.$('button[id*="cookie" i], button[class*="cookie" i], [data-e2e="cookie-banner"] button');
+      if (cookieBtn && await cookieBtn.isVisible()) {
+        await cookieBtn.click();
+        await activePage.waitForTimeout(300);
+      }
+      // Đóng modal app / popup thông báo nếu có
+      const closeBtn = await activePage.$('[data-e2e="modal-close-inner-button"], [aria-label="Close"], button.btn-close, [data-e2e="close-icon"]');
+      if (closeBtn && await closeBtn.isVisible()) {
+        await closeBtn.click();
+        await activePage.waitForTimeout(300);
+      }
+      // Mở khung chat nếu đang bị thu nhỏ (collapse)
+      const expandChatBtn = await activePage.$('[data-e2e="expand-chat-button"], button[aria-label*="chat" i], [class*="ChatRoomFold"]');
+      if (expandChatBtn && await expandChatBtn.isVisible()) {
+        await expandChatBtn.click();
+        await activePage.waitForTimeout(400);
+      }
+    } catch (_) {}
+
+    // 2. Tìm phần tử nhập bình luận trong khung chat TikTok Live
     const candidateSelectors = [
       'div[data-e2e="comment-input"]',
+      'div[data-e2e="chat-room-input"]',
+      'div[data-e2e="live-comment-input"]',
       'div[contenteditable="true"]',
-      '[data-e2e="chat-room-input"]',
-      '[data-e2e="live-comment-input"]',
+      'div[role="textbox"]',
+      'textarea[placeholder*="bình luận" i]',
+      'textarea[placeholder*="comment" i]',
+      'textarea[placeholder*="chat" i]',
+      'input[placeholder*="bình luận" i]',
+      'input[placeholder*="comment" i]',
       'div[class*="ChatInputContainer"] [contenteditable="true"]',
       'div[class*="DivChatRoom"] [contenteditable="true"]',
       'div[class*="CommentInput"] [contenteditable="true"]',
       'div[class*="DivBottomArea"] [contenteditable="true"]',
-      'textarea[placeholder*="bình luận" i]',
-      'textarea[placeholder*="comment" i]',
+      'div[class*="ChatRoom"] [contenteditable="true"]',
+      'div[class*="LiveChat"] [contenteditable="true"]',
+      'div[class*="Editor"] [contenteditable="true"]',
+      'div.DraftEditor-root [contenteditable="true"]',
+      'div[class*="editor"] [contenteditable="true"]',
+      'div[class*="chat-input"]',
+      '[data-e2e="chat-input-area"]',
       '[placeholder*="Gửi bình luận" i]',
+      '[placeholder*="Nhập bình luận" i]',
       '[placeholder*="Add comment" i]',
       '[placeholder*="Send a comment" i]',
-      '[placeholder*="Say something" i]'
+      '[placeholder*="Say something" i]',
+      '[placeholder*="Type a message" i]',
+      '[placeholder*="Chat..." i]'
     ];
 
     // Chờ ô nhập bình luận xuất hiện (tối đa 5s phòng khi live đang tải chat)
@@ -256,19 +292,50 @@ async function sendComment(text) {
     }
 
     if (!inputElement) {
-      // Kiểm tra xem có đang yêu cầu đăng nhập không
+      // Phân tích trạng thái phòng Live và giao diện để đưa ra nguyên nhân chính xác
+      let isEndedOrOffline = false;
+      let isLoginRequired = false;
+      let isCommentsOff = false;
+      try {
+        const pageStatus = await activePage.evaluate(() => {
+          const txt = (document.body ? document.body.innerText : '');
+          return {
+            hasEnded: /LIVE has ended|Phát trực tiếp đã kết thúc|Video này không khả dụng|chưa phát trực tiếp|đang ngoại tuyến|offline|chưa bắt đầu/i.test(txt),
+            hasLogin: /Log in to chat|Đăng nhập để bình luận|Đăng nhập để chat|Log in to follow/i.test(txt) || !!document.querySelector('[data-e2e="login-to-chat"]'),
+            hasCommentsOff: /Bình luận đã bị tắt|Comments are turned off|Comments disabled/i.test(txt)
+          };
+        });
+        isEndedOrOffline = pageStatus.hasEnded;
+        isLoginRequired = pageStatus.hasLogin;
+        isCommentsOff = pageStatus.hasCommentsOff;
+
+        // Chụp ảnh chẩn đoán lỗi lưu vào disk
+        const debugPath = path.resolve(profileDir, 'debug_comment_error.png');
+        await activePage.screenshot({ path: debugPath }).catch(() => {});
+      } catch (_) {}
+
       const loggedIn = await checkLoggedIn(activePage, context);
+
+      let finalError;
+      if (isEndedOrOffline) {
+        finalError = 'Phòng Live hiện đang NGOẠI TUYẾN (Offline). TikTok chỉ hiển thị ô nhập chat khi tài khoản đang PHÁT TRỰC TIẾP thực tế. Vui lòng bật Live trên TikTok trước khi gửi thử bình luận!';
+      } else if (!loggedIn || isLoginRequired) {
+        finalError = 'Tài khoản chưa đăng nhập TikTok. Vui lòng bấm "Mở trình duyệt đăng nhập TikTok" trước!';
+      } else if (isCommentsOff) {
+        finalError = 'Chủ phòng Live đã tắt tính năng bình luận trong phiên phát sóng này.';
+      } else {
+        finalError = 'Không tìm thấy ô nhập chat trên giao diện Live (hãy kiểm tra xem phòng Live có đang mở phát trực tiếp và mở chat không)';
+      }
+
       emit({
         type: 'comment_result',
         success: false,
-        error: loggedIn
-          ? 'Không tìm thấy ô nhập chat trên giao diện Live (hãy kiểm tra xem phòng Live có đang mở chat không)'
-          : 'Tài khoản chưa đăng nhập TikTok. Vui lòng bấm "Mở trình duyệt đăng nhập TikTok" trước!'
+        error: finalError
       });
       return;
     }
 
-    // 2. Focus và nhập nội dung như người thật (human typing)
+    // 3. Focus và nhập nội dung như người thật (human typing)
     await inputElement.scrollIntoViewIfNeeded();
     await inputElement.click();
     await activePage.waitForTimeout(150);
@@ -282,12 +349,14 @@ async function sendComment(text) {
     await activePage.keyboard.type(commentText, { delay: 35 });
     await activePage.waitForTimeout(250);
 
-    // 3. Tìm nút gửi (post/send button) hoặc nhấn Enter
+    // 4. Tìm nút gửi (post/send button) hoặc nhấn Enter
     let clickedPost = false;
     try {
       const postBtnSelectors = [
         'button[data-e2e="comment-post"]',
+        'button[data-e2e="chat-room-send-btn"]',
         'button[class*="ButtonPost"]',
+        'button[class*="SendButton"]',
         'button[type="submit"]',
         'button:has(svg[data-e2e*="send"])'
       ];
