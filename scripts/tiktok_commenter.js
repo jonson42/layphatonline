@@ -580,9 +580,29 @@ async function sendComment(text) {
     await activePage.keyboard.press('Backspace');
     await activePage.waitForTimeout(100);
 
-    // Gõ phím tự nhiên
-    await activePage.keyboard.type(commentText, { delay: 35 });
-    await activePage.waitForTimeout(250);
+    // Chèn văn bản bằng insertText: Playwright gửi trực tiếp chuỗi Unicode qua CDP Input.insertText
+    // Tuyệt đối không dùng keyboard.type() vì sẽ sinh ra raw keydown khiến Unikey/EVKey trên Windows can thiệp gây nhân đôi ký tự và lỗi font
+    await activePage.keyboard.insertText(commentText);
+    await activePage.waitForTimeout(200);
+
+    // Fallback bảo đảm nội dung đã vào input / contenteditable (Draft.js / Lexical / React)
+    await activePage.evaluate((text) => {
+      const active = document.activeElement;
+      if (!active) return;
+      const current = (active.innerText || active.value || '').trim();
+      if (!current) {
+        if (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA') {
+          active.value = text;
+          active.dispatchEvent(new Event('input', { bubbles: true }));
+          active.dispatchEvent(new Event('change', { bubbles: true }));
+        } else if (active.isContentEditable) {
+          document.execCommand('selectAll', false, null);
+          document.execCommand('insertText', false, text);
+          active.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertText', data: text }));
+        }
+      }
+    }, commentText);
+    await activePage.waitForTimeout(150);
 
     // 4. Tìm nút gửi (post/send button) và nhấn Enter
     try {
