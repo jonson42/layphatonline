@@ -1,5 +1,16 @@
 import phongsinhPlaylistData from '../assets/phongsinh_playlist.json';
 
+// Singleton toàn cục dọn sạch mọi audio rác / ghost audio từ HMR hoặc render trước đó
+if (typeof window !== 'undefined' && window.__templeMasterBgAudio) {
+  try {
+    window.__templeMasterBgAudio.pause();
+    window.__templeMasterBgAudio.muted = true;
+    window.__templeMasterBgAudio.volume = 0;
+    window.__templeMasterBgAudio.src = '';
+  } catch (_) {}
+  window.__templeMasterBgAudio = null;
+}
+
 /**
  * TempleAudioEngine
  * - Nhạc nền: Phát trực tiếp file "Nam Mô A Di Đà Phật.m4a" (/assets/bg_chant.m4a) lặp vô tận êm dịu,
@@ -32,8 +43,8 @@ class TempleAudioEngine {
     this.useSynthMusicFallback = false;
     this.synthBgTimer = null;
     this.phongsinhTimer = null;
-    this.currentMode = 'temple';
-    this.currentTrackSrc = '/assets/phongsinh_music/20_Phật_Chú_A_Di_Đà.mp3';
+    this.currentMode = null;
+    this.currentTrackSrc = null;
     this.bgAudio = null;
     this.currentYoutubeId = null;
     this.activeYoutubeId = null;
@@ -57,13 +68,6 @@ class TempleAudioEngine {
       this.ctx.resume();
     }
     this.unlocked = true;
-    if (this.bgMusicEnabled) {
-      if (!this.bgAudio && this.currentMode) {
-        this.setMode(this.currentMode);
-      } else {
-        this.startZenAmbience();
-      }
-    }
     return this.ctx;
   }
 
@@ -82,19 +86,29 @@ class TempleAudioEngine {
     }
     this.useSynthMusicFallback = false;
 
-    if (this.bgAudio) {
-      try {
-        this.bgAudio.onended = null;
-        this.bgAudio.onerror = null;
-        this.bgAudio.onplay = null;
-        this.bgAudio.onpause = null;
-        this.bgAudio.pause();
-        this.bgAudio.currentTime = 0;
-        this.bgAudio.removeAttribute('src');
-        this.bgAudio.src = '';
-        this.bgAudio.load();
-      } catch (_) {}
-      this.bgAudio = null;
+    const audiosToKill = [this.bgAudio];
+    if (typeof window !== 'undefined' && window.__templeMasterBgAudio) {
+      audiosToKill.push(window.__templeMasterBgAudio);
+      window.__templeMasterBgAudio = null;
+    }
+    this.bgAudio = null;
+
+    for (const el of audiosToKill) {
+      if (el) {
+        try {
+          el.onended = null;
+          el.onerror = null;
+          el.onplay = null;
+          el.onpause = null;
+          el.pause();
+          el.muted = true;
+          el.volume = 0;
+          el.currentTime = 0;
+          el.removeAttribute('src');
+          el.src = '';
+          el.load();
+        } catch (_) {}
+      }
     }
   }
 
@@ -190,6 +204,7 @@ class TempleAudioEngine {
     };
 
     this.bgAudio = audioEl;
+    if (typeof window !== 'undefined') window.__templeMasterBgAudio = audioEl;
 
     if (this.bgMusicEnabled && this.unlocked && !this.activeYoutubeId) {
       this.startZenAmbience();
@@ -241,6 +256,7 @@ class TempleAudioEngine {
     };
 
     this.bgAudio = audioEl;
+    if (typeof window !== 'undefined') window.__templeMasterBgAudio = audioEl;
 
     if (this.onPhongsinhTrackChange) {
       try {
