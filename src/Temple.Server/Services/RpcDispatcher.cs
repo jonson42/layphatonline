@@ -164,6 +164,14 @@ public class RpcDispatcher
             case "live.openLogin":
                 return await _commenterService.OpenLoginAsync();
 
+            case "live.setCookie":
+                var pCookie = DeserializeParams<SetCookieParams>(parameters);
+                return await _commenterService.SetCookieAsync(pCookie?.Cookie ?? "");
+
+            case "live.openSystemBrowserLogin":
+                bool opened = await _commenterService.OpenSystemBrowserLoginAsync();
+                return new { success = opened };
+
             case "live.sendComment":
                 var pSendCom = DeserializeParams<SendCommentParams>(parameters);
                 bool okCom = await _commenterService.SendCommentAsync(pSendCom?.Text ?? "", ignoreCooldown: true);
@@ -203,4 +211,3 @@ public class RpcDispatcher
         }
     }
 }
-

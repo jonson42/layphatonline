@@ -28,32 +28,133 @@ let activePage = null;
 let currentLiveUrl = '';
 let isClosing = false;
 let lastKnownLoggedIn = false;
+let currentIsHeadless = false;
 
 // Đường dẫn profile lưu session đăng nhập vĩnh viễn
 const profileDir = path.resolve(__dirname, '..', 'data', 'tiktok_browser_profile');
 if (!fs.existsSync(profileDir)) {
   fs.mkdirSync(profileDir, { recursive: true });
 }
+const savedCookiesFile = path.join(profileDir, 'saved_cookies.json');
 
 /**
- * Kiểm tra nhanh file Cookies SQLite trên đĩa để xem đã có sessionid của TikTok chưa
+ * Phân tích chuỗi Cookie từ người dùng (hỗ trợ cả mã sessionid thô lẫn chuỗi cookie header)
+ */
+function parseCookieInput(cookieStr) {
+  if (!cookieStr || typeof cookieStr !== 'string') return [];
+  const trimmed = cookieStr.trim();
+  if (!trimmed) return [];
+
+  const cookies = [];
+  // TH 1: Chỉ là 1 mã sessionid thô (chuỗi hex/token không chứa dấu = hay ;)
+  if (!trimmed.includes('=') && !trimmed.includes(';') && trimmed.length >= 16) {
+    cookies.push(
+      { name: 'sessionid', value: trimmed, domain: '.tiktok.com', path: '/' },
+      { name: 'sessionid_ss', value: trimmed, domain: '.tiktok.com', path: '/' },
+      { name: 'sid_tt', value: trimmed, domain: '.tiktok.com', path: '/' }
+    );
+    return cookies;
+  }
+
+  // TH 2: Chuỗi cookie header "sessionid=xyz; tt-target-idc=useast2a; ..."
+  const parts = trimmed.split(';');
+  for (const part of parts) {
+    const eqIdx = part.indexOf('=');
+    if (eqIdx > 0) {
+      const name = part.slice(0, eqIdx).trim();
+      const value = part.slice(eqIdx + 1).trim();
+      if (name && value) {
+        cookies.push({
+          name,
+          value,
+          domain: '.tiktok.com',
+          path: '/'
+        });
+      }
+    }
+  }
+  return cookies;
+}
+
+/**
+ * Kiểm tra nhanh file Cookies SQLite trên đĩa hoặc saved_cookies.json
  */
 function checkSavedCookies() {
   try {
+    if (fs.existsSync(savedCookiesFile)) {
+      const raw = fs.readFileSync(savedCookiesFile, 'utf8');
+      const data = JSON.parse(raw);
+      if (Array.isArray(data) && data.some(ck => ck.name === 'sessionid' || ck.name === 'sessionid_ss' || ck.name === 'sid_tt')) {
+        return true;
+      }
+    }
+  } catch (_) {}
+
+  try {
     const cookiesPath = path.join(profileDir, 'Default', 'Network', 'Cookies');
-    if (!fs.existsSync(cookiesPath)) return false;
-    const buf = fs.readFileSync(cookiesPath);
-    const content = buf.toString('latin1');
-    return content.includes('sessionid') && content.includes('.tiktok.com');
-  } catch (_) {
-    return false;
-  }
+    if (fs.existsSync(cookiesPath)) {
+      const buf = fs.readFileSync(cookiesPath);
+      const content = buf.toString('latin1');
+      return content.includes('sessionid') && content.includes('.tiktok.com');
+    }
+  } catch (_) {}
+
+  return false;
+}
+
+/**
+ * Nạp cookies đã lưu từ saved_cookies.json vào Context
+ */
+async function loadSavedCookies(ctx) {
+  try {
+    if (fs.existsSync(savedCookiesFile) && ctx) {
+      const raw = fs.readFileSync(savedCookiesFile, 'utf8');
+      const cookies = JSON.parse(raw);
+      if (Array.isArray(cookies) && cookies.length > 0) {
+        await ctx.addCookies(cookies);
+        lastKnownLoggedIn = true;
+        return true;
+      }
+    }
+  } catch (_) {}
+  return false;
+}
+
+/**
+ * Dọn dẹp lockfile cũ nếu trình duyệt trước đó bị crash
+ */
+function cleanupStaleLockfile() {
+  try {
+    const lock = path.join(profileDir, 'lockfile');
+    if (fs.existsSync(lock)) {
+      try {
+        const fd = fs.openSync(lock, 'r+');
+        fs.closeSync(fd);
+        fs.unlinkSync(lock);
+      } catch (_) {}
+    }
+  } catch (_) {}
 }
 
 async function getBrowserContext(headless = false) {
-  if (context) return context;
+  // Nếu đã có context nhưng người dùng muốn mở GUI đăng nhập mà context cũ đang là headless, đóng để mở lại GUI
+  if (context) {
+    if (!headless && currentIsHeadless) {
+      try {
+        await context.close();
+      } catch (_) {}
+      context = null;
+      activePage = null;
+    } else {
+      return context;
+    }
+  }
+
   if (!playwrightChromium) throw new Error('Playwright Chromium chưa sẵn sàng');
 
+  cleanupStaleLockfile();
+
+  currentIsHeadless = !!headless;
   const launchOptions = {
     headless: !!headless,
     args: [
@@ -61,9 +162,12 @@ async function getBrowserContext(headless = false) {
       '--no-sandbox',
       '--disable-setuid-sandbox',
       '--disable-infobars',
+      '--no-first-run',
+      '--no-default-browser-check',
+      '--start-maximized',
       '--window-size=1280,820'
     ],
-    viewport: { width: 1280, height: 760 }
+    viewport: null
   };
 
   // Thử dùng Chrome thực của hệ thống, nếu không có thì fallback sang Chromium / Edge
@@ -73,15 +177,20 @@ async function getBrowserContext(headless = false) {
       channel: 'chrome'
     });
   } catch (errChrome) {
+    cleanupStaleLockfile();
     try {
       context = await playwrightChromium.launchPersistentContext(profileDir, {
         ...launchOptions,
         channel: 'msedge'
       });
     } catch (errEdge) {
+      cleanupStaleLockfile();
       context = await playwrightChromium.launchPersistentContext(profileDir, launchOptions);
     }
   }
+
+  // Tự động nạp cookies đã lưu
+  await loadSavedCookies(context);
 
   context.on('close', () => {
     context = null;
@@ -113,7 +222,7 @@ async function checkLoggedIn(page, ctx) {
     }
   } catch (_) {}
 
-  // 2. Kiểm tra qua file cookie database của profile Chrome
+  // 2. Kiểm tra qua file cookie database hoặc saved_cookies.json
   if (checkSavedCookies()) {
     lastKnownLoggedIn = true;
     return true;
@@ -136,6 +245,48 @@ async function checkLoggedIn(page, ctx) {
   }
 
   return lastKnownLoggedIn;
+}
+
+async function setCookies(cookieInput) {
+  try {
+    const list = parseCookieInput(cookieInput);
+    if (!list || list.length === 0) {
+      emit({ type: 'error', message: 'Không tìm thấy cookie hợp lệ từ nội dung vừa nhập. Hãy kiểm tra lại (cần có sessionid hoặc chuỗi cookie đầy đủ).' });
+      return;
+    }
+
+    // Lưu vào saved_cookies.json để nạp lại vĩnh viễn
+    try {
+      fs.writeFileSync(savedCookiesFile, JSON.stringify(list, null, 2), 'utf8');
+    } catch (eWrite) {
+      console.error('Không thể lưu saved_cookies.json:', eWrite.message);
+    }
+
+    lastKnownLoggedIn = true;
+
+    // Nạp vào context hiện tại nếu đang mở
+    const ctx = await getBrowserContext(false);
+    await ctx.addCookies(list);
+
+    // Nếu activePage đang mở, tải lại trang
+    if (activePage && !activePage.isClosed()) {
+      try {
+        const cur = activePage.url();
+        if (cur && cur.includes('tiktok.com')) {
+          await activePage.reload({ timeout: 20000, waitUntil: 'domcontentloaded' });
+        }
+      } catch (_) {}
+    }
+
+    emit({
+      type: 'status',
+      running: true,
+      loggedIn: true,
+      message: `✅ Đã lưu và kích hoạt ${list.length} Cookie TikTok! Trạng thái: ĐÃ ĐĂNG NHẬP.`
+    });
+  } catch (err) {
+    emit({ type: 'error', message: `Lỗi khi lưu cookie: ${err.message}` });
+  }
 }
 
 async function openLive(url, headless = false) {
@@ -171,12 +322,17 @@ async function openLogin() {
   try {
     isClosing = false;
     emit({ type: 'status', running: true, loggedIn: lastKnownLoggedIn, message: 'Đang mở cửa sổ đăng nhập TikTok...' });
-    // Mở headful để người dùng thấy và quét mã QR hoặc đăng nhập
+    
+    // Mở headful GUI để người dùng thấy rõ cửa sổ trên màn hình
     const ctx = await getBrowserContext(false);
     const pages = ctx.pages();
     activePage = pages.length > 0 ? pages[0] : await ctx.newPage();
 
     await activePage.goto('https://www.tiktok.com/login', { timeout: 35000, waitUntil: 'domcontentloaded' });
+    try {
+      await activePage.bringToFront();
+    } catch (_) {}
+
     emit({
       type: 'status',
       running: true,
@@ -193,6 +349,15 @@ async function openLogin() {
       const ok = await checkLoggedIn(activePage, ctx);
       if (ok) {
         clearInterval(pollTimer);
+
+        // Lưu cookie vào saved_cookies.json để lần sau không cần đăng nhập lại
+        try {
+          const cks = await ctx.cookies('https://www.tiktok.com');
+          if (cks && cks.length > 0) {
+            fs.writeFileSync(savedCookiesFile, JSON.stringify(cks, null, 2), 'utf8');
+          }
+        } catch (_) {}
+
         const targetLive = currentLiveUrl || 'https://www.tiktok.com/@tranyennhi0987/live';
         emit({
           type: 'status',
@@ -256,19 +421,16 @@ async function sendComment(text) {
   try {
     // 1. Tự động dọn dẹp các popup cản trở trước khi tìm ô chat
     try {
-      // Đóng cookie banner nếu có
       const cookieBtn = await activePage.$('button[id*="cookie" i], button[class*="cookie" i], [data-e2e="cookie-banner"] button');
       if (cookieBtn && await cookieBtn.isVisible()) {
         await cookieBtn.click();
         await activePage.waitForTimeout(300);
       }
-      // Đóng modal app / popup thông báo nếu có
       const closeBtn = await activePage.$('[data-e2e="modal-close-inner-button"], [aria-label="Close"], button.btn-close, [data-e2e="close-icon"]');
       if (closeBtn && await closeBtn.isVisible()) {
         await closeBtn.click();
         await activePage.waitForTimeout(300);
       }
-      // Mở khung chat nếu đang bị thu nhỏ (collapse)
       const expandChatBtn = await activePage.$('[data-e2e="expand-chat-button"], button[aria-label*="chat" i], [class*="ChatRoomFold"]');
       if (expandChatBtn && await expandChatBtn.isVisible()) {
         await expandChatBtn.click();
@@ -321,7 +483,6 @@ async function sendComment(text) {
       '[placeholder*="Chat..." i]'
     ];
 
-    // Chờ ô nhập bình luận xuất hiện (tối đa 5s phòng khi live đang tải chat)
     let inputElement = null;
     const startTime = Date.now();
     while (!inputElement && (Date.now() - startTime < 5000)) {
@@ -344,7 +505,6 @@ async function sendComment(text) {
       try {
         const found = await activePage.evaluate(() => {
           const all = Array.from(document.querySelectorAll('input, textarea, div[contenteditable="true"], [role="textbox"]'));
-          // 1. Theo placeholder/aria
           for (const el of all) {
             const ph = (el.getAttribute('placeholder') || '').toLowerCase();
             const aria = (el.getAttribute('aria-label') || '').toLowerCase();
@@ -353,7 +513,6 @@ async function sendComment(text) {
               return true;
             }
           }
-          // 2. Theo tọa độ góc dưới bên phải (vùng khung chat)
           for (const el of all) {
             const rect = el.getBoundingClientRect();
             if (rect.width > 30 && rect.height > 15 && rect.bottom > window.innerHeight * 0.65 && rect.left > window.innerWidth * 0.45) {
@@ -370,7 +529,6 @@ async function sendComment(text) {
     }
 
     if (!inputElement) {
-      // Phân tích trạng thái phòng Live và giao diện để đưa ra nguyên nhân chính xác
       let isEndedOrOffline = false;
       let isLoginRequired = false;
       let isCommentsOff = false;
@@ -387,7 +545,6 @@ async function sendComment(text) {
         isLoginRequired = pageStatus.hasLogin;
         isCommentsOff = pageStatus.hasCommentsOff;
 
-        // Chụp ảnh chẩn đoán lỗi lưu vào disk
         const debugPath = path.resolve(profileDir, 'debug_comment_error.png');
         await activePage.screenshot({ path: debugPath }).catch(() => {});
       } catch (_) {}
@@ -398,7 +555,7 @@ async function sendComment(text) {
       if (isEndedOrOffline) {
         finalError = 'Phòng Live hiện đang NGOẠI TUYẾN (Offline). TikTok chỉ hiển thị ô nhập chat khi tài khoản đang PHÁT TRỰC TIẾP thực tế. Vui lòng bật Live trên TikTok trước khi gửi thử bình luận!';
       } else if (!loggedIn || isLoginRequired) {
-        finalError = 'Tài khoản chưa đăng nhập TikTok. Vui lòng bấm "Mở trình duyệt đăng nhập TikTok" trước!';
+        finalError = 'Tài khoản chưa đăng nhập TikTok. Bạn có thể dán mã Cookie/SessionID từ trình duyệt hiện tại hoặc bấm "Mở trình duyệt đăng nhập TikTok"!';
       } else if (isCommentsOff) {
         finalError = 'Chủ phòng Live đã tắt tính năng bình luận trong phiên phát sóng này.';
       } else {
@@ -453,7 +610,6 @@ async function sendComment(text) {
 
     // Luôn luôn nhấn Enter để đảm bảo gửi tin nhắn
     await activePage.keyboard.press('Enter');
-
     await activePage.waitForTimeout(600);
 
     emit({
@@ -505,6 +661,10 @@ process.stdin.on('data', async (chunk) => {
           break;
         case 'open_login':
           await openLogin();
+          break;
+        case 'set_cookies':
+        case 'import_cookies':
+          await setCookies(cmd.cookie || cmd.cookies);
           break;
         case 'comment':
           await sendComment(cmd.text);

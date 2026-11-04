@@ -35,10 +35,13 @@ public class TikTokCommenterService : ITikTokCommenterService, IDisposable
             ? Path.Combine(env.ContentRootPath, "data")
             : Path.GetFullPath(Path.Combine(env.ContentRootPath, "..", "..", "data"));
         string cookiePath = Path.Combine(dataDir, "tiktok_browser_profile", "Default", "Network", "Cookies");
-        if (File.Exists(cookiePath) && new FileInfo(cookiePath).Length > 1000)
+        string savedCookieJson = Path.Combine(dataDir, "tiktok_browser_profile", "saved_cookies.json");
+
+        if ((File.Exists(cookiePath) && new FileInfo(cookiePath).Length > 1000) ||
+            (File.Exists(savedCookieJson) && new FileInfo(savedCookieJson).Length > 10))
         {
             _state.LoggedIn = true;
-            _state.StatusMessage = "Đã nhận diện phiên đăng nhập TikTok từ profile lưu trữ";
+            _state.StatusMessage = "Đã nhận diện phiên đăng nhập TikTok từ profile/cookie lưu trữ";
             _state.LastError = null;
         }
 
@@ -139,6 +142,53 @@ public class TikTokCommenterService : ITikTokCommenterService, IDisposable
         return GetState();
     }
 
+    public async Task<TikTokCommenterState> SetCookieAsync(string cookie)
+    {
+        string clean = (cookie ?? "").Trim();
+        if (string.IsNullOrWhiteSpace(clean))
+        {
+            lock (_lock)
+            {
+                _state.LastError = "Nội dung cookie trống.";
+            }
+            BroadcastState();
+            return GetState();
+        }
+
+        lock (_lock)
+        {
+            EnsureProcessStarted();
+            _state.Running = true;
+            _state.StatusMessage = "Đang nạp Cookie TikTok...";
+            _state.LastError = null;
+        }
+
+        SendCommand(new { action = "set_cookies", cookie = clean });
+        BroadcastState();
+
+        await Task.Delay(1200);
+        return GetState();
+    }
+
+    public async Task<bool> OpenSystemBrowserLoginAsync()
+    {
+        try
+        {
+            var psi = new ProcessStartInfo
+            {
+                FileName = "https://www.tiktok.com/login",
+                UseShellExecute = true
+            };
+            Process.Start(psi);
+            return await Task.FromResult(true);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "[PlaywrightCommenter] Lỗi mở trình duyệt hệ thống");
+            return false;
+        }
+    }
+
     public async Task<bool> SendCommentAsync(string text, bool ignoreCooldown = false)
     {
         string clean = (text ?? "").Trim();
@@ -221,7 +271,7 @@ public class TikTokCommenterService : ITikTokCommenterService, IDisposable
             StandardOutputEncoding = Encoding.UTF8,
             StandardErrorEncoding = Encoding.UTF8,
             UseShellExecute = false,
-            CreateNoWindow = true,
+            CreateNoWindow = false,
             WorkingDirectory = scriptDir
         };
         startInfo.EnvironmentVariables["NODE_SKIP_PLATFORM_CHECK"] = "1";
@@ -400,4 +450,3 @@ public class TikTokCommenterService : ITikTokCommenterService, IDisposable
         StopProcess();
     }
 }
-

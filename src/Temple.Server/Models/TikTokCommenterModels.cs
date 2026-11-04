@@ -41,3 +41,8 @@ public class StartCommenterParams
     public bool? Headless { get; set; }
 }
 
+public class SetCookieParams
+{
+    [JsonPropertyName("cookie")]
+    public string? Cookie { get; set; }
+}

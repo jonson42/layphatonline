@@ -57,6 +57,9 @@ export default function AdminPanel({ state, callRpc, onCloseAdmin }) {
     }
   }, [state?.settings?.autoCommentEnabled]);
   const [loadingComment, setLoadingComment] = useState(false);
+  const [cookieInput, setCookieInput] = useState('');
+  const [showCookieGuide, setShowCookieGuide] = useState(false);
+  const [loadingCookie, setLoadingCookie] = useState(false);
 
   const [localCommenter, setLocalCommenter] = React.useState(null);
   const commenter = localCommenter || state?.commenter;
@@ -112,6 +115,40 @@ export default function AdminPanel({ state, callRpc, onCloseAdmin }) {
       alert('Đã mở cửa sổ trình duyệt TikTok! Bạn vui lòng đăng nhập hoặc quét mã QR trên màn hình trình duyệt đó.');
     } catch (e) {
       setRpcOutput(`Login Error: ${e.message}`);
+    }
+  };
+
+  const handleSaveCookie = async () => {
+    if (!cookieInput.trim()) {
+      alert('Vui lòng dán Cookie hoặc Session ID từ TikTok!');
+      return;
+    }
+    setLoadingCookie(true);
+    try {
+      const res = await callRpc('live.setCookie', { cookie: cookieInput.trim() });
+      if (res) setLocalCommenter(res);
+      setRpcOutput(JSON.stringify(res, null, 2));
+      if (res?.loggedIn) {
+        alert('🎉 Đã nạp Cookie TikTok thành công! Bot đã sẵn sàng gửi bình luận.');
+        setCookieInput('');
+      } else if (res?.lastError) {
+        alert(`Lỗi: ${res.lastError}`);
+      }
+    } catch (e) {
+      setRpcOutput(`Cookie Error: ${e.message}`);
+      alert(`Lỗi: ${e.message}`);
+    } finally {
+      setLoadingCookie(false);
+    }
+  };
+
+  const handleOpenSystemBrowserLogin = async () => {
+    try {
+      const res = await callRpc('live.openSystemBrowserLogin');
+      setRpcOutput(JSON.stringify(res, null, 2));
+      alert('🌐 Đã mở TikTok trên trình duyệt hiện tại của máy tính! Bạn hãy đăng nhập tài khoản rồi copy Cookie / sessionid dán vào ô bên dưới.');
+    } catch (e) {
+      setRpcOutput(`Browser Error: ${e.message}`);
     }
   };
 
@@ -1087,6 +1124,104 @@ export default function AdminPanel({ state, callRpc, onCloseAdmin }) {
               </div>
             </div>
 
+            {/* PHƯƠNG ÁN 1: DÙNG TRÌNH DUYỆT HIỆN TẠI QUA COOKIE / SESSION ID */}
+            <div style={{
+              background: 'linear-gradient(135deg, rgba(16, 185, 129, 0.16) 0%, rgba(6, 78, 59, 0.32) 100%)',
+              border: '1.5px solid rgba(52, 211, 153, 0.45)',
+              borderRadius: '14px',
+              padding: '16px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '10px',
+              boxShadow: '0 4px 14px rgba(0,0,0,0.3)'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span style={{ fontSize: '18px' }}>⚡</span>
+                  <strong style={{ fontSize: '15px', color: '#6ee7b7' }}>
+                    Cách 1: Lấy Phiên TikTok Trực Tiếp Từ Trình Duyệt Hiện Tại (Nhanh Nhất - Không Cần Quét QR)
+                  </strong>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setShowCookieGuide(!showCookieGuide)}
+                  style={{
+                    background: 'rgba(255, 255, 255, 0.12)',
+                    color: '#a7f3d0',
+                    border: '1px solid #6ee7b7',
+                    borderRadius: '6px',
+                    padding: '5px 12px',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    cursor: 'pointer'
+                  }}
+                >
+                  {showCookieGuide ? '▲ Ẩn Hướng Dẫn' : '💡 Xem Hướng Dẫn Lấy Cookie (5 Giây) ▼'}
+                </button>
+              </div>
+
+              {showCookieGuide && (
+                <div style={{
+                  background: 'rgba(0, 0, 0, 0.55)',
+                  borderRadius: '10px',
+                  padding: '12px 14px',
+                  fontSize: '13px',
+                  color: '#e2e8f0',
+                  lineHeight: '1.6',
+                  border: '1px dashed rgba(110, 231, 183, 0.5)'
+                }}>
+                  <div style={{ fontWeight: 700, color: '#fde047', marginBottom: '4px' }}>
+                    📌 Cách lấy Cookie từ tab TikTok đã đăng nhập trên trình duyệt hiện tại:
+                  </div>
+                  <div>1. Mở tab TikTok (<a href="https://www.tiktok.com" target="_blank" rel="noreferrer" style={{ color: '#93c5fd' }}>tiktok.com</a>) trên trình duyệt này (nơi bạn đã đăng nhập tài khoản).</div>
+                  <div>2. Nhấn phím <strong>F12</strong> (hoặc chuột phải chọn <em>Kiểm tra / Inspect</em>) → chọn tab <strong>Console</strong>.</div>
+                  <div>3. Gõ hoặc dán dòng lệnh: <code style={{ color: '#67e8f9', background: '#1e293b', padding: '2px 6px', borderRadius: '4px' }}>copy(document.cookie)</code> rồi nhấn <strong>Enter</strong>.</div>
+                  <div>4. Quay lại đây dán vào ô bên dưới rồi bấm <strong>"Lưu Cookie & Đăng Nhập Ngay"</strong> là xong!</div>
+                  <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '4px' }}>
+                    *(Hoặc vào thẻ Application → Cookies → tiktok.com → copy riêng giá trị của <strong>sessionid</strong>)*
+                  </div>
+                </div>
+              )}
+
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <input
+                  type="text"
+                  value={cookieInput}
+                  onChange={(e) => setCookieInput(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSaveCookie()}
+                  placeholder="Dán Cookie hoặc Session ID từ TikTok vào đây (ví dụ: sessionid=xxxx hoặc token)..."
+                  style={{
+                    flex: 1,
+                    background: '#091510',
+                    border: '1px solid rgba(110, 231, 183, 0.4)',
+                    borderRadius: '10px',
+                    padding: '10px 14px',
+                    color: '#fff',
+                    fontSize: '13px',
+                    fontFamily: 'monospace'
+                  }}
+                />
+                <button
+                  type="button"
+                  onClick={handleSaveCookie}
+                  disabled={loadingCookie}
+                  style={{
+                    background: 'linear-gradient(180deg, #10b981 0%, #047857 100%)',
+                    color: '#fff',
+                    padding: '10px 20px',
+                    borderRadius: '10px',
+                    border: '1px solid #6ee7b7',
+                    fontWeight: 700,
+                    fontSize: '13px',
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  {loadingCookie ? 'Đang lưu...' : '💾 Lưu Cookie & Đăng Nhập Ngay'}
+                </button>
+              </div>
+            </div>
+
             {/* Các nút điều khiển chính */}
             <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
               {!commenter?.running ? (
@@ -1126,6 +1261,24 @@ export default function AdminPanel({ state, callRpc, onCloseAdmin }) {
               )}
 
               <button
+                onClick={handleOpenSystemBrowserLogin}
+                style={{
+                  background: 'linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%)',
+                  color: '#fff',
+                  padding: '10px 18px',
+                  borderRadius: '10px',
+                  border: '1px solid #93c5fd',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}
+              >
+                🌐 Mở TikTok Trên Trình Duyệt Máy Tính (Chrome)
+              </button>
+
+              <button
                 onClick={handleOpenLogin}
                 style={{
                   background: 'linear-gradient(180deg, #f59e0b 0%, #b45309 100%)',
@@ -1137,7 +1290,7 @@ export default function AdminPanel({ state, callRpc, onCloseAdmin }) {
                   cursor: 'pointer'
                 }}
               >
-                🔑 Mở Trình Duyệt Đăng Nhập TikTok
+                🔑 Mở Cửa Sổ Riêng Playwright (Quét QR)
               </button>
 
               <button
