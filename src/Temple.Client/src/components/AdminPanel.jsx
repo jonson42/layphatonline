@@ -51,7 +51,15 @@ export default function AdminPanel({ state, callRpc, onCloseAdmin }) {
   const [chatSample, setChatSample] = useState(null);
   const [loadingComment, setLoadingComment] = useState(false);
 
-  const commenter = state?.commenter;
+  const [localCommenter, setLocalCommenter] = React.useState(null);
+  const commenter = localCommenter || state?.commenter;
+
+  const loadCommenterStatus = async () => {
+    try {
+      const res = await callRpc('live.getCommenterStatus');
+      if (res) setLocalCommenter(res);
+    } catch (_) {}
+  };
 
   // Tải câu mẫu LiveChatGenerator và trạng thái commenter
   const loadChatSample = async () => {
@@ -63,12 +71,14 @@ export default function AdminPanel({ state, callRpc, onCloseAdmin }) {
 
   React.useEffect(() => {
     loadChatSample();
+    loadCommenterStatus();
   }, []);
 
   const handleStartCommenter = async () => {
     setLoadingComment(true);
     try {
       const res = await callRpc('live.startCommenter', { username: ttUser, headless: false });
+      if (res) setLocalCommenter(res);
       setRpcOutput(JSON.stringify(res, null, 2));
     } catch (e) {
       setRpcOutput(`Commenter Error: ${e.message}`);
@@ -80,6 +90,7 @@ export default function AdminPanel({ state, callRpc, onCloseAdmin }) {
   const handleStopCommenter = async () => {
     try {
       const res = await callRpc('live.stopCommenter');
+      if (res) setLocalCommenter(res);
       setRpcOutput(JSON.stringify(res, null, 2));
     } catch (e) {
       setRpcOutput(`Commenter Error: ${e.message}`);
@@ -89,6 +100,7 @@ export default function AdminPanel({ state, callRpc, onCloseAdmin }) {
   const handleOpenLogin = async () => {
     try {
       const res = await callRpc('live.openLogin');
+      if (res) setLocalCommenter(res);
       setRpcOutput(JSON.stringify(res, null, 2));
       alert('Đã mở cửa sổ trình duyệt TikTok! Bạn vui lòng đăng nhập hoặc quét mã QR trên màn hình trình duyệt đó.');
     } catch (e) {

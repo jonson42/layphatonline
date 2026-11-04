@@ -30,7 +30,9 @@ public class RpcDispatcher
         switch (method)
         {
             case "temple.getState":
-                return _templeService.GetPublicState();
+                var pubState = _templeService.GetPublicState();
+                pubState.Commenter = _commenterService.GetState();
+                return pubState;
 
             case "temple.burnIncense":
                 var pBurn = DeserializeParams<BurnIncenseParams>(parameters);
