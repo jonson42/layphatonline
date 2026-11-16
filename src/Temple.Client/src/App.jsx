@@ -5,6 +5,7 @@ import TempleStage from './components/TempleStage';
 import BothiStage from './components/BothiStage';
 import PhongSinhStage from './components/PhongSinhStage';
 import XinChuStage from './components/XinChuStage';
+import TuTienStage from './components/TuTienStage';
 import QuickDock from './components/QuickDock';
 import AdminPanel from './components/AdminPanel';
 
@@ -28,10 +29,12 @@ export default function App() {
   // - obs = 2: Cố định chế độ Bố thí ('bothi')
   // - obs = 3: Cố định chế độ Phóng sinh chim ('phongsinh')
   // - obs = 4: Cố định chế độ Xem quẻ / Thầy bói ('xinchu')
+  // - obs = 5: Cố định chế độ Tu Tiên Ngự Kiếm Độ Kiếp ('tutien')
   const effectiveMode = useMemo(() => {
     if (obsParam === '2') return 'bothi';
     if (obsParam === '3') return 'phongsinh';
     if (obsParam === '4') return 'xinchu';
+    if (obsParam === '5') return 'tutien';
     return state?.settings?.mode || 'temple';
   }, [obsParam, state?.settings?.mode]);
 
@@ -76,7 +79,15 @@ export default function App() {
 
   return (
     <div className="app-workspace">
-      {effectiveMode === 'phongsinh' ? (
+      {effectiveMode === 'tutien' ? (
+        <TuTienStage
+          state={state}
+          activeEvent={activeEvent}
+          audio={audio}
+          callRpc={callRpc}
+          obsMode={obsMode}
+        />
+      ) : effectiveMode === 'phongsinh' ? (
         <PhongSinhStage
           state={state}
           activeEvent={activeEvent}

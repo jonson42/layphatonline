@@ -172,7 +172,7 @@ export default function QuickDock({ state, audio, callRpc, onOpenAdmin }) {
         <div style={{ fontSize: '12px', fontWeight: 700, color: '#ffd54f', marginBottom: '8px' }}>
           🔄 CHẾ ĐỘ PHÁT LIVE HIỆN TẠI:
         </div>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '4px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '3px' }}>
           <button
             style={{
               padding: '10px 4px',

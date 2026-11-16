@@ -309,7 +309,7 @@ public class TempleService : ITempleService
     public TempleEventResult StrikeWoodenFish(StrikeWoodenFishParams p)
     {
         string mode = _state.Settings.Mode;
-        if (mode == "bothi" || mode == "phongsinh" || mode == "xinchu")
+        if (mode == "bothi" || mode == "phongsinh" || mode == "xinchu" || mode == "tutien")
         {
             return CommonThankYou(p.User, p.UniqueId, p.Avatar, "heart", p.Count, 0, null, p.ReadTts ?? true, p.TtsText);
         }
@@ -474,6 +474,12 @@ public class TempleService : ITempleService
                 ttsText = $"Thầy Bói kính chào {dev.Name} đã ghé gian hàng xem bói và xin chữ! Nhờ thí chủ cho em xin vài đồng, thả tim hoặc follow để thầy đoán trọn quẻ, viết chữ giải hạn nghênh tài lộc ạ! {wish}.";
                 wishText = "Nhờ anh/chị vừa vào live cho em xin vài đồng, thả tim hoặc follow để thầy đoán trọn quẻ, viết chữ giải hạn ạ! 🔮🌸🙏";
                 evtType = "xinchuGreet";
+            }
+            else if (mode == "tutien")
+            {
+                ttsText = $"Tiên Môn kính chào đạo hữu {dev.Name} đã giá lâm Đỉnh Tiên Sơn! Nhờ đạo hữu thả tim và trợ duyên linh khí để sớm ngày phi thăng độ kiếp! {wish}.";
+                wishText = "Nhờ đạo hữu thả tim và trợ duyên linh khí để sớm ngày phi thăng độ kiếp! ⚡🗡️✨";
+                evtType = "tutienGreet";
             }
             else
             {
@@ -814,7 +820,7 @@ public class TempleService : ITempleService
     public TempleEventResult OfferGift(OfferGiftParams p)
     {
         string mode = _state.Settings.Mode;
-        if (mode == "bothi" || mode == "phongsinh" || mode == "xinchu")
+        if (mode == "bothi" || mode == "phongsinh" || mode == "xinchu" || mode == "tutien")
         {
             return CommonThankYou(p.User, p.UniqueId, p.Avatar, "bonus", 1, p.Coins, p.GiftName, p.ReadTts ?? true, null, p.Wish);
         }
